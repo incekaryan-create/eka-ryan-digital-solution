@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard - Eka Ryan Portfolio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+          colors: { zinc: { 850: '#1c1c22', 950: '#09090b' } }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { scrollbar-width: thin; scrollbar-color: #3f3f46 #18181b; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #18181b; }
+    ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+    .sidebar-link.active { background: #dc2626; color: #fff; }
+    .sidebar-link:not(.active):hover { background: #27272a; color: #fff; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: #dc2626; box-shadow: 0 0 0 2px rgba(220,38,38,0.15); }
+    .modal-enter { animation: modalIn 0.2s ease; }
+    @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    .toast { animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards; }
+    @keyframes toastIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes toastOut { to { transform: translateX(100%); opacity: 0; } }
+    .row-hover:hover { background: rgba(255,255,255,0.02); }
+  </style>
+</head>
+<body class="bg-zinc-950 text-white min-h-screen font-sans">
+
+  <!-- LOGIN -->
+  <div id="login-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950">
+    <div class="w-full max-w-sm mx-4 text-center">
+      <div class="inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-red-600/10 text-red-500 mb-4">
+        <svg class="h-7 w-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <h2 class="text-xl font-bold mb-1">Admin Panel</h2>
+      <p class="text-xs text-zinc-500 mb-6">Masuk untuk mengelola portfolio</p>
+      <form id="login-form" class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
+        <div class="mb-4 text-left">
+          <label class="block text-[10px] text-zinc-400 uppercase tracking-widest mb-1.5 font-semibold">Username</label>
+          <input id="login-user" type="text" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-white" />
+        </div>
+        <div class="mb-5 text-left">
+          <label class="block text-[10px] text-zinc-400 uppercase tracking-widest mb-1.5 font-semibold">Password</label>
+          <input id="login-pass" type="password" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-white" />
+        </div>
+        <button type="submit" class="w-full rounded-lg bg-red-600 hover:bg-red-700 py-2.5 text-xs font-bold tracking-widest transition-all uppercase">MASUK</button>
+        <p id="login-error" class="text-xs text-red-500 mt-3 hidden">Username atau password salah</p>
+      </form>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="hidden flex">
+
+    <!-- SIDEBAR -->
+    <aside class="fixed left-0 top-0 bottom-0 w-56 bg-zinc-900/50 border-r border-zinc-800 flex flex-col z-30">
+      <div class="p-5 border-b border-zinc-800">
+        <div class="flex items-center gap-2.5">
+          <div class="h-8 w-8 rounded-lg bg-red-600 flex items-center justify-center text-xs font-black">ER</div>
+          <div>
+            <p class="text-xs font-bold leading-tight">Eka Ryan</p>
+            <p class="text-[9px] text-zinc-500 font-mono">ADMIN PANEL</p>
+          </div>
+        </div>
+      </div>
+      <nav class="flex-1 p-3 space-y-1">
+        <a href="#" onclick="go('dashboard')" data-page="dashboard" class="sidebar-link active flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all">
+          <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Beranda
+        </a>
+        <a href="#" onclick="go('services')" data-page="services" class="sidebar-link flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-zinc-400 transition-all">
+          <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          Layanan
+        </a>
+        <a href="#" onclick="go('workflow')" data-page="workflow" class="sidebar-link flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-zinc-400 transition-all">
+          <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Alur Kerja
+        </a>
+        <a href="#" onclick="go('skills')" data-page="skills" class="sidebar-link flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-zinc-400 transition-all">
+          <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Keahlian
+        </a>
+        <a href="#" onclick="go('addons')" data-page="addons" class="sidebar-link flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-zinc-400 transition-all">
+          <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          Fitur Tambahan
+        </a>
+        <a href="#" onclick="go('config')" data-page="config" class="sidebar-link flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-zinc-400 transition-all">
+          <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          Pengaturan
+        </a>
+        <div class="pt-3 mt-3 border-t border-zinc-800">
+          <a href="#" onclick="go('messages')" data-page="messages" class="sidebar-link flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-zinc-400 transition-all">
+            <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Pesan
+            <span id="sidebar-msg-badge" class="ml-auto hidden bg-red-600 text-[8px] font-bold px-1.5 py-0.5 rounded-full">0</span>
+          </a>
+        </div>
+      </nav>
+      <div class="p-3 border-t border-zinc-800">
+        <a href="index.html" target="_blank" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-zinc-500 hover:text-white hover:bg-zinc-800 transition-all">
+          <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Lihat Website
+        </a>
+        <button onclick="logout()" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-zinc-500 hover:text-red-500 hover:bg-zinc-800 transition-all">
+          <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Keluar
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-1 ml-56">
+      <!-- TOPBAR -->
+      <header class="sticky top-0 z-20 h-14 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md flex items-center justify-between px-6">
+        <h1 id="page-title" class="text-sm font-bold">Beranda</h1>
+        <div class="flex items-center gap-2">
+          <span class="text-[10px] text-zinc-600 font-mono" id="current-time"></span>
+        </div>
+      </header>
+
+      <!-- PAGES -->
+      <div class="p-6">
+
+        <!-- PAGE: DASHBOARD -->
+        <div id="page-dashboard" class="page">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4">
+              <p class="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">Layanan</p>
+              <p class="text-2xl font-bold mt-1" id="stat-services">0</p>
+            </div>
+            <div class="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4">
+              <p class="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">Keahlian</p>
+              <p class="text-2xl font-bold mt-1" id="stat-skills">0</p>
+            </div>
+            <div class="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4">
+              <p class="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">Alur Kerja</p>
+              <p class="text-2xl font-bold mt-1" id="stat-workflow">0</p>
+            </div>
+            <div class="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4">
+              <p class="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">Pesan</p>
+              <p class="text-2xl font-bold mt-1 text-red-500" id="stat-messages">0</p>
+              <p class="text-[10px] text-zinc-600 mt-0.5" id="stat-unread">0 belum dibaca</p>
+            </div>
+          </div>
+          <div class="rounded-xl border border-zinc-800 bg-zinc-900/30 p-6">
+            <h3 class="text-sm font-bold mb-1">Selamat Datang, Eka Ryan</h3>
+            <p class="text-xs text-zinc-500">Kelola portfolio Anda dari panel ini. Pilih menu di sidebar untuk mulai mengedit.</p>
+          </div>
+        </div>
+
+        <!-- PAGE: SERVICES (CRUD) -->
+        <div id="page-services" class="page hidden">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <p class="text-[10px] text-red-500 font-semibold uppercase tracking-widest">Manajemen</p>
+              <h2 class="text-lg font-bold">Layanan</h2>
+            </div>
+            <button onclick="openServiceModal()" class="flex items-center gap-1.5 rounded-lg bg-red-600 hover:bg-red-700 px-4 py-2 text-[10px] font-bold tracking-widest uppercase transition-all">
+              <svg class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Tambah
+            </button>
+          </div>
+          <div class="rounded-xl border border-zinc-800 overflow-hidden">
+            <div class="bg-zinc-900/50 px-4 py-2.5 border-b border-zinc-800 flex items-center gap-3">
+              <input id="search-services" type="text" placeholder="Cari layanan..." oninput="renderServicesTable()" class="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-white placeholder-zinc-600 w-64" />
+              <span class="text-[10px] text-zinc-600 font-mono" id="count-services">0 item</span>
+            </div>
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-zinc-800 text-left">
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider w-12">#</th>
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">Layanan</th>
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">Harga</th>
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">Tags</th>
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider w-24">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-services"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PAGE: WORKFLOW (CRUD) -->
+        <div id="page-workflow" class="page hidden">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <p class="text-[10px] text-red-500 font-semibold uppercase tracking-widest">Manajemen</p>
+              <h2 class="text-lg font-bold">Alur Kerja</h2>
+            </div>
+            <button onclick="openWorkflowModal()" class="flex items-center gap-1.5 rounded-lg bg-red-600 hover:bg-red-700 px-4 py-2 text-[10px] font-bold tracking-widest uppercase transition-all">
+              <svg class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Tambah
+            </button>
+          </div>
+          <div class="rounded-xl border border-zinc-800 overflow-hidden">
+            <div class="bg-zinc-900/50 px-4 py-2.5 border-b border-zinc-800">
+              <span class="text-[10px] text-zinc-600 font-mono" id="count-workflow">0 langkah</span>
+            </div>
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-zinc-800 text-left">
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider w-12">#</th>
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">Judul</th>
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">Deskripsi</th>
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider w-24">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-workflow"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PAGE: SKILLS (CRUD) -->
+        <div id="page-skills" class="page hidden">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <p class="text-[10px] text-red-500 font-semibold uppercase tracking-widest">Manajemen</p>
+              <h2 class="text-lg font-bold">Keahlian</h2>
+            </div>
+            <button onclick="openSkillModal()" class="flex items-center gap-1.5 rounded-lg bg-red-600 hover:bg-red-700 px-4 py-2 text-[10px] font-bold tracking-widest uppercase transition-all">
+              <svg class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Tambah
+            </button>
+          </div>
+          <div class="rounded-xl border border-zinc-800 overflow-hidden">
+            <div class="bg-zinc-900/50 px-4 py-2.5 border-b border-zinc-800 flex items-center gap-3">
+              <input id="search-skills" type="text" placeholder="Cari keahlian..." oninput="renderSkillsTable()" class="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-white placeholder-zinc-600 w-64" />
+              <span class="text-[10px] text-zinc-600 font-mono" id="count-skills">0 item</span>
+            </div>
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-zinc-800 text-left">
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider w-12">#</th>
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">Nama</th>
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">Kategori</th>
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider w-24">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-skills"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PAGE: ADD-ONS -->
+        <div id="page-addons" class="page hidden">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <p class="text-[10px] text-red-500 font-semibold uppercase tracking-widest">Manajemen</p>
+              <h2 class="text-lg font-bold">Fitur Tambahan</h2>
+            </div>
+            <button onclick="openAddonModal()" class="flex items-center gap-1.5 rounded-lg bg-red-600 hover:bg-red-700 px-4 py-2 text-[10px] font-bold tracking-widest uppercase transition-all">
+              <svg class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Tambah
+            </button>
+          </div>
+          <div class="rounded-xl border border-zinc-800 overflow-hidden">
+            <div class="bg-zinc-900/50 px-4 py-2.5 border-b border-zinc-800 flex items-center gap-3">
+              <input id="search-addons" type="text" placeholder="Cari fitur..." oninput="renderAddonsTable()" class="bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-white placeholder-zinc-600 w-64" />
+              <span class="text-[10px] text-zinc-600 font-mono" id="count-addons">0 item</span>
+            </div>
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-zinc-800 text-left">
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider w-12">#</th>
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">Nama</th>
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">Kategori</th>
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">Harga</th>
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider w-24">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-addons"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PAGE: CONFIG -->
+        <div id="page-config" class="page hidden">
+          <div class="mb-6">
+            <p class="text-[10px] text-red-500 font-semibold uppercase tracking-widest">Manajemen</p>
+            <h2 class="text-lg font-bold">Pengaturan Website</h2>
+          </div>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Hero -->
+            <div class="rounded-xl border border-zinc-800 bg-zinc-900/30 p-5">
+              <h3 class="text-xs font-bold mb-4 flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-red-500"></span> Hero / Beranda</h3>
+              <div class="space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                  <div><label class="block text-[10px] text-zinc-500 mb-1">Greeting</label><input id="cfg-hero-greeting" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+                  <div><label class="block text-[10px] text-zinc-500 mb-1">Nama</label><input id="cfg-hero-name" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+                </div>
+                <div><label class="block text-[10px] text-zinc-500 mb-1">Tagline</label><input id="cfg-hero-tagline" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+                <div><label class="block text-[10px] text-zinc-500 mb-1">Deskripsi</label><textarea id="cfg-hero-desc" rows="2" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white"></textarea></div>
+                <div>
+                  <label class="block text-[10px] text-zinc-500 mb-1">Foto Profil</label>
+                  <div class="flex gap-2">
+                    <input id="cfg-hero-image" class="flex-1 rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" placeholder="URL gambar atau upload" />
+                    <label class="cursor-pointer rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-[10px] font-bold text-zinc-400 hover:text-white hover:border-zinc-600 transition-all">
+                      <svg class="h-4 w-4 inline mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                      <input type="file" class="hidden" accept="image/*" onchange="uploadHeroImage(this)" />
+                    </label>
+                  </div>
+                  <div id="hero-preview" class="mt-2 hidden">
+                    <img id="hero-preview-img" class="w-20 h-20 rounded-lg object-cover border border-zinc-700" />
+                    <button onclick="deleteHeroImage()" class="mt-1 text-[9px] text-red-500 hover:text-red-400">Hapus Gambar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Contact -->
+            <div class="rounded-xl border border-zinc-800 bg-zinc-900/30 p-5">
+              <h3 class="text-xs font-bold mb-4 flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-red-500"></span> Kontak & Sosial</h3>
+              <div class="space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                  <div><label class="block text-[10px] text-zinc-500 mb-1">Email</label><input id="cfg-email" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+                  <div><label class="block text-[10px] text-zinc-500 mb-1">WhatsApp</label><input id="cfg-wa" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div><label class="block text-[10px] text-zinc-500 mb-1">Lokasi</label><input id="cfg-location" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+                  <div><label class="block text-[10px] text-zinc-500 mb-1">Website</label><input id="cfg-website" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div><label class="block text-[10px] text-zinc-500 mb-1">LinkedIn</label><input id="cfg-linkedin" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+                  <div><label class="block text-[10px] text-zinc-500 mb-1">Instagram</label><input id="cfg-instagram" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div><label class="block text-[10px] text-zinc-500 mb-1">TikTok</label><input id="cfg-tiktok" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+                  <div><label class="block text-[10px] text-zinc-500 mb-1">X / Twitter</label><input id="cfg-twitter" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+                </div>
+              </div>
+            </div>
+            <!-- Guarantee -->
+            <div class="rounded-xl border border-zinc-800 bg-zinc-900/30 p-5">
+              <h3 class="text-xs font-bold mb-4 flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-red-500"></span> Kartu Jaminan</h3>
+              <div class="space-y-3">
+                <div><label class="block text-[10px] text-zinc-500 mb-1">Judul</label><input id="cfg-guarantee-title" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+                <div><label class="block text-[10px] text-zinc-500 mb-1">Deskripsi</label><textarea id="cfg-guarantee-desc" rows="2" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white"></textarea></div>
+                <div><label class="block text-[10px] text-zinc-500 mb-1">Poin 1</label><input id="cfg-guarantee-p1" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+                <div><label class="block text-[10px] text-zinc-500 mb-1">Poin 2</label><input id="cfg-guarantee-p2" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+                <div><label class="block text-[10px] text-zinc-500 mb-1">Poin 3</label><input id="cfg-guarantee-p3" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+              </div>
+            </div>
+            <!-- Quality -->
+            <div class="rounded-xl border border-zinc-800 bg-zinc-900/30 p-5">
+              <h3 class="text-xs font-bold mb-4 flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-red-500"></span> Kartu Kualitas</h3>
+              <div class="space-y-3">
+                <div><label class="block text-[10px] text-zinc-500 mb-1">Judul</label><input id="cfg-quality-title" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+                <div><label class="block text-[10px] text-zinc-500 mb-1">Deskripsi</label><textarea id="cfg-quality-desc" rows="2" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white"></textarea></div>
+                <div><label class="block text-[10px] text-zinc-500 mb-1">Poin 1</label><input id="cfg-quality-p1" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+                <div><label class="block text-[10px] text-zinc-500 mb-1">Poin 2</label><input id="cfg-quality-p2" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+                <div><label class="block text-[10px] text-zinc-500 mb-1">Poin 3</label><input id="cfg-quality-p3" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-6 flex justify-end">
+            <button onclick="saveConfig()" class="rounded-lg bg-red-600 hover:bg-red-700 px-6 py-2.5 text-xs font-bold tracking-widest uppercase transition-all">Simpan Semua Pengaturan</button>
+          </div>
+        </div>
+
+        <!-- PAGE: MESSAGES -->
+        <div id="page-messages" class="page hidden">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <p class="text-[10px] text-red-500 font-semibold uppercase tracking-widest">Inbox</p>
+              <h2 class="text-lg font-bold">Pesan Masuk</h2>
+            </div>
+            <button onclick="clearAllMessages()" class="rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-2 text-[10px] font-bold tracking-widest text-zinc-400 hover:text-red-500 hover:border-red-600/50 transition-all uppercase">Hapus Semua</button>
+          </div>
+          <div class="rounded-xl border border-zinc-800 overflow-hidden">
+            <div class="bg-zinc-900/50 px-4 py-2.5 border-b border-zinc-800">
+              <span class="text-[10px] text-zinc-600 font-mono" id="count-messages">0 pesan</span>
+            </div>
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-zinc-800 text-left">
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider w-8"></th>
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">Pengirim</th>
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">Layanan</th>
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider">Pesan</th>
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider w-28">Tanggal</th>
+                  <th class="px-4 py-2.5 text-[10px] text-zinc-500 font-semibold uppercase tracking-wider w-20">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-messages"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: SERVICE ===== -->
+  <div id="modal-service" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" onclick="closeModal('modal-service')"></div>
+    <div class="modal-enter relative z-10 w-full max-w-lg rounded-2xl border border-zinc-800 bg-zinc-900 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-zinc-800 px-6 py-4">
+        <h3 id="modal-service-title" class="text-sm font-bold">Tambah Layanan</h3>
+        <button onclick="closeModal('modal-service')" class="rounded-lg p-1.5 text-zinc-500 hover:text-white hover:bg-zinc-800 transition-all">
+          <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="form-service" class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+        <input type="hidden" id="svc-id" />
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="block text-[10px] text-zinc-500 mb-1 font-semibold">Judul *</label><input id="svc-title" required class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+          <div><label class="block text-[10px] text-zinc-500 mb-1 font-semibold">Subtitle</label><input id="svc-subtitle" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+        </div>
+        <div><label class="block text-[10px] text-zinc-500 mb-1 font-semibold">Deskripsi *</label><textarea id="svc-desc" rows="2" required class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white"></textarea></div>
+        <div><label class="block text-[10px] text-zinc-500 mb-1 font-semibold">Harga</label><input id="svc-price" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+        <div>
+          <label class="block text-[10px] text-zinc-500 mb-1 font-semibold">Gambar Layanan</label>
+          <div class="flex gap-2">
+            <input id="svc-image" class="flex-1 rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" placeholder="URL gambar atau upload" />
+            <label class="cursor-pointer rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-[10px] font-bold text-zinc-400 hover:text-white hover:border-zinc-600 transition-all">
+              <svg class="h-4 w-4 inline mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+              <input type="file" class="hidden" accept="image/*" onchange="uploadServiceImage(this)" />
+            </label>
+          </div>
+          <div id="svc-image-preview" class="mt-2 hidden">
+            <img id="svc-image-preview-img" class="w-20 h-20 rounded-lg object-cover border border-zinc-700" />
+            <button type="button" onclick="deleteServiceImage()" class="mt-1 text-[9px] text-red-500 hover:text-red-400">Hapus Gambar</button>
+          </div>
+        </div>
+        <div><label class="block text-[10px] text-zinc-500 mb-1 font-semibold">Tags (pisah koma)</label><input id="svc-tags" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+        <div><label class="block text-[10px] text-zinc-500 mb-1 font-semibold">Detail (satu per baris)</label><textarea id="svc-details" rows="4" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white"></textarea></div>
+      </form>
+      <div class="flex justify-end gap-2 border-t border-zinc-800 px-6 py-3">
+        <button onclick="closeModal('modal-service')" class="rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-2 text-[10px] font-bold tracking-widest text-zinc-400 hover:text-white hover:border-zinc-600 transition-all uppercase">Batal</button>
+        <button onclick="saveService()" class="rounded-lg bg-red-600 hover:bg-red-700 px-5 py-2 text-[10px] font-bold tracking-widest text-white transition-all uppercase">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: ADD-ONS ===== -->
+  <div id="modal-addon" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" onclick="closeModal('modal-addon')"></div>
+    <div class="modal-enter relative z-10 w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-900 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-zinc-800 px-6 py-4">
+        <h3 id="modal-addon-title" class="text-sm font-bold">Tambah Fitur</h3>
+        <button onclick="closeModal('modal-addon')" class="rounded-lg p-1.5 text-zinc-500 hover:text-white hover:bg-zinc-800 transition-all">
+          <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="form-addon" class="p-6 space-y-4">
+        <input type="hidden" id="addon-id" />
+        <div><label class="block text-[10px] text-zinc-500 mb-1 font-semibold">Nama Fitur *</label><input id="addon-name" required class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" placeholder="Contoh: Integrasi Midtrans" /></div>
+        <div><label class="block text-[10px] text-zinc-500 mb-1 font-semibold">Kategori *</label>
+          <select id="addon-category" required class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white">
+            <option value="">-- Pilih Kategori --</option>
+            <option value="Payment Gateway">Payment Gateway</option>
+            <option value="Authentication">Authentication</option>
+            <option value="Notifications">Notifications</option>
+            <option value="Database">Database</option>
+            <option value="CMS">CMS</option>
+            <option value="Analytics">Analytics</option>
+            <option value="SEO">SEO</option>
+            <option value="Performance">Performance</option>
+            <option value="Security">Security</option>
+          </select>
+        </div>
+        <div><label class="block text-[10px] text-zinc-500 mb-1 font-semibold">Harga *</label><input id="addon-price" required class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" placeholder="Contoh: +Rp 500.000" /></div>
+      </form>
+      <div class="flex justify-end gap-2 border-t border-zinc-800 px-6 py-3">
+        <button onclick="closeModal('modal-addon')" class="rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-2 text-[10px] font-bold tracking-widest text-zinc-400 hover:text-white hover:border-zinc-600 transition-all uppercase">Batal</button>
+        <button onclick="saveAddon()" class="rounded-lg bg-red-600 hover:bg-red-700 px-5 py-2 text-[10px] font-bold tracking-widest text-white transition-all uppercase">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: WORKFLOW ===== -->
+  <div id="modal-workflow" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" onclick="closeModal('modal-workflow')"></div>
+    <div class="modal-enter relative z-10 w-full max-w-lg rounded-2xl border border-zinc-800 bg-zinc-900 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-zinc-800 px-6 py-4">
+        <h3 id="modal-workflow-title" class="text-sm font-bold">Tambah Langkah</h3>
+        <button onclick="closeModal('modal-workflow')" class="rounded-lg p-1.5 text-zinc-500 hover:text-white hover:bg-zinc-800 transition-all">
+          <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="form-workflow" class="p-6 space-y-4">
+        <input type="hidden" id="wf-id" />
+        <div><label class="block text-[10px] text-zinc-500 mb-1 font-semibold">Judul *</label><input id="wf-title" required class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+        <div><label class="block text-[10px] text-zinc-500 mb-1 font-semibold">Deskripsi Singkat *</label><input id="wf-short" required class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white" /></div>
+        <div><label class="block text-[10px] text-zinc-500 mb-1 font-semibold">Deskripsi Panjang</label><textarea id="wf-long" rows="3" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white"></textarea></div>
+      </form>
+      <div class="flex justify-end gap-2 border-t border-zinc-800 px-6 py-3">
+        <button onclick="closeModal('modal-workflow')" class="rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-2 text-[10px] font-bold tracking-widest text-zinc-400 hover:text-white transition-all uppercase">Batal</button>
+        <button onclick="saveWorkflow()" class="rounded-lg bg-red-600 hover:bg-red-700 px-5 py-2 text-[10px] font-bold tracking-widest text-white transition-all uppercase">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: SKILL ===== -->
+  <div id="modal-skill" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" onclick="closeModal('modal-skill')"></div>
+    <div class="modal-enter relative z-10 w-full max-w-sm rounded-2xl border border-zinc-800 bg-zinc-900 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-zinc-800 px-6 py-4">
+        <h3 id="modal-skill-title" class="text-sm font-bold">Tambah Keahlian</h3>
+        <button onclick="closeModal('modal-skill')" class="rounded-lg p-1.5 text-zinc-500 hover:text-white hover:bg-zinc-800 transition-all">
+          <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="form-skill" class="p-6 space-y-4">
+        <input type="hidden" id="sk-id" />
+        <div><label class="block text-[10px] text-zinc-500 mb-1 font-semibold">Nama Skill *</label><input id="sk-name" required class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white uppercase" placeholder="REACT" /></div>
+        <div><label class="block text-[10px] text-zinc-500 mb-1 font-semibold">Kategori</label>
+          <select id="sk-category" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-xs text-white">
+            <option value="frontend">Frontend</option><option value="backend">Backend</option><option value="mobile">Mobile</option>
+            <option value="database">Database</option><option value="devops">DevOps</option><option value="language">Language</option>
+            <option value="tool">Tool</option><option value="design">Design</option><option value="other">Other</option>
+          </select>
+        </div>
+      </form>
+      <div class="flex justify-end gap-2 border-t border-zinc-800 px-6 py-3">
+        <button onclick="closeModal('modal-skill')" class="rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-2 text-[10px] font-bold tracking-widest text-zinc-400 hover:text-white transition-all uppercase">Batal</button>
+        <button onclick="saveSkill()" class="rounded-lg bg-red-600 hover:bg-red-700 px-5 py-2 text-[10px] font-bold tracking-widest text-white transition-all uppercase">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: MESSAGE DETAIL ===== -->
+  <div id="modal-message" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" onclick="closeModal('modal-message')"></div>
+    <div class="modal-enter relative z-10 w-full max-w-lg rounded-2xl border border-zinc-800 bg-zinc-900 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-zinc-800 px-6 py-4">
+        <h3 class="text-sm font-bold">Detail Pesan</h3>
+        <button onclick="closeModal('modal-message')" class="rounded-lg p-1.5 text-zinc-500 hover:text-white hover:bg-zinc-800 transition-all">
+          <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="p-6">
+        <div class="space-y-3">
+          <div class="flex justify-between"><span class="text-[10px] text-zinc-500 uppercase font-semibold">Nama</span><span id="msg-name" class="text-xs font-bold text-white"></span></div>
+          <div class="flex justify-between"><span class="text-[10px] text-zinc-500 uppercase font-semibold">Email</span><span id="msg-email" class="text-xs text-zinc-300"></span></div>
+          <div class="flex justify-between"><span class="text-[10px] text-zinc-500 uppercase font-semibold">WhatsApp</span><span id="msg-whatsapp" class="text-xs text-zinc-300 font-mono"></span></div>
+          <div class="flex justify-between"><span class="text-[10px] text-zinc-500 uppercase font-semibold">Layanan</span><span id="msg-service" class="text-xs text-zinc-300 font-semibold text-red-400"></span></div>
+          <div class="flex justify-between"><span class="text-[10px] text-zinc-500 uppercase font-semibold">Tanggal</span><span id="msg-date" class="text-xs text-zinc-300"></span></div>
+          <div id="msg-addons-row" class="pt-2">
+            <p class="text-[10px] text-zinc-500 uppercase font-semibold mb-1.5">Fitur Tambahan</p>
+            <div id="msg-addons" class="flex flex-wrap gap-1.5"></div>
+          </div>
+          <div class="pt-3 border-t border-zinc-800">
+            <p class="text-[10px] text-zinc-500 uppercase font-semibold mb-2">Pesan</p>
+            <p id="msg-body" class="text-xs text-zinc-300 leading-relaxed whitespace-pre-wrap"></p>
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 border-t border-zinc-800 px-6 py-3">
+        <button onclick="closeModal('modal-message')" class="rounded-lg border border-zinc-700 bg-zinc-900 px-5 py-2 text-[10px] font-bold tracking-widest text-zinc-400 hover:text-white transition-all uppercase">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast-container" class="fixed top-4 right-4 z-[60] space-y-2"></div>
+
+  <script src="db.js"></script>
+  <script>
+    // ===== SECURITY HELPERS =====
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ===== IMAGE UPLOAD HELPERS =====
+    async function uploadToR2(file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      return await res.json();
+    }
+
+    async function deleteFromR2(key) {
+      await fetch('/api/upload/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key })
+      });
+    }
+
+    function extractR2Key(url) {
+      if (!url || !url.includes('/r2/')) return null;
+      return url.split('/r2/')[1];
+    }
+
+    async function uploadHeroImage(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const oldUrl = document.getElementById('cfg-hero-image').value;
+      const oldKey = extractR2Key(oldUrl);
+      const data = await uploadToR2(file);
+      document.getElementById('cfg-hero-image').value = data.url;
+      document.getElementById('hero-preview-img').src = data.url;
+      document.getElementById('hero-preview').classList.remove('hidden');
+      if (oldKey) await deleteFromR2(oldKey);
+      toast('Gambar profil berhasil diupload!');
+    }
+
+    async function deleteHeroImage() {
+      const url = document.getElementById('cfg-hero-image').value;
+      const key = extractR2Key(url);
+      if (key) await deleteFromR2(key);
+      document.getElementById('cfg-hero-image').value = '';
+      document.getElementById('hero-preview').classList.add('hidden');
+      toast('Gambar profil dihapus!');
+    }
+
+    async function uploadServiceImage(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const oldUrl = document.getElementById('svc-image').value;
+      const oldKey = extractR2Key(oldUrl);
+      const data = await uploadToR2(file);
+      document.getElementById('svc-image').value = data.url;
+      document.getElementById('svc-image-preview-img').src = data.url;
+      document.getElementById('svc-image-preview').classList.remove('hidden');
+      if (oldKey) await deleteFromR2(oldKey);
+      toast('Gambar layanan berhasil diupload!');
+    }
+
+    async function deleteServiceImage() {
+      const url = document.getElementById('svc-image').value;
+      const key = extractR2Key(url);
+      if (key) await deleteFromR2(key);
+      document.getElementById('svc-image').value = '';
+      document.getElementById('svc-image-preview').classList.add('hidden');
+      toast('Gambar layanan dihapus!');
+    }
+
+    // ===== AUTH =====
+    function checkAuth() {
+      if (sessionStorage.getItem('admin_logged') === '1') {
+        document.getElementById('login-overlay').classList.add('hidden');
+        document.getElementById('dashboard').classList.remove('hidden');
+        init();
+      }
+    }
+    document.getElementById('login-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const u = document.getElementById('login-user').value;
+      const p = document.getElementById('login-pass').value;
+      if (u === 'Eka Ryan' && p === 'Ekaryan443!') {
+        sessionStorage.setItem('admin_logged', '1');
+        document.getElementById('login-overlay').classList.add('hidden');
+        document.getElementById('dashboard').classList.remove('hidden');
+        init();
+      } else {
+        document.getElementById('login-error').classList.remove('hidden');
+      }
+    });
+    function logout() { sessionStorage.removeItem('admin_logged'); location.reload(); }
+
+    // ===== NAVIGATION =====
+    let currentPage = 'dashboard';
+    function go(page) {
+      currentPage = page;
+      document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+      document.getElementById('page-' + page).classList.remove('hidden');
+      document.querySelectorAll('.sidebar-link').forEach(l => { l.classList.remove('active'); l.classList.add('text-zinc-400'); });
+      document.querySelector(`[data-page="${page}"]`).classList.add('active');
+      document.querySelector(`[data-page="${page}"]`).classList.remove('text-zinc-400');
+      const titles = { dashboard: 'Beranda', services: 'Layanan', workflow: 'Alur Kerja', skills: 'Keahlian', addons: 'Fitur Tambahan', config: 'Pengaturan', messages: 'Pesan' };
+      document.getElementById('page-title').textContent = titles[page] || page;
+      if (page === 'services') renderServicesTable();
+      if (page === 'workflow') renderWorkflowTable();
+      if (page === 'skills') renderSkillsTable();
+      if (page === 'addons') renderAddonsTable();
+      if (page === 'messages') renderMessagesTable();
+      if (page === 'config') loadConfig();
+      if (page === 'dashboard') loadStats();
+    }
+
+    // ===== MODAL =====
+    function openModal(id) { const m = document.getElementById(id); m.classList.remove('hidden'); m.classList.add('flex'); }
+    function closeModal(id) { const m = document.getElementById(id); m.classList.add('hidden'); m.classList.remove('flex'); }
+
+    // ===== TOAST =====
+    function toast(msg) {
+      const c = document.getElementById('toast-container');
+      const t = document.createElement('div');
+      t.className = 'toast rounded-lg bg-green-600 text-white px-4 py-2.5 text-xs font-bold shadow-xl';
+      t.textContent = msg;
+      c.appendChild(t);
+      setTimeout(() => t.remove(), 3000);
+    }
+
+    // ===== TIME =====
+    function updateTime() { document.getElementById('current-time').textContent = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }); }
+    setInterval(updateTime, 1000);
+
+    // ===== DASHBOARD =====
+    function loadStats() {
+      document.getElementById('stat-services').textContent = db.getServices().length;
+      document.getElementById('stat-skills').textContent = db.getSkills().length;
+      document.getElementById('stat-workflow').textContent = db.getWorkflow().length;
+      const msgs = db.getMessages();
+      const unread = db.getUnreadMessages().length;
+      document.getElementById('stat-messages').textContent = msgs.length;
+      document.getElementById('stat-unread').textContent = unread + ' belum dibaca';
+      updateBadge();
+    }
+    function updateBadge() {
+      const unread = db.getUnreadMessages().length;
+      const badge = document.getElementById('sidebar-msg-badge');
+      if (unread > 0) { badge.textContent = unread; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); }
+    }
+
+    // ===== SERVICES CRUD =====
+    function renderServicesTable() {
+      const search = (document.getElementById('search-services')?.value || '').toLowerCase();
+      let items = db.getServices();
+      if (search) items = items.filter(s => s.title.toLowerCase().includes(search) || s.subtitle.toLowerCase().includes(search) || s.description.toLowerCase().includes(search));
+      document.getElementById('count-services').textContent = items.length + ' item';
+      document.getElementById('tbody-services').innerHTML = items.map(s => {
+        const tags = db.getServiceTags(s.id);
+        return `<tr class="border-b border-zinc-800/50 row-hover">
+          <td class="px-4 py-3 text-xs text-zinc-600 font-mono">${String(s.sort_order).padStart(2,'0')}</td>
+          <td class="px-4 py-3"><p class="text-xs font-bold">${s.title}</p><p class="text-[10px] text-zinc-500 font-mono">${s.subtitle}</p></td>
+          <td class="px-4 py-3 text-xs text-zinc-400">${s.price}</td>
+          <td class="px-4 py-3"><div class="flex flex-wrap gap-1">${tags.slice(0,3).map(t => `<span class="text-[9px] bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded font-mono">${t}</span>`).join('')}${tags.length > 3 ? `<span class="text-[9px] text-zinc-600">+${tags.length-3}</span>` : ''}</div></td>
+          <td class="px-4 py-3">
+            <div class="flex gap-1">
+              <button onclick="editService('${s.id}')" class="rounded p-1.5 text-zinc-500 hover:text-white hover:bg-zinc-800 transition-all" title="Edit"><svg class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
+              <button onclick="deleteService('${s.id}')" class="rounded p-1.5 text-zinc-500 hover:text-red-500 hover:bg-zinc-800 transition-all" title="Hapus"><svg class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+    function openServiceModal(id) {
+      document.getElementById('svc-id').value = '';
+      document.getElementById('svc-title').value = '';
+      document.getElementById('svc-subtitle').value = '';
+      document.getElementById('svc-desc').value = '';
+      document.getElementById('svc-price').value = '';
+      document.getElementById('svc-image').value = '';
+      document.getElementById('svc-tags').value = '';
+      document.getElementById('svc-details').value = '';
+      document.getElementById('svc-image-preview').classList.add('hidden');
+      document.getElementById('modal-service-title').textContent = 'Tambah Layanan';
+      openModal('modal-service');
+    }
+    function editService(id) {
+      const s = db.getService(id);
+      if (!s) return;
+      document.getElementById('svc-id').value = s.id;
+      document.getElementById('svc-title').value = s.title;
+      document.getElementById('svc-subtitle').value = s.subtitle;
+      document.getElementById('svc-desc').value = s.description;
+      document.getElementById('svc-price').value = s.price;
+      document.getElementById('svc-image').value = s.image;
+      if (s.image) {
+        document.getElementById('svc-image-preview-img').src = s.image;
+        document.getElementById('svc-image-preview').classList.remove('hidden');
+      } else {
+        document.getElementById('svc-image-preview').classList.add('hidden');
+      }
+      document.getElementById('svc-tags').value = db.getServiceTags(s.id).join(', ');
+      document.getElementById('svc-details').value = db.getServiceDetails(s.id).join('\n');
+      document.getElementById('modal-service-title').textContent = 'Edit Layanan';
+      openModal('modal-service');
+    }
+    function saveService() {
+      const id = document.getElementById('svc-id').value;
+      const data = {
+        title: document.getElementById('svc-title').value.trim(),
+        subtitle: document.getElementById('svc-subtitle').value.trim(),
+        description: document.getElementById('svc-desc').value.trim(),
+        price: document.getElementById('svc-price').value.trim(),
+        image: document.getElementById('svc-image').value.trim(),
+        tags: document.getElementById('svc-tags').value.split(',').map(t => t.trim()).filter(Boolean),
+        details: document.getElementById('svc-details').value.split('\n').filter(x => x.trim())
+      };
+      if (!data.title) return;
+      if (id) { db.updateService(id, data); toast('Layanan diperbarui!'); }
+      else { db.createService(data); toast('Layanan ditambahkan!'); }
+      closeModal('modal-service');
+      renderServicesTable();
+    }
+    function deleteService(id) {
+      if (!confirm('Yakin hapus layanan ini?')) return;
+      db.deleteService(id);
+      renderServicesTable();
+      toast('Layanan dihapus!');
+    }
+
+    // ===== WORKFLOW CRUD =====
+    function renderWorkflowTable() {
+      const items = db.getWorkflow();
+      document.getElementById('count-workflow').textContent = items.length + ' langkah';
+      document.getElementById('tbody-workflow').innerHTML = items.map(w => `<tr class="border-b border-zinc-800/50 row-hover">
+        <td class="px-4 py-3 text-xs text-zinc-600 font-mono">${String(w.sort_order).padStart(2,'0')}</td>
+        <td class="px-4 py-3 text-xs font-bold">${w.title}</td>
+        <td class="px-4 py-3 text-xs text-zinc-400 max-w-xs truncate">${w.short_desc}</td>
+        <td class="px-4 py-3"><div class="flex gap-1">
+          <button onclick="editWorkflow('${w.id}')" class="rounded p-1.5 text-zinc-500 hover:text-white hover:bg-zinc-800 transition-all" title="Edit"><svg class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
+          <button onclick="deleteWorkflow('${w.id}')" class="rounded p-1.5 text-zinc-500 hover:text-red-500 hover:bg-zinc-800 transition-all" title="Hapus"><svg class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+        </div></td>
+      </tr>`).join('');
+    }
+    function openWorkflowModal() {
+      document.getElementById('wf-id').value = '';
+      document.getElementById('wf-title').value = '';
+      document.getElementById('wf-short').value = '';
+      document.getElementById('wf-long').value = '';
+      document.getElementById('modal-workflow-title').textContent = 'Tambah Langkah';
+      openModal('modal-workflow');
+    }
+    function editWorkflow(id) {
+      const w = db.getWorkflow().find(x => x.id === id);
+      if (!w) return;
+      document.getElementById('wf-id').value = w.id;
+      document.getElementById('wf-title').value = w.title;
+      document.getElementById('wf-short').value = w.short_desc;
+      document.getElementById('wf-long').value = w.long_desc;
+      document.getElementById('modal-workflow-title').textContent = 'Edit Langkah';
+      openModal('modal-workflow');
+    }
+    function saveWorkflow() {
+      const id = document.getElementById('wf-id').value;
+      const data = { title: document.getElementById('wf-title').value.trim(), short_desc: document.getElementById('wf-short').value.trim(), long_desc: document.getElementById('wf-long').value.trim() };
+      if (!data.title) return;
+      if (id) { db.updateWorkflow(id, data); toast('Langkah diperbarui!'); }
+      else { db.createWorkflow(data); toast('Langkah ditambahkan!'); }
+      closeModal('modal-workflow');
+      renderWorkflowTable();
+    }
+    function deleteWorkflow(id) {
+      if (!confirm('Yakin hapus langkah ini?')) return;
+      db.deleteWorkflow(id);
+      renderWorkflowTable();
+      toast('Langkah dihapus!');
+    }
+
+    // ===== SKILLS CRUD =====
+    function renderSkillsTable() {
+      const search = (document.getElementById('search-skills')?.value || '').toLowerCase();
+      let items = db.getSkills();
+      if (search) items = items.filter(s => s.name.toLowerCase().includes(search) || s.category.toLowerCase().includes(search));
+      document.getElementById('count-skills').textContent = items.length + ' item';
+      document.getElementById('tbody-skills').innerHTML = items.map(s => `<tr class="border-b border-zinc-800/50 row-hover">
+        <td class="px-4 py-3 text-xs text-zinc-600 font-mono">${String(s.sort_order).padStart(2,'0')}</td>
+        <td class="px-4 py-3 text-xs font-bold font-mono">${s.name}</td>
+        <td class="px-4 py-3"><span class="text-[10px] bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded-full font-semibold uppercase">${s.category}</span></td>
+        <td class="px-4 py-3"><div class="flex gap-1">
+          <button onclick="editSkill('${s.id}')" class="rounded p-1.5 text-zinc-500 hover:text-white hover:bg-zinc-800 transition-all" title="Edit"><svg class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
+          <button onclick="deleteSkill('${s.id}')" class="rounded p-1.5 text-zinc-500 hover:text-red-500 hover:bg-zinc-800 transition-all" title="Hapus"><svg class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+        </div></td>
+      </tr>`).join('');
+    }
+    function openSkillModal() {
+      document.getElementById('sk-id').value = '';
+      document.getElementById('sk-name').value = '';
+      document.getElementById('sk-category').value = 'frontend';
+      document.getElementById('modal-skill-title').textContent = 'Tambah Keahlian';
+      openModal('modal-skill');
+    }
+    function editSkill(id) {
+      const s = db.getSkills().find(x => x.id === id);
+      if (!s) return;
+      document.getElementById('sk-id').value = s.id;
+      document.getElementById('sk-name').value = s.name;
+      document.getElementById('sk-category').value = s.category;
+      document.getElementById('modal-skill-title').textContent = 'Edit Keahlian';
+      openModal('modal-skill');
+    }
+    function saveSkill() {
+      const id = document.getElementById('sk-id').value;
+      const data = { name: document.getElementById('sk-name').value.trim().toUpperCase(), category: document.getElementById('sk-category').value };
+      if (!data.name) return;
+      if (id) { db.updateSkill(id, data); toast('Keahlian diperbarui!'); }
+      else { db.createSkill(data); toast('Keahlian ditambahkan!'); }
+      closeModal('modal-skill');
+      renderSkillsTable();
+    }
+    function deleteSkill(id) {
+      if (!confirm('Yakin hapus keahlian ini?')) return;
+      db.deleteSkill(id);
+      renderSkillsTable();
+      toast('Keahlian dihapus!');
+    }
+
+    // ===== ADD-ONS CRUD =====
+    let addonsList = [];
+    async function renderAddonsTable() {
+      const search = (document.getElementById('search-addons')?.value || '').toLowerCase();
+      try {
+        const res = await fetch('/api/addons');
+        const grouped = await res.json();
+        addonsList = [];
+        Object.values(grouped).forEach(items => addonsList.push(...items));
+      } catch(e) {
+        addonsList = [];
+      }
+      let filtered = addonsList;
+      if (search) filtered = filtered.filter(a => a.name.toLowerCase().includes(search) || a.category.toLowerCase().includes(search));
+      document.getElementById('count-addons').textContent = filtered.length + ' item';
+      document.getElementById('tbody-addons').innerHTML = filtered.map((a, i) => `<tr class="border-b border-zinc-800/50 row-hover">
+        <td class="px-4 py-3 text-xs text-zinc-600 font-mono">${String(i + 1).padStart(2,'0')}</td>
+        <td class="px-4 py-3 text-xs font-bold">${a.name}</td>
+        <td class="px-4 py-3"><span class="text-[10px] bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded-full font-semibold uppercase">${a.category}</span></td>
+        <td class="px-4 py-3 text-xs text-zinc-400 font-mono">${a.price}</td>
+        <td class="px-4 py-3"><div class="flex gap-1">
+          <button onclick="editAddon('${a.id}')" class="rounded p-1.5 text-zinc-500 hover:text-white hover:bg-zinc-800 transition-all" title="Edit"><svg class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
+          <button onclick="deleteAddon('${a.id}')" class="rounded p-1.5 text-zinc-500 hover:text-red-500 hover:bg-zinc-800 transition-all" title="Hapus"><svg class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+        </div></td>
+      </tr>`).join('');
+    }
+    function openAddonModal() {
+      document.getElementById('addon-id').value = '';
+      document.getElementById('addon-name').value = '';
+      document.getElementById('addon-category').value = '';
+      document.getElementById('addon-price').value = '';
+      document.getElementById('modal-addon-title').textContent = 'Tambah Fitur';
+      openModal('modal-addon');
+    }
+    function editAddon(id) {
+      const a = addonsList.find(x => x.id === id);
+      if (!a) return;
+      document.getElementById('addon-id').value = a.id;
+      document.getElementById('addon-name').value = a.name;
+      document.getElementById('addon-category').value = a.category;
+      document.getElementById('addon-price').value = a.price;
+      document.getElementById('modal-addon-title').textContent = 'Edit Fitur';
+      openModal('modal-addon');
+    }
+    async function saveAddon() {
+      const id = document.getElementById('addon-id').value;
+      const data = {
+        name: document.getElementById('addon-name').value.trim(),
+        category: document.getElementById('addon-category').value,
+        price: document.getElementById('addon-price').value.trim()
+      };
+      if (!data.name || !data.category) return;
+      if (id) {
+        await fetch('/api/addons/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+        toast('Fitur diperbarui!');
+      } else {
+        await fetch('/api/addons', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+        toast('Fitur ditambahkan!');
+      }
+      closeModal('modal-addon');
+      renderAddonsTable();
+    }
+    async function deleteAddon(id) {
+      if (!confirm('Yakin hapus fitur ini?')) return;
+      await fetch('/api/addons/' + id, { method: 'DELETE' });
+      renderAddonsTable();
+      toast('Fitur dihapus!');
+    }
+
+    // ===== MESSAGES =====
+    function renderMessagesTable() {
+      const items = db.getMessages();
+      document.getElementById('count-messages').textContent = items.length + ' pesan';
+      document.getElementById('tbody-messages').innerHTML = items.map(m => `<tr class="border-b border-zinc-800/50 row-hover ${!m.is_read ? 'bg-red-600/5' : ''}">
+        <td class="px-4 py-3">${!m.is_read ? '<span class="h-2 w-2 rounded-full bg-red-500 inline-block"></span>' : ''}</td>
+        <td class="px-4 py-3"><p class="text-xs font-bold">${escapeHtml(m.name)}</p><p class="text-[10px] text-zinc-500">${escapeHtml(m.email)}</p><p class="text-[10px] text-zinc-600 font-mono">${escapeHtml(m.whatsapp) || '-'}</p></td>
+        <td class="px-4 py-3 text-xs text-red-400 font-semibold">${escapeHtml(m.subject)}</td>
+        <td class="px-4 py-3 text-xs text-zinc-500 max-w-[200px] truncate">${escapeHtml(m.message)}</td>
+        <td class="px-4 py-3 text-[10px] text-zinc-600 font-mono">${new Date(m.created_at).toLocaleDateString('id-ID')}</td>
+        <td class="px-4 py-3"><div class="flex gap-1">
+          <button onclick="viewMessage('${m.id}')" class="rounded p-1.5 text-zinc-500 hover:text-white hover:bg-zinc-800 transition-all" title="Lihat"><svg class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          <button onclick="deleteMsg('${m.id}')" class="rounded p-1.5 text-zinc-500 hover:text-red-500 hover:bg-zinc-800 transition-all" title="Hapus"><svg class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+        </div></td>
+      </tr>`).join('');
+      updateBadge();
+    }
+    function viewMessage(id) {
+      const m = db.getMessages().find(x => x.id === id);
+      if (!m) return;
+      db.markMessageRead(id);
+      document.getElementById('msg-name').textContent = m.name;
+      document.getElementById('msg-email').textContent = m.email;
+      document.getElementById('msg-whatsapp').textContent = m.whatsapp || '-';
+      document.getElementById('msg-service').textContent = m.subject || '-';
+      document.getElementById('msg-date').textContent = new Date(m.created_at).toLocaleString('id-ID');
+      document.getElementById('msg-body').textContent = m.message;
+      const addonsEl = document.getElementById('msg-addons');
+      const addonsRow = document.getElementById('msg-addons-row');
+      if (m.add_ons && Array.isArray(m.add_ons) && m.add_ons.length > 0) {
+        addonsEl.innerHTML = m.add_ons.map(a => `<span class="inline-block rounded-md bg-zinc-800 border border-zinc-700 px-2 py-0.5 text-[10px] text-zinc-300 font-mono">${escapeHtml(a)}</span>`).join('');
+        addonsRow.classList.remove('hidden');
+      } else {
+        addonsRow.classList.add('hidden');
+      }
+      openModal('modal-message');
+      renderMessagesTable();
+    }
+    function deleteMsg(id) {
+      if (!confirm('Hapus pesan ini?')) return;
+      db.deleteMessage(id);
+      renderMessagesTable();
+      toast('Pesan dihapus!');
+    }
+    function clearAllMessages() {
+      if (!confirm('Hapus SEMUA pesan? Tindakan ini tidak bisa dibatalkan.')) return;
+      db.deleteAllMessages();
+      renderMessagesTable();
+      toast('Semua pesan dihapus!');
+    }
+
+    // ===== CONFIG =====
+    function loadConfig() {
+      const c = db.getConfig();
+      document.getElementById('cfg-hero-greeting').value = c.hero_greeting;
+      document.getElementById('cfg-hero-name').value = c.hero_name;
+      document.getElementById('cfg-hero-tagline').value = c.hero_tagline;
+      document.getElementById('cfg-hero-desc').value = c.hero_description;
+      document.getElementById('cfg-hero-image').value = c.hero_image;
+      if (c.hero_image) {
+        document.getElementById('hero-preview-img').src = c.hero_image;
+        document.getElementById('hero-preview').classList.remove('hidden');
+      }
+      document.getElementById('cfg-email').value = c.contact_email;
+      document.getElementById('cfg-wa').value = c.contact_wa;
+      document.getElementById('cfg-location').value = c.contact_location;
+      document.getElementById('cfg-website').value = c.contact_website;
+      document.getElementById('cfg-linkedin').value = c.social_linkedin;
+      document.getElementById('cfg-instagram').value = c.social_instagram;
+      document.getElementById('cfg-tiktok').value = c.social_tiktok;
+      document.getElementById('cfg-twitter').value = c.social_twitter;
+      document.getElementById('cfg-guarantee-title').value = c.guarantee_title;
+      document.getElementById('cfg-guarantee-desc').value = c.guarantee_desc;
+      document.getElementById('cfg-guarantee-p1').value = c.guarantee_p1;
+      document.getElementById('cfg-guarantee-p2').value = c.guarantee_p2;
+      document.getElementById('cfg-guarantee-p3').value = c.guarantee_p3;
+      document.getElementById('cfg-quality-title').value = c.quality_title;
+      document.getElementById('cfg-quality-desc').value = c.quality_desc;
+      document.getElementById('cfg-quality-p1').value = c.quality_p1;
+      document.getElementById('cfg-quality-p2').value = c.quality_p2;
+      document.getElementById('cfg-quality-p3').value = c.quality_p3;
+    }
+    function saveConfig() {
+      db.updateConfig({
+        hero_greeting: document.getElementById('cfg-hero-greeting').value,
+        hero_name: document.getElementById('cfg-hero-name').value,
+        hero_tagline: document.getElementById('cfg-hero-tagline').value,
+        hero_description: document.getElementById('cfg-hero-desc').value,
+        hero_image: document.getElementById('cfg-hero-image').value,
+        contact_email: document.getElementById('cfg-email').value,
+        contact_wa: document.getElementById('cfg-wa').value,
+        contact_location: document.getElementById('cfg-location').value,
+        contact_website: document.getElementById('cfg-website').value,
+        social_linkedin: document.getElementById('cfg-linkedin').value,
+        social_instagram: document.getElementById('cfg-instagram').value,
+        social_tiktok: document.getElementById('cfg-tiktok').value,
+        social_twitter: document.getElementById('cfg-twitter').value,
+        guarantee_title: document.getElementById('cfg-guarantee-title').value,
+        guarantee_desc: document.getElementById('cfg-guarantee-desc').value,
+        guarantee_p1: document.getElementById('cfg-guarantee-p1').value,
+        guarantee_p2: document.getElementById('cfg-guarantee-p2').value,
+        guarantee_p3: document.getElementById('cfg-guarantee-p3').value,
+        quality_title: document.getElementById('cfg-quality-title').value,
+        quality_desc: document.getElementById('cfg-quality-desc').value,
+        quality_p1: document.getElementById('cfg-quality-p1').value,
+        quality_p2: document.getElementById('cfg-quality-p2').value,
+        quality_p3: document.getElementById('cfg-quality-p3').value
+      });
+      toast('Pengaturan tersimpan!');
+    }
+
+    // ===== DATA =====
+    function exportData() {
+      const data = db.exportAll();
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'portfolio-backup-' + new Date().toISOString().split('T')[0] + '.json';
+      a.click(); URL.revokeObjectURL(url);
+      toast('Data berhasil diexport!');
+    }
+    function importData() {
+      const input = document.createElement('input');
+      input.type = 'file'; input.accept = '.json';
+      input.onchange = e => {
+        const file = e.target.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+          const result = db.importAll(ev.target.result);
+          if (result.success) { init(); toast(result.message); } else { alert(result.message); }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+    function resetAllData() {
+      if (!confirm('Reset semua data ke default? Tindakan ini tidak bisa dibatalkan.')) return;
+      db.resetAll();
+      init();
+      toast('Data berhasil direset!');
+    }
+
+    // ===== INIT =====
+    function init() {
+      loadStats();
+      updateTime();
+    }
+    checkAuth();
+  </script>
+</body>
+</html>
