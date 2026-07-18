@@ -5,3 +5,7 @@ dist/
 .cache/
 *.log
 .DS_Store
+.aider*
+
+# Large audio served from R2 (not committed)
+public/src/assets/sound/backsound.mp3
