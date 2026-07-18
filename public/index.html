@@ -70,10 +70,10 @@
 
   <!-- Background music (autoplay on homepage open, with user-interaction fallback) -->
   <audio id="bg-audio" src="/audio/backsound.mp3" loop preload="auto"></audio>
-  <button id="bg-audio-toggle" aria-label="Toggle background music"
-    class="fixed bottom-4 left-4 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900/80 text-white backdrop-blur transition-colors hover:border-red-500 hover:text-red-500 cursor-pointer">
-    <svg id="bg-audio-icon-play" class="h-5 w-5 hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
-    <svg id="bg-audio-icon-pause" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>
+  <button id="bg-audio-toggle" aria-label="Putar musik latar" title="Putar musik latar"
+    class="group fixed bottom-4 left-4 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900/80 text-white backdrop-blur transition-colors hover:border-red-500 hover:text-red-500 cursor-pointer animate-pulse">
+    <svg id="bg-audio-icon-play" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+    <svg id="bg-audio-icon-pause" class="h-5 w-5 hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>
   </button>
 
   <!-- Decorative background grid -->
@@ -1284,10 +1284,13 @@ PENGALAMAN:
       iconPause.classList.toggle('hidden', !bgPlaying);
     }
     function playBgAudio() {
-      bgAudio.play().then(() => {
-        bgPlaying = true;
-        updateBgIcon();
-      }).catch(() => { /* autoplay blocked; wait for user interaction */ });
+      const p = bgAudio.play();
+      if (p && typeof p.then === 'function') {
+        p.then(() => {
+          bgPlaying = true;
+          updateBgIcon();
+        }).catch(() => { /* autoplay blocked; wait for user interaction */ });
+      }
     }
     bgToggle.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -1299,18 +1302,22 @@ PENGALAMAN:
       }
       updateBgIcon();
     });
-    // Try to autoplay on homepage open; browsers block it until user interacts,
-    // so also start on the first user interaction (click/keydown/scroll/touch).
+    // Default state: paused -> show the play icon so the user knows it's off.
+    updateBgIcon();
+    // Try to autoplay on homepage open; browsers block it until the user
+    // interacts, so also start on the first user interaction of any kind.
     playBgAudio();
     const startOnInteraction = () => {
       if (!bgPlaying) playBgAudio();
       if (bgPlaying) {
+        window.removeEventListener('pointerdown', startOnInteraction);
         window.removeEventListener('click', startOnInteraction);
         window.removeEventListener('keydown', startOnInteraction);
         window.removeEventListener('scroll', startOnInteraction);
         window.removeEventListener('touchstart', startOnInteraction);
       }
     };
+    window.addEventListener('pointerdown', startOnInteraction, { once: false });
     window.addEventListener('click', startOnInteraction);
     window.addEventListener('keydown', startOnInteraction);
     window.addEventListener('scroll', startOnInteraction);
