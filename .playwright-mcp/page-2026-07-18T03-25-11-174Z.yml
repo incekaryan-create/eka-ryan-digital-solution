@@ -1,0 +1,382 @@
+- generic [active] [ref=e1]:
+  - button "Toggle background music" [ref=e2] [cursor=pointer]
+  - banner [ref=e6]:
+    - generic [ref=e8]:
+      - link "ER EKA RYAN" [ref=e9] [cursor=pointer]:
+        - /url: "#"
+        - generic [ref=e10]: ER
+        - generic [ref=e11]: EKA RYAN
+      - navigation [ref=e12]:
+        - link "Layanan" [ref=e13] [cursor=pointer]:
+          - /url: "#services"
+        - link "Alur Kerja" [ref=e14] [cursor=pointer]:
+          - /url: "#workflow"
+        - link "Keahlian" [ref=e15] [cursor=pointer]:
+          - /url: "#skills"
+        - link "Kolaborasi" [ref=e16] [cursor=pointer]:
+          - /url: "#collaborate"
+      - generic [ref=e17]:
+        - link "WhatsApp" [ref=e18] [cursor=pointer]:
+          - /url: https://wa.me/6285857854360?text=Halo%20Eka%20Ryan%2C%20saya%20tertarik%20dengan%20portfolio%20Anda%20dan%20ingin%20berkolaborasi.
+        - button "Share Portfolio" [ref=e22] [cursor=pointer]
+  - generic [ref=e26]:
+    - generic [ref=e27]:
+      - generic [ref=e28]: MENU PORTFOLIO
+      - button [ref=e29] [cursor=pointer]
+    - textbox "Cari proyek atau skill..." [ref=e37]
+    - navigation [ref=e38]:
+      - link "Layanan" [ref=e39] [cursor=pointer]:
+        - /url: "#services"
+      - link "Alur Kerja" [ref=e40] [cursor=pointer]:
+        - /url: "#workflow"
+      - link "Keahlian" [ref=e41] [cursor=pointer]:
+        - /url: "#skills"
+      - link "Kolaborasi" [ref=e42] [cursor=pointer]:
+        - /url: "#collaborate"
+      - link "Admin Panel" [ref=e43] [cursor=pointer]:
+        - /url: admin.html
+    - generic [ref=e44]:
+      - text: Tersedia untuk kolaborasi
+      - paragraph [ref=e45]: inc.ekaryan@gmail.com
+      - link "WhatsApp" [ref=e47] [cursor=pointer]:
+        - /url: https://wa.me/6285857854360?text=Halo%20Eka%20Ryan%2C%20saya%20tertarik%20dengan%20portfolio%20Anda%20dan%20ingin%20berkolaborasi.
+  - main [ref=e51]:
+    - generic [ref=e52]:
+      - generic:
+        - heading "PORTFOLIO" [level=1]
+      - generic [ref=e53]:
+        - generic [ref=e54]: PENGEMBANG WEBSITE, SOFTWARE & APLIKASI
+        - link "TERSEDIA UNTUK FREELANCE & KOLABORASI" [ref=e55] [cursor=pointer]:
+          - /url: "#collaborate"
+      - generic [ref=e61]:
+        - generic [ref=e62]:
+          - generic [ref=e63]: Hai, Saya
+          - heading "Eka Ryan" [level=2] [ref=e64]
+          - paragraph [ref=e65]: Web Developer • UI/UX Designer • Freelancer
+          - paragraph [ref=e66]: Saya merancang dan membangun antarmuka digital yang cepat, estetis, dan berorientasi pada data. Spesialisasi dalam dashboard tingkat lanjut dan pengalaman web interaktif.
+          - generic [ref=e67]:
+            - link "Lihat Layanan" [ref=e68] [cursor=pointer]:
+              - /url: "#services"
+            - link "Hubungi Saya" [ref=e69] [cursor=pointer]:
+              - /url: "#collaborate"
+        - generic [ref=e71]:
+          - img "Eka Ryan Portrait" [ref=e73]
+          - generic:
+            - generic:
+              - img:
+                - generic: BUILDING DIGITAL EXPERIENCES * CODE WITH PRECISION *
+              - generic: ER
+        - generic [ref=e78]:
+          - generic [ref=e79]:
+            - generic [ref=e80]:
+              - generic [ref=e81]: BERDOMISILI DI
+              - generic [ref=e82]: BALI, INDONESIA
+            - generic [ref=e83]:
+              - generic [ref=e84]: PENGALAMAN
+              - generic [ref=e85]: 5+ TAHUN
+            - generic [ref=e86]:
+              - generic [ref=e87]: TERSEDIA UNTUK
+              - generic [ref=e88]: SELURUH DUNIA
+          - generic [ref=e89]:
+            - generic [ref=e90]:
+              - paragraph [ref=e91]: 45+
+              - paragraph [ref=e92]: Layanan Tersedia
+            - generic [ref=e93]:
+              - paragraph [ref=e94]: 20+
+              - paragraph [ref=e95]: Klien Puas
+      - generic [ref=e96]:
+        - generic [ref=e97]: GULIR KE BAWAH UNTUK MENJELAJAHI
+        - generic [ref=e98]: SISTEM LIVE
+    - generic [ref=e102]:
+      - generic [ref=e103]:
+        - generic [ref=e104]:
+          - text: Yang Saya Tawarkan
+          - heading "Layanan" [level=3] [ref=e105]
+        - generic [ref=e106]: Menampilkan 6 layanan
+      - generic [ref=e107]:
+        - generic [ref=e108]:
+          - generic [ref=e109]:
+            - generic [ref=e110]:
+              - generic [ref=e111]: "01"
+              - generic [ref=e112]: FULL-STACK DEVELOPMENT
+            - img "Pengembangan Web" [ref=e114]
+            - heading "Pengembangan Web" [level=4] [ref=e115]
+            - paragraph [ref=e116]: Membangun website modern, responsif, dan performa tinggi menggunakan teknologi terkini.
+          - generic [ref=e117]:
+            - generic [ref=e118]:
+              - generic [ref=e119]: "#React"
+              - generic [ref=e120]: "#Next.js"
+              - generic [ref=e121]: "#Node.js"
+            - paragraph [ref=e122]: Mulai dari Rp 5.000.000
+        - generic [ref=e123]:
+          - generic [ref=e124]:
+            - generic [ref=e125]:
+              - generic [ref=e126]: "02"
+              - generic [ref=e127]: UI/UX DESIGN
+            - img "Desain UI/UX" [ref=e129]
+            - heading "Desain UI/UX" [level=4] [ref=e130]
+            - paragraph [ref=e131]: Merancang antarmuka pengguna yang intuitif dan pengalaman pengguna yang memukau.
+          - generic [ref=e132]:
+            - generic [ref=e133]:
+              - generic [ref=e134]: "#Figma"
+              - generic [ref=e135]: "#Adobe XD"
+              - generic [ref=e136]: "#Prototyping"
+            - paragraph [ref=e137]: Mulai dari Rp 3.000.000
+        - generic [ref=e138]:
+          - generic [ref=e139]:
+            - generic [ref=e140]:
+              - generic [ref=e141]: "03"
+              - generic [ref=e142]: MOBILE APP DEVELOPMENT
+            - img "Aplikasi Mobile" [ref=e144]
+            - heading "Aplikasi Mobile" [level=4] [ref=e145]
+            - paragraph [ref=e146]: Mengembangkan aplikasi mobile lintas platform untuk iOS dan Android.
+          - generic [ref=e147]:
+            - generic [ref=e148]:
+              - generic [ref=e149]: "#React Native"
+              - generic [ref=e150]: "#Flutter"
+              - generic [ref=e151]: "#Expo"
+            - paragraph [ref=e152]: Mulai dari Rp 8.000.000
+        - generic [ref=e153]:
+          - generic [ref=e154]:
+            - generic [ref=e155]:
+              - generic [ref=e156]: "04"
+              - generic [ref=e157]: DATA VISUALIZATION
+            - img "Dashboard & Admin Panel" [ref=e159]
+            - heading "Dashboard & Admin Panel" [level=4] [ref=e160]
+            - paragraph [ref=e161]: Membangun dashboard analitik interaktif dengan visualisasi data real-time untuk pengambilan keputusan.
+          - generic [ref=e162]:
+            - generic [ref=e163]:
+              - generic [ref=e164]: "#React"
+              - generic [ref=e165]: "#Recharts"
+              - generic [ref=e166]: "#WebSocket"
+            - paragraph [ref=e167]: Mulai dari Rp 7.000.000
+        - generic [ref=e168]:
+          - generic [ref=e169]:
+            - generic [ref=e170]:
+              - generic [ref=e171]: "05"
+              - generic [ref=e172]: BACKEND INTEGRATION
+            - img "API & Integrasi" [ref=e174]
+            - heading "API & Integrasi" [level=4] [ref=e175]
+            - paragraph [ref=e176]: Membangun dan mengintegrasikan API backend yang aman, cepat, dan terukur untuk berbagai kebutuhan bisnis.
+          - generic [ref=e177]:
+            - generic [ref=e178]:
+              - generic [ref=e179]: "#Node.js"
+              - generic [ref=e180]: "#Express"
+              - generic [ref=e181]: "#REST APIs"
+            - paragraph [ref=e182]: Mulai dari Rp 4.000.000
+        - generic [ref=e183]:
+          - generic [ref=e184]:
+            - generic [ref=e185]:
+              - generic [ref=e186]: "06"
+              - generic [ref=e187]: TECHNICAL CONSULTING
+            - img "Konsultasi Teknis" [ref=e189]
+            - heading "Konsultasi Teknis" [level=4] [ref=e190]
+            - paragraph [ref=e191]: Audit kode, arsitektur sistem, dan rekomendasi optimasi untuk proyek yang sudah berjalan.
+          - generic [ref=e192]:
+            - generic [ref=e193]:
+              - generic [ref=e194]: "#TypeScript"
+              - generic [ref=e195]: "#CI/CD"
+              - generic [ref=e196]: "#Docker"
+            - paragraph [ref=e197]: Mulai dari Rp 2.000.000
+    - generic [ref=e199]:
+      - generic [ref=e200]:
+        - generic [ref=e201]:
+          - text: Metode Kreatif Saya
+          - heading "Alur Kerja Saya" [level=3] [ref=e202]
+        - generic [ref=e203]: Jalur terstruktur dari konsep ke kode
+      - generic [ref=e204]:
+        - generic [ref=e205]:
+          - generic [ref=e206]:
+            - generic [ref=e208] [cursor=pointer]:
+              - generic [ref=e209]: "01"
+              - generic [ref=e210]:
+                - heading "KEBUTUHAN" [level=4] [ref=e211]
+                - paragraph [ref=e212]: Menganalisis tujuan proyek, kendala arsitektur, dan alur pengguna.
+            - generic [ref=e217]:
+              - paragraph [ref=e218]: Kami memulai setiap proyek engineering dengan spesifikasi teknis yang terstruktur, desain skema API, dan definisi arsitektur. Menyesuaikan skema basis data, aturan keamanan, dan pilihan framework dengan target skalabilitas Anda.
+              - generic [ref=e219]:
+                - generic [ref=e220]: Tinjauan Klien
+                - generic [ref=e224]: Prototipe Interaktif
+          - generic [ref=e228]:
+            - generic [ref=e230] [cursor=pointer]:
+              - generic [ref=e231]: "02"
+              - generic [ref=e232]:
+                - heading "ARSITEKTUR" [level=4] [ref=e233]
+                - paragraph [ref=e234]: Pengaturan basis data, desain API, dan perencanaan alur sistem.
+            - generic [ref=e238]:
+              - paragraph [ref=e239]: Menyiapkan skema basis data, dokumentasi API REST atau GraphQL, dan konfigurasi serverless/microservices. Memastikan kendala keamanan tinggi dan jalur yang dioptimalkan untuk mengurangi beban respons server.
+              - generic [ref=e240]:
+                - generic [ref=e241]: Tinjauan Klien
+                - generic [ref=e245]: Prototipe Interaktif
+          - generic [ref=e249]:
+            - generic [ref=e251] [cursor=pointer]:
+              - generic [ref=e252]: "03"
+              - generic [ref=e253]:
+                - heading "PENGEMBANGAN" [level=4] [ref=e254]
+                - paragraph [ref=e255]: Menulis kode yang bersih, type-safe, dan modular.
+            - generic [ref=e259]:
+              - paragraph [ref=e260]: Menulis perangkat lunak yang dioptimalkan menggunakan framework modern dan robust seperti React, Next.js, atau Node.js. Mengikuti konfigurasi TypeScript yang ketat untuk menjamin type-safety, kemampuan pemeliharaan, dan standar kode yang bersih.
+              - generic [ref=e261]:
+                - generic [ref=e262]: Tinjauan Klien
+                - generic [ref=e266]: Prototipe Interaktif
+          - generic [ref=e270]:
+            - generic [ref=e272] [cursor=pointer]:
+              - generic [ref=e273]: "04"
+              - generic [ref=e274]:
+                - heading "UJI & OPTIMASI" [level=4] [ref=e275]
+                - paragraph [ref=e276]: Pengujian ketat, debugging, dan optimasi performa.
+            - generic [ref=e280]:
+              - paragraph [ref=e281]: Menguji jalur kode melalui kasus uji modular, mengoptimalkan pengindeksan basis data, dan mengonfigurasi bundle aset. Mengaudit kecepatan halaman, perilaku rendering responsif, dan metrik latensi backend sebelum integrasi.
+              - generic [ref=e282]:
+                - generic [ref=e283]: Tinjauan Klien
+                - generic [ref=e287]: Prototipe Interaktif
+          - generic [ref=e291]:
+            - generic [ref=e293] [cursor=pointer]:
+              - generic [ref=e294]: "05"
+              - generic [ref=e295]:
+                - heading "DEPLOY" [level=4] [ref=e296]
+                - paragraph [ref=e297]: Konfigurasi pipeline CI/CD, staging server, dan peluncuran.
+            - generic [ref=e301]:
+              - paragraph [ref=e302]: Mendeplikasi aplikasi ke lingkungan produksi dengan otomasi CI/CD. Memverifikasi variabel sisi server, koneksi SSL, kunci API, dan batas beban untuk menjamin uptime dan skalabilitas yang tak tertandingi.
+              - generic [ref=e303]:
+                - generic [ref=e304]: Tinjauan Klien
+                - generic [ref=e308]: Prototipe Interaktif
+        - generic [ref=e313]:
+          - heading "Jaminan Kualitas Saya" [level=4] [ref=e319]
+          - paragraph [ref=e320]: Setiap pixel yang dirancang memiliki fungsi jelas. Saya memadukan estetika desain dengan psikologi pengguna untuk menghasilkan tata letak yang meningkatkan metrik, mempertahankan pengguna, dan memberikan kesan.
+          - generic [ref=e321]:
+            - generic [ref=e322]: 100% Tata Letak Kustom
+            - generic [ref=e325]: Desain kontras aksesibel (WCAG)
+            - generic [ref=e328]: Siap coding React yang mulus
+    - generic [ref=e332]:
+      - generic [ref=e333]:
+        - generic [ref=e334]:
+          - text: Keahlian Teknis
+          - heading "Keahlian & Kemampuan" [level=3] [ref=e335]
+        - generic [ref=e336]: Daftar teknologi yang dikuasai
+      - generic [ref=e337]:
+        - generic [ref=e338]:
+          - paragraph [ref=e339]: Teknologi & Metodologi Inti
+          - generic [ref=e340]:
+            - generic [ref=e341]: REACT
+            - generic [ref=e342]: TYPESCRIPT
+            - generic [ref=e343]: NEXT.JS
+            - generic [ref=e344]: NODE.JS
+            - generic [ref=e345]: EXPRESS
+            - generic [ref=e346]: POSTGRESQL
+            - generic [ref=e347]: FLUTTER
+            - generic [ref=e348]: REACT NATIVE
+            - generic [ref=e349]: REST APIS
+            - generic [ref=e350]: TAILWIND CSS
+            - generic [ref=e351]: GIT
+            - generic [ref=e352]: DOCKER
+            - generic [ref=e353]: MONGODB
+            - generic [ref=e354]: CI/CD
+            - generic [ref=e355]: WEBSOCKETS
+            - generic [ref=e356]: CLOUDFLARE
+            - generic [ref=e357]: PRISMA
+            - generic [ref=e358]: GRAPHQL
+            - generic [ref=e359]: FIGMA
+            - generic [ref=e360]: REDUX
+            - generic [ref=e361]: SUPABASE
+            - generic [ref=e362]: FIREBASE
+            - generic [ref=e363]: VERCEL
+            - generic [ref=e364]: AWS
+            - generic [ref=e365]: PYTHON
+            - generic [ref=e366]: VUE.JS
+            - generic [ref=e367]: DJANGO
+            - generic [ref=e368]: REDIS
+            - generic [ref=e369]: KUBERNETES
+            - generic [ref=e370]: WEBPACK
+        - generic [ref=e372]:
+          - generic [ref=e374]: JAMINAN 100%
+          - generic [ref=e380]:
+            - generic [ref=e381]: JAMINAN KEPUASAN
+            - heading "Jaminan Uang Kembali" [level=4] [ref=e382]
+            - paragraph [ref=e383]: Tanpa Syarat Ribet
+            - paragraph [ref=e384]: Jika hasil pekerjaan tidak sesuai dengan kesepakatan awal, saya menjamin pengembalian uang penuh. Kepuasan Anda adalah prioritas utama saya.
+          - generic [ref=e385]:
+            - generic [ref=e386]: Revisi tanpa batas hingga disetujui
+            - generic [ref=e389]: Pengembalian dana 100% jika tidak puas
+            - generic [ref=e392]: Transparansi proses dari awal hingga akhir
+    - generic [ref=e396]:
+      - generic [ref=e397]:
+        - generic [ref=e398]:
+          - text: Hubungi Saya
+          - heading "Ayo Berkolaborasi" [level=3] [ref=e399]
+        - generic [ref=e400]: Mari buat sesuatu yang luar biasa
+      - generic [ref=e401]:
+        - generic [ref=e402]:
+          - generic [ref=e403]:
+            - heading "PUNYA PROYEK YANG IDE?" [level=4] [ref=e404]
+            - paragraph [ref=e405]: Saya selalu terbuka untuk mendiskusikan proyek baru, ide kreatif, atau kesempatan untuk menjadi bagian dari visi Anda.
+            - generic [ref=e406]:
+              - generic [ref=e408]:
+                - generic [ref=e414]:
+                  - generic [ref=e415]: EMAIL
+                  - link "ekaryandigitalsolution.pages.dev" [ref=e416] [cursor=pointer]:
+                    - /url: mailto:inc.ekaryan@gmail.com
+                - button "Salin Alamat Email" [ref=e417] [cursor=pointer]
+              - generic [ref=e427]:
+                - generic [ref=e428]: LOKASI
+                - generic [ref=e429]: Bali, Indonesia
+              - generic [ref=e436]:
+                - generic [ref=e437]: WEBSITE
+                - link "ekaryandigitalsolution.pages.dev" [ref=e438] [cursor=pointer]:
+                  - /url: https://ekaryandigitalsolution.pages.dev
+          - generic [ref=e439]: Mari buat sesuatu yang luar biasa bersama
+        - generic [ref=e441]:
+          - generic [ref=e442]:
+            - generic [ref=e443]:
+              - generic [ref=e444]: Nama Lengkap *
+              - textbox "Eka Ryan" [ref=e445]
+            - generic [ref=e446]:
+              - generic [ref=e447]: Email *
+              - textbox "email@contoh.com" [ref=e448]
+          - generic [ref=e449]:
+            - generic [ref=e450]: Nomor WhatsApp *
+            - textbox "08123456789" [ref=e451]
+          - generic [ref=e452]:
+            - generic [ref=e453]: Layanan yang Dibutuhkan *
+            - combobox [ref=e454]:
+              - option "-- Pilih Layanan --" [selected]
+              - option "Pengembangan Web — Mulai dari Rp 5.000.000"
+              - option "Desain UI/UX — Mulai dari Rp 3.000.000"
+              - option "Aplikasi Mobile — Mulai dari Rp 8.000.000"
+              - option "Dashboard & Admin Panel — Mulai dari Rp 7.000.000"
+              - option "API & Integrasi — Mulai dari Rp 4.000.000"
+              - option "Konsultasi Teknis — Mulai dari Rp 2.000.000"
+          - generic [ref=e455]:
+            - generic [ref=e456]: Pesan Anda *
+            - textbox "Ceritakan tentang visi proyek Anda, fitur, platform, dan tujuan..." [ref=e457]
+          - generic [ref=e458]:
+            - generic [ref=e459]: Fitur Tambahan (opsional)
+            - button "Pilih fitur tambahan..." [ref=e460] [cursor=pointer]
+          - button "KIRIM & MINTA PENAWARAN" [ref=e464] [cursor=pointer]
+  - contentinfo [ref=e468]:
+    - generic [ref=e469]:
+      - generic [ref=e470]:
+        - generic [ref=e471]:
+          - generic [ref=e472]: HUBUNGKAN DENGAN SAYA
+          - generic [ref=e473]:
+            - link "LinkedIn" [ref=e474] [cursor=pointer]:
+              - /url: https://linkedin.com/in/placeholder
+            - link "Instagram" [ref=e479] [cursor=pointer]:
+              - /url: https://instagram.com/placeholder
+            - link "TikTok" [ref=e483] [cursor=pointer]:
+              - /url: https://tiktok.com/@placeholder
+            - link "X" [ref=e486] [cursor=pointer]:
+              - /url: https://x.com/placeholder
+        - paragraph [ref=e490]: “TALK IS CHEAP. SHOW ME THE CODE.”
+        - button "Unduh CV Saya" [ref=e492] [cursor=pointer]
+      - generic [ref=e497]:
+        - generic [ref=e498]: © 2026 EKA RYAN. HAK CIPTA DIPERTAHANKAN.
+        - generic [ref=e499]:
+          - link "Admin" [ref=e500] [cursor=pointer]:
+            - /url: admin.html
+          - generic [ref=e501]: •
+          - link "Kebijakan Privasi" [ref=e502] [cursor=pointer]:
+            - /url: "#"
+          - generic [ref=e503]: •
+          - link "Ketentuan Layanan" [ref=e504] [cursor=pointer]:
+            - /url: "#"

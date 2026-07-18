@@ -19,7 +19,7 @@ const DEFAULTS = {
     hero_name: 'Eka Ryan',
     hero_description: 'Saya merancang dan membangun antarmuka digital yang cepat, estetis, dan berorientasi pada data. Spesialisasi dalam dashboard tingkat lanjut dan pengalaman web interaktif.',
     hero_tagline: 'Web Developer • UI/UX Designer • Freelancer',
-    hero_image: 'src/assets/images/alex_morgan_hero_1784011179158.jpg',
+    hero_image: '',
     guarantee_title: 'Jaminan Uang Kembali',
     guarantee_desc: 'Jika hasil pekerjaan tidak sesuai dengan kesepakatan awal, saya menjamin pengembalian uang penuh. Kepuasan Anda adalah prioritas utama saya.',
     guarantee_p1: 'Revisi tanpa batas hingga disetujui',
@@ -45,7 +45,7 @@ const DEFAULTS = {
       id: 'svc_1', sort_order: 1,
       title: 'Pengembangan Web', subtitle: 'FULL-STACK DEVELOPMENT',
       description: 'Membangun website modern, responsif, dan performa tinggi menggunakan teknologi terkini.',
-      image: 'src/assets/images/nexora_dashboard_1784011198961.jpg',
+      image: '',
       price: 'Mulai dari Rp 5.000.000',
       is_active: true, created_at: '2024-11-15T08:00:00.000Z'
     },
@@ -53,7 +53,7 @@ const DEFAULTS = {
       id: 'svc_2', sort_order: 2,
       title: 'Desain UI/UX', subtitle: 'UI/UX DESIGN',
       description: 'Merancang antarmuka pengguna yang intuitif dan pengalaman pengguna yang memukau.',
-      image: 'src/assets/images/volterra_motors_1784011216086.jpg',
+      image: '',
       price: 'Mulai dari Rp 3.000.000',
       is_active: true, created_at: '2024-11-15T08:00:00.000Z'
     },
@@ -61,7 +61,7 @@ const DEFAULTS = {
       id: 'svc_3', sort_order: 3,
       title: 'Aplikasi Mobile', subtitle: 'MOBILE APP DEVELOPMENT',
       description: 'Mengembangkan aplikasi mobile lintas platform untuk iOS dan Android.',
-      image: 'src/assets/images/balance_app_1784011231185.jpg',
+      image: '',
       price: 'Mulai dari Rp 8.000.000',
       is_active: true, created_at: '2024-11-15T08:00:00.000Z'
     },
@@ -69,7 +69,7 @@ const DEFAULTS = {
       id: 'svc_4', sort_order: 4,
       title: 'Dashboard & Admin Panel', subtitle: 'DATA VISUALIZATION',
       description: 'Membangun dashboard analitik interaktif dengan visualisasi data real-time untuk pengambilan keputusan.',
-      image: 'src/assets/images/nexora_dashboard_1784011198961.jpg',
+      image: '',
       price: 'Mulai dari Rp 7.000.000',
       is_active: true, created_at: '2024-12-01T08:00:00.000Z'
     },
@@ -77,7 +77,7 @@ const DEFAULTS = {
       id: 'svc_5', sort_order: 5,
       title: 'API & Integrasi', subtitle: 'BACKEND INTEGRATION',
       description: 'Membangun dan mengintegrasikan API backend yang aman, cepat, dan terukur untuk berbagai kebutuhan bisnis.',
-      image: 'src/assets/images/volterra_motors_1784011216086.jpg',
+      image: '',
       price: 'Mulai dari Rp 4.000.000',
       is_active: true, created_at: '2024-12-10T08:00:00.000Z'
     },
@@ -85,7 +85,7 @@ const DEFAULTS = {
       id: 'svc_6', sort_order: 6,
       title: 'Konsultasi Teknis', subtitle: 'TECHNICAL CONSULTING',
       description: 'Audit kode, arsitektur sistem, dan rekomendasi optimasi untuk proyek yang sudah berjalan.',
-      image: 'src/assets/images/balance_app_1784011231185.jpg',
+      image: '',
       price: 'Mulai dari Rp 2.000.000',
       is_active: true, created_at: '2024-12-20T08:00:00.000Z'
     }

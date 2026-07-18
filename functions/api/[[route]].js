@@ -148,6 +148,12 @@ export async function onRequest(context) {
     if (path.match(/^\/upload\/delete$/) && method === 'POST') {
       return await deleteFile(request, env, corsHeaders);
     }
+    if (path === '/storage' && method === 'GET') {
+      return await listStorage(request, env, corsHeaders);
+    }
+    if (path === '/storage' && method === 'DELETE') {
+      return await deleteStorageObject(request, env, corsHeaders);
+    }
 
     // R2 file serving (public)
     if (path.match(/^\/r2\/.+/) && method === 'GET') {
@@ -486,5 +492,32 @@ async function deleteFile(request, env, corsHeaders) {
 
   await env.R2.delete(key);
   
+  return jsonResponse({ success: true }, 200, corsHeaders);
+}
+
+// ===== STORAGE MANAGER =====
+// List all objects in the R2 bucket (protected by admin key).
+async function listStorage(request, env, corsHeaders) {
+  const objects = await env.R2.list({ limit: 1000 });
+  const items = objects.objects.map(o => ({
+    key: o.key,
+    size: o.size,
+    uploaded: o.uploaded,
+    url: `https://ekaryandigitalsolution.pages.dev/api/r2/${o.key}`
+  }));
+  return jsonResponse({ objects: items, truncated: objects.truncated }, 200, corsHeaders);
+}
+
+// Delete any object in the R2 bucket by key (protected by admin key).
+async function deleteStorageObject(request, env, corsHeaders) {
+  const { key } = await request.json();
+  if (!key || typeof key !== 'string') {
+    return jsonResponse({ error: 'Invalid key' }, 400, corsHeaders);
+  }
+  // Prevent path traversal / deleting the audio asset by accident is allowed but guard '..'
+  if (key.includes('..') || key.length === 0) {
+    return jsonResponse({ error: 'Invalid key format' }, 400, corsHeaders);
+  }
+  await env.R2.delete(key);
   return jsonResponse({ success: true }, 200, corsHeaders);
 }
