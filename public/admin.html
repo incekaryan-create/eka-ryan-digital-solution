@@ -610,9 +610,46 @@
     // ===== IMAGE UPLOAD HELPERS =====
     const ADMIN_KEY = 'Ekaryan443!';
 
+    // Compress + resize an image client-side before uploading so it renders
+    // fast and consistently (avoids 1.6MB+ unoptimized PNGs on the page).
+    async function optimizeImage(file, maxDim = 1600, quality = 0.85) {
+      if (!file || !file.type.startsWith('image/')) return file;
+      try {
+        const bitmap = await createImageBitmap(file);
+        let { width, height } = bitmap;
+        if (width > maxDim || height > maxDim) {
+          const scale = Math.min(maxDim / width, maxDim / height);
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(bitmap, 0, 0, width, height);
+        // Keep PNG only if the source actually has transparency; else JPEG.
+        let hasAlpha = false;
+        if (file.type === 'image/png' || file.type === 'image/webp') {
+          const data = ctx.getImageData(0, 0, width, height).data;
+          for (let i = 3; i < data.length; i += 200) {
+            if (data[i] < 255) { hasAlpha = true; break; }
+          }
+        }
+        const outType = hasAlpha ? 'image/png' : 'image/jpeg';
+        const outName = file.name.replace(/\.[^.]+$/, '') + (hasAlpha ? '.png' : '.jpg');
+        const blob = await new Promise(res => canvas.toBlob(res, outType, quality));
+        bitmap.close && bitmap.close();
+        return new File([blob], outName, { type: outType });
+      } catch (e) {
+        // If optimization fails for any reason, upload the original.
+        return file;
+      }
+    }
+
     async function uploadToR2(file) {
+      const optimized = await optimizeImage(file);
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', optimized);
       const res = await fetch('/api/upload?key=' + encodeURIComponent(ADMIN_KEY), {
         method: 'POST',
         body: formData

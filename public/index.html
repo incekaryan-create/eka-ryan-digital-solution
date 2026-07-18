@@ -951,7 +951,7 @@
               <span class="font-mono text-[10px] text-zinc-400 tracking-widest uppercase bg-zinc-900 px-2.5 py-1 rounded-full group-hover:text-red-500 transition-colors">${p.subtitle}</span>
             </div>
             <div class="relative mt-6 aspect-video overflow-hidden rounded-lg bg-zinc-900 border border-zinc-900">
-              <img src="${p.image}" alt="${p.title}" class="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105" referrerpolicy="no-referrer" />
+              <img src="${p.image}" alt="${p.title}" loading="lazy" onerror="this.style.display='none'" class="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105" referrerpolicy="no-referrer" />
             </div>
             <h4 class="font-display text-xl font-bold tracking-tight mt-6 text-white group-hover:text-red-500 transition-colors uppercase">${p.title}</h4>
             <p class="font-sans text-xs text-zinc-400 mt-2 line-clamp-2 leading-relaxed">${p.description}</p>
