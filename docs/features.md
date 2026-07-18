@@ -1,81 +1,54 @@
 # Features Documentation
 
+Fitur nyata **Eka Ryan Digital Solution** — portfolio digital freelancer (Eka Ryan).
+
 ## Feature Index
 
-| Feature | Status | Version |
-|---------|--------|---------|
-| Authentication | Active | 1.0.0 |
-| Dashboard | Active | 1.0.0 |
-| API Integration | Active | 1.0.0 |
-| Cloud Deployment | Active | 1.0.0 |
+| Fitur | Status | Penyimpanan | Akses |
+|-------|--------|-------------|-------|
+| Hero & Config | Active | D1 (`config`) | Publik GET / API PUT |
+| Layanan (Services) | Active | D1 (`services`, `service_details`, `service_tags`) | Publik GET / Admin CRUD |
+| Workflow | Active | D1 (`workflow`) | Publik GET / Admin CRUD |
+| Skills | Active | D1 (`skills`) | Publik GET / Admin CRUD |
+| Add-ons | Active | D1 (`add_ons`) | Publik GET / Admin CRUD |
+| Pesan Kontak | Active | D1 (`messages`) | Publik POST / Admin baca/hapus |
+| Storage (R2) | Active | R2 bucket | Admin upload/delete |
+| Admin Panel | Active | D1 + R2 | Login key `Ekaryan443!` |
+| Backup/Restore | Active | localStorage (`db.js`) | Admin export/import |
 
-## Authentication
+## Halaman Publik (`index.html`)
 
-### Description
-Sistem autentikasi user dengan email dan password.
+- **Hero**: nama, greeting, deskripsi, tagline, gambar hero (dari R2), jaminan & kualitas.
+- **Layanan**: grid layanan dari `GET /api/services` (judul, subtitle, gambar, harga, tags, details).
+- **Workflow**: langkah alur kerja dari `GET /api/workflow`.
+- **Skills**: keahlian dari `GET /api/skills`.
+- **Add-ons**: checkbox pilihan fitur tambahan dari `GET /api/addons` (dikelompokkan per kategori).
+- **Form Kontak**: kirim pesan via `POST /api/messages` (publik, tanpa key).
+- **Config fallback**: bila API gagal, `db.getConfig()` (localStorage) dipakai sebagai cadangan.
 
-### Implementation
-- Firebase Authentication
-- JWT tokens
-- Session management
+## Admin Panel (`admin.html`)
 
-### Endpoints
-- POST /api/auth/login
-- POST /api/auth/register
-- POST /api/auth/logout
+Login dengan key `Ekaryan443!`. Panel mencakup:
 
-## Dashboard
+- **Dashboard**: statistik jumlah layanan, workflow, skills, pesan.
+- **Services CRUD**: tabel + form tambah/edit/hapus via `POST/PUT/DELETE /api/services`.
+- **Workflow CRUD**: via `POST/PUT/DELETE /api/workflow`.
+- **Skills CRUD**: via `POST/PUT/DELETE /api/skills`.
+- **Add-ons CRUD**: via `POST/PUT/DELETE /api/addons`.
+- **Messages**: lihat, tandai dibaca (`PUT /api/messages/:id/read`), hapus (`DELETE /api/messages/:id`), hapus semua (`DELETE /api/messages`).
+- **Config**: edit hero & kontak via `PUT /api/config` (mirror ke `db.updateConfig()`).
+- **Storage Manager**: list objek R2 (`GET /api/storage`), upload (`POST /api/upload`), hapus (`DELETE /api/storage`).
+- **Backup/Restore**: `db.exportAll()` / `db.importAll()` untuk cadangan JSON lokal.
 
-### Description
-Dashboard untuk monitoring dan analytics.
+## Storage (R2)
 
-### Features
-- Real-time data
-- Charts and graphs
-- Export to CSV
+- Bucket: `eka-ryan-digital-solution-assets`.
+- File diakses publik via `GET /api/r2/<key>` (cache 1 tahun).
+- Upload dibatasi 5 MB, tipe JPEG/PNG/GIF/WebP.
+- Hero image & gambar layanan disimpan di `uploads/`.
 
-## API Integration
+## Catatan
 
-### Description
-Integrasi dengan external APIs.
-
-### Supported APIs
-- Payment Gateway
-- Email Service
-- SMS Service
-
-## Cloud Deployment
-
-### Description
-Deployment ke cloud platforms.
-
-### Supported Platforms
-- Cloudflare Workers
-- Firebase Hosting
-- Vercel
-- Netlify
-
-## Changelog
-
-### v1.0.0 (2024-01-01)
-- Initial release
-- Basic authentication
-- Dashboard v1
-- API endpoints
-
-### v1.1.0 (2024-02-01)
-- Added OAuth support
-- Dashboard improvements
-- New API endpoints
-
-## Roadmap
-
-### v1.2.0 (Planned)
-- [ ] Two-factor authentication
-- [ ] Advanced analytics
-- [ ] Webhook support
-
-### v2.0.0 (Planned)
-- [ ] Microservices architecture
-- [ ] GraphQL API
-- [ ] Real-time notifications
+- **Tidak ada Firebase, autentikasi user, OAuth, atau dashboard analytics** di proyek ini.
+- Semua data dinamis disimpan di **Cloudflare D1** (SQL) dan **R2** (file).
+- `db.js` hanya sebagai fallback localStorage + backup lokal, bukan sumber utama.

@@ -1,79 +1,80 @@
-# Firebase Setup Guide
+# Cloudflare Setup (D1 + R2 + Pages)
 
-## Overview
-Firebase adalah platform pengembangan aplikan dari Google untuk membangun aplikasi web dan mobile.
+> **Catatan**: Proyek ini **TIDAK menggunakan Firebase**. Dokumen ini menggantikan panduan Firebase lama dengan setup Cloudflare yang sebenarnya (D1 untuk database, R2 untuk file, Pages untuk hosting).
 
-## Services
+## Prerequisites
 
-### Authentication
-```javascript
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+- Akun Cloudflare (Account ID: `55bcfa4f9d8d6b01276737c7b64339a8`)
+- `wrangler` CLI (`npm i -g wrangler`)
+- `wrangler login` sudah dilakukan
 
-const auth = getAuth();
-await signInWithEmailAndPassword(auth, email, password);
-```
+## D1 Database (SQL)
 
-### Firestore Database
-```javascript
-import { collection, addDoc, getDocs } from 'firebase/firestore';
+Database: `eka-ryan-digital-solution-db` (id `91e5a4c5-92e1-4ae2-b027-cdab35724030`).
 
-// Add document
-await addDoc(collection(db, 'users'), { name: 'John' });
-
-// Get documents
-const snapshot = await getDocs(collection(db, 'users'));
-```
-
-### Cloud Storage
-```javascript
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-
-const storageRef = ref(storage, 'images/photo.jpg');
-await uploadBytes(storageRef, file);
-const url = await getDownloadURL(storageRef);
-```
-
-### Hosting
 ```bash
-firebase deploy --only hosting
+# List database
+wrangler d1 list --remote
+
+# Jalankan SQL (selalu pakai --remote di macOS lama)
+wrangler d1 execute eka-ryan-digital-solution-db --remote \
+  --command="SELECT * FROM services ORDER BY sort_order;"
+
+# Dari file SQL
+wrangler d1 execute eka-ryan-digital-solution-db --remote --file=./schema.sql
 ```
 
-## Configuration
+Tabel utama: `config`, `services`, `service_details`, `service_tags`, `workflow`, `skills`, `messages`, `add_ons`.
 
-### firebase.json
-```json
-{
-  "hosting": {
-    "public": "public",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
-  },
-  "firestore": {
-    "rules": "firestore.rules"
-  }
-}
+## R2 Bucket (File Storage)
+
+Bucket: `eka-ryan-digital-solution-assets`.
+
+```bash
+# Upload file
+wrangler r2 object put eka-ryan-digital-solution-assets/uploads/photo.jpg --file=./photo.jpg
+
+# Hapus file
+wrangler r2 object delete eka-ryan-digital-solution-assets/uploads/photo.jpg
 ```
 
-## Security Rules
+> **Catatan**: `wrangler r2 object` tidak punya subcommand `list`. Untuk list objek, pakai Cloudflare REST API:
+> ```bash
+> curl -sk "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/r2/buckets/eka-ryan-digital-solution-assets/objects?limit=100" \
+>   -H "Authorization: Bearer $TOKEN"
+> ```
 
-### Firestore Rules
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-  }
-}
+## Pages Project
+
+- Project name: `ekaryandigitalsolution`
+- Build output: `./public` (diatur via `pages_build_output_dir` di `wrangler.toml`)
+- Functions: `functions/api/[[route]].js`
+
+## Secrets & Environment
+
+Set via dashboard Cloudflare → Pages → Settings → Environment variables (Production):
+
+| Variable | Keterangan |
+|----------|-----------|
+| `ADMIN_PASSWORD` | Override key admin (default `Ekaryan443!` bila kosong) |
+| `JWT_SECRET` | (opsional) untuk auth lanjutan |
+
+Jangan commit secret ke repo.
+
+## Bindings (wrangler.toml)
+
+```toml
+[[d1_databases]]
+binding = "DB"
+database_name = "eka-ryan-digital-solution-db"
+database_id = "91e5a4c5-92e1-4ae2-b027-cdab35724030"
+
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "eka-ryan-digital-solution-assets"
 ```
-
-## Best Practices
-
-1. **Security Rules**: Selalu gunakan security rules
-2. **Indexes**: Buat index untuk query kompleks
-3. **Offline support**: Firestore punya offline persistence
-4. **Structure**: Hindari data terlalu nested
 
 ## References
-- [Firebase Docs](https://firebase.google.com/docs)
-- [Firebase Console](https://console.firebase.google.com)
+- [Cloudflare D1](https://developers.cloudflare.com/d1/)
+- [Cloudflare R2](https://developers.cloudflare.com/r2/)
+- [Cloudflare Pages](https://developers.cloudflare.com/pages/)

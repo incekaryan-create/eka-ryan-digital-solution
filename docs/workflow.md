@@ -1,101 +1,56 @@
 # Development Workflow
 
-## Git Workflow
+## Git Workflow (Sederhana)
 
-### Branch Strategy
-- `main` - Production branch
-- `develop` - Development branch
-- `feature/*` - Feature branches
-- `hotfix/*` - Hotfix branches
+Proyek ini menggunakan **satu branch utama: `main`**. Tidak ada branch `develop`, `feature/*`, atau `hotfix/*`.
 
-### Commands
+### Alur Kerja Harian
 
-#### Start New Feature
 ```bash
-git checkout develop
-git pull origin develop
-git checkout -b feature/new-feature
-```
-
-#### Finish Feature
-```bash
-git checkout develop
-git merge feature/new-feature
-git push origin develop
-git branch -d feature/new-feature
-```
-
-#### Hotfix
-```bash
+# 1. Pastikan di main & update
 git checkout main
 git pull origin main
-git checkout -b hotfix/fix-bug
-# fix bug
-git checkout main
-git merge hotfix/fix-bug
+
+# 2. Edit kode (public/, functions/, docs/, wrangler.toml)
+
+# 3. Commit
+git add -A
+git commit -m "feat: tambah storage manager"
+
+# 4. Push → otomatis trigger GitHub Actions deploy
 git push origin main
-git checkout develop
-git merge hotfix/fix-bug
-git branch -d hotfix/fix-bug
 ```
+
+Setiap `push` ke `main` memicu `.github/workflows/deploy.yml` yang men-deploy `./public` ke Cloudflare Pages (`ekaryandigitalsolution`).
 
 ## Commit Convention
 
-### Format
+Format bebas, disarankan:
+
 ```
-<type>(<scope>): <subject>
+<type>: <subject singkat>
 
-<body>
-
-<footer>
-```
-
-### Types
-- `feat` - New feature
-- `fix` - Bug fix
-- `docs` - Documentation
-- `style` - Formatting
-- `refactor` - Code restructuring
-- `test` - Adding tests
-- `chore` - Maintenance
-
-### Examples
-```
-feat(auth): add OAuth support
-
-- Added Google OAuth
-- Added GitHub OAuth
-- Updated login page
-
-Closes #123
+<penjelasan opsional>
 ```
 
-## Code Review
+Types:
+- `feat` - fitur baru
+- `fix` - perbaikan bug
+- `docs` - dokumentasi
+- `style` - formatting
+- `refactor` - restrukturisasi
+- `chore` - maintenance
 
-### Checklist
-- [ ] Code follows style guide
-- [ ] Tests pass
-- [ ] No security issues
-- [ ] Documentation updated
-- [ ] No console logs
+Contoh: `fix: admin panel sekarang baca/tulis D1 bukan localStorage`
 
-## Release Process
+## Deployment
 
-### Version Bump
-```bash
-# Patch version
-npm version patch
+Deploy **otomatis** lewat GitHub Actions (lihat `docs/deployment.md`). Tidak ada version bump manual atau release tag wajib.
 
-# Minor version
-npm version minor
+## Code Review Checklist
 
-# Major version
-npm version major
-```
-
-### Create Release
-1. Update CHANGELOG.md
-2. Bump version
-3. Create git tag
-4. Push to GitHub
-5. Create GitHub Release
+- [ ] Perubahan tidak mem-break API publik
+- [ ] `db.js` hanya dipakai sebagai fallback/backup, bukan sumber utama
+- [ ] Tidak ada secret di-commit
+- [ ] Dokumentasi (`docs/`) diperbarui bila ada perubahan API/fitur
+- [ ] Deploy GitHub Actions sukses (green)

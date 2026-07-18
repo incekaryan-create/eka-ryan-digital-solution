@@ -22,20 +22,25 @@ Portfolio website for Eka Ryan Digital Solution, deployed on Cloudflare Pages wi
 ## Project Structure
 
 ```
-eka-ryan-portfolio/
+eka-ryan-digital-solution/
 ├── public/                 # Static files (deployed to Pages)
 │   ├── index.html         # Main portfolio page
 │   ├── admin.html         # Admin panel
-│   ├── db.js              # Database client
-│   └── src/               # Assets
+│   ├── db.js              # LocalStorage fallback + backup (bukan sumber utama)
+│   └── src/               # Assets (images, css, js)
 ├── functions/             # Pages Functions (API)
 │   └── api/
-│       └── [[route]].js   # API handler
-├── schema.sql             # D1 database schema
-├── seed.sql               # Seed data (fictional)
-├── wrangler.toml          # Cloudflare configuration
-├── deploy.sh              # Deployment script
-└── package.json           # Dependencies
+│       └── [[route]].js   # API handler (catch-all)
+├── docs/                  # Dokumentasi project
+│   ├── api-registry.md
+│   ├── deployment.md
+│   ├── cloudflare-workers.md
+│   ├── features.md
+│   ├── firebase-setup.md  # sebenarnya: Cloudflare setup (D1+R2)
+│   ├── workflow.md
+│   └── troubleshooting.md
+├── wrangler.toml          # Cloudflare Pages config + bindings
+└── .github/workflows/deploy.yml  # Auto-deploy ke Pages
 ```
 
 ## Quick Start
@@ -58,83 +63,91 @@ npm install
 wrangler login
 ```
 
-### 3. Deploy Everything
+### 3. Deploy
+
+Deploy otomatis via GitHub Actions setiap `git push` ke `main`. Untuk deploy manual:
 
 ```bash
-./deploy.sh
+wrangler pages deploy ./public --project-name=ekaryandigitalsolution
 ```
-
-This will:
-1. Create R2 bucket
-2. Create D1 database
-3. Initialize database schema
-4. Seed with fictional data
-5. Deploy to Cloudflare Pages
 
 ### 4. Access Your Website
 
 - **Website**: https://ekaryandigitalsolution.pages.dev
-- **Admin Panel**: https://ekaryandigitalsolution.pages.dev/admin.html
+- **Admin Panel**: https://ekaryandigitalsolution.pages.dev/admin (redirect dari `/admin.html`)
 
 ## Manual Setup
 
 ### Create R2 Bucket
 
 ```bash
-wrangler r2 bucket create portfolio-assets
+wrangler r2 bucket create eka-ryan-digital-solution-assets
 ```
 
 ### Create D1 Database
 
 ```bash
-wrangler d1 create portfolio-db
+wrangler d1 create eka-ryan-digital-solution-db
 ```
 
-Update `wrangler.toml` with the database ID.
+Update `wrangler.toml` dengan database ID yang dihasilkan.
 
 ### Initialize Database
 
-```bash
-# Create tables
-wrangler d1 execute portfolio-db --remote --file=./schema.sql
+Skema & seed data sudah ada di Cloudflare D1 (database `eka-ryan-digital-solution-db`). Untuk menjalankan SQL manual:
 
-# Seed data
-wrangler d1 execute portfolio-db --remote --file=./seed.sql
+```bash
+wrangler d1 execute eka-ryan-digital-solution-db --remote --command="SELECT * FROM services;"
 ```
+
+> Di macOS lama, selalu tambahkan `--remote` untuk perintah D1/R2.
 
 ### Deploy to Pages
 
 ```bash
-wrangler pages deploy ./public --project-name ekaryandigitalsolution
+wrangler pages deploy ./public --project-name=ekaryandigitalsolution
 ```
 
 ## Local Development
 
-```bash
-npm run dev
-```
-
-This starts a local development server with D1 and R2 emulated locally.
+Tidak ada build step. Cukup edit `public/` dan `functions/`. Deploy lewat `git push` (GitHub Actions) atau `wrangler pages deploy`.
 
 ## API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/config` | Get site configuration |
-| PUT | `/api/config` | Update site configuration |
-| GET | `/api/services` | List all services |
-| GET | `/api/services/:id` | Get service details |
-| POST | `/api/services` | Create new service |
-| PUT | `/api/services/:id` | Update service |
-| DELETE | `/api/services/:id` | Delete service |
-| GET | `/api/workflow` | List workflow steps |
-| POST | `/api/workflow` | Create workflow step |
-| GET | `/api/skills` | List all skills |
-| POST | `/api/skills` | Create new skill |
-| GET | `/api/messages` | List all messages |
-| POST | `/api/messages` | Submit contact form |
-| PUT | `/api/messages/:id/read` | Mark message as read |
-| POST | `/api/upload` | Upload file to R2 |
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/api/config` | Get site configuration | publik |
+| PUT | `/api/config` | Update site configuration | key |
+| GET | `/api/services` | List all services | publik |
+| GET | `/api/services/:id` | Get service details | publik |
+| POST | `/api/services` | Create new service | key |
+| PUT | `/api/services/:id` | Update service | key |
+| DELETE | `/api/services/:id` | Delete service | key |
+| GET | `/api/workflow` | List workflow steps | publik |
+| POST | `/api/workflow` | Create workflow step | key |
+| PUT | `/api/workflow/:id` | Update workflow step | key |
+| DELETE | `/api/workflow/:id` | Delete workflow step | key |
+| GET | `/api/skills` | List all skills | publik |
+| POST | `/api/skills` | Create new skill | key |
+| PUT | `/api/skills/:id` | Update skill | key |
+| DELETE | `/api/skills/:id` | Delete skill | key |
+| GET | `/api/addons` | List add-ons (grouped) | publik |
+| GET | `/api/addons/list` | List add-ons (flat) | publik |
+| POST | `/api/addons` | Create add-on | key |
+| PUT | `/api/addons/:id` | Update add-on | key |
+| DELETE | `/api/addons/:id` | Delete add-on | key |
+| GET | `/api/messages` | List all messages | key |
+| POST | `/api/messages` | Submit contact form | **publik** |
+| PUT | `/api/messages/:id/read` | Mark message as read | key |
+| DELETE | `/api/messages/:id` | Delete message | key |
+| DELETE | `/api/messages` | Delete all messages | key |
+| POST | `/api/upload` | Upload file to R2 | key |
+| POST | `/api/upload/delete` | Delete file from R2 | key |
+| GET | `/api/storage` | List R2 objects | key |
+| DELETE | `/api/storage` | Delete R2 object | key |
+| GET | `/api/r2/*` | Serve public file from R2 | publik |
+
+Lihat `docs/api-registry.md` untuk detail lengkap.
 
 ## Database Tables
 
@@ -148,20 +161,35 @@ This starts a local development server with D1 and R2 emulated locally.
 
 ## Admin Panel
 
-Default credentials:
-- Username: `admin`
-- Password: `admin123`
+Akses `/admin`. Tidak ada username — hanya **admin key**:
+
+- **Admin key**: `Ekaryan443!` (default, hardcoded di `admin.html` & fallback `env.ADMIN_PASSWORD || 'Ekaryan443!'` di API)
+
+Untuk mengubah key di production, set **Pages secret** `ADMIN_PASSWORD` di dashboard Cloudflare (Settings → Environment variables), bukan di `wrangler.toml`.
 
 ## Environment Variables
 
-Set in `wrangler.toml`:
+`wrangler.toml` saat ini:
 
 ```toml
 [vars]
 ENVIRONMENT = "production"
-ADMIN_PASSWORD = "admin123"
-JWT_SECRET = "your-secret-key"
 ```
+
+Secret (jangan di-commit, set via Cloudflare dashboard):
+- `ADMIN_PASSWORD` — override admin key (default `Ekaryan443!` bila kosong)
+- `JWT_SECRET` — (opsional) untuk auth lanjutan
+
+## Documentation
+
+Lihat folder `docs/`:
+- `api-registry.md` — semua endpoint API
+- `deployment.md` — cara deploy (GitHub Actions)
+- `cloudflare-workers.md` — Pages Functions & bindings
+- `features.md` — fitur project
+- `firebase-setup.md` — sebenarnya panduan Cloudflare (D1+R2)
+- `workflow.md` — git workflow
+- `troubleshooting.md` — masalah umum & solusi
 
 ## License
 

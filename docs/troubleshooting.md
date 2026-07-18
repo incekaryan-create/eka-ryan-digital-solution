@@ -1,122 +1,93 @@
 # Troubleshooting Guide
 
-## Common Issues
+Masalah nyata yang ditemui di proyek **Eka Ryan Digital Solution** (Cloudflare Pages + D1 + R2).
 
-### Cloudflare Workers
+## Cloudflare / Wrangler
 
-#### Issue: Worker not deploying
+### Issue: `wrangler d1` / `wrangler r2` gagal di macOS lama
+Cloudflare butuh macOS 13.5+, namun dev environment bisa di bawahnya. Solusi: selalu tambahkan `--remote`.
 ```bash
-# Check wrangler config
-wrangler whoami
-wrangler deploy --dry-run
+wrangler d1 execute eka-ryan-digital-solution-db --remote --command="..."
+wrangler r2 object put ... --remote
 ```
 
-#### Issue: KV namespace not found
+### Issue: `wrangler r2 object list` tidak ada
+`wrangler r2 object` tidak punya subcommand `list`. Gunakan REST API:
 ```bash
-# List namespaces
-wrangler kv:namespace list
-
-# Create namespace
-wrangler kv:namespace create "MY_KV"
+curl -sk "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/r2/buckets/eka-ryan-digital-solution-assets/objects?limit=100" \
+  -H "Authorization: Bearer $TOKEN"
 ```
 
-#### Issue: D1 database error
+### Issue: Deploy GitHub Actions gagal
+- Cek secret `CLOUDFLARE_API_TOKEN` & `CLOUDFLARE_ACCOUNT_ID` di repo GitHub (Settings → Secrets).
+- Pastikan token punya izin `Pages:Edit` + `Account:Cloudflare Pages`.
+- Cek log run di tab Actions.
+
+### Issue: Perubahan tidak muncul di live
+- Cloudflare Pages cache: hard refresh (Cmd+Shift+R) atau buka mode incognito.
+- `*.pages.dev` adalah subdomain Cloudflare, tidak ada user zone → tidak bisa purge cache via API. Cache akan expire natural.
+- Pastikan file benar-benar ter-commit & push ke `main` (deploy otomatis).
+
+## API
+
+### Issue: `401 Unauthorized` saat write
+- Pastikan mengirim `?key=Ekaryan443!` (atau header `Authorization: Bearer Ekaryan443!`).
+- Bila `ADMIN_PASSWORD` diset di Cloudflare, pakai nilai itu, bukan default.
+
+### Issue: `POST /api/messages` tetap butuh key?
+Tidak seharusnya. `/api/messages` adalah publik (ada di `publicWritePaths`). Bila 401, cek `functions/api/[[route]].js` baris auth gate.
+
+### Issue: Data admin tidak muncul di halaman utama
+- **Penyebab lama (sudah diperbaiki)**: admin menulis ke `localStorage` (`db.js`) sementara publik membaca D1. Sekarang admin & publik sama-sama pakai D1 via API.
+- Bila masih beda: cek `GET /api/services` vs tampilan publik; pastikan tidak ada cache lama di browser.
+
+### Issue: `grep_search` gagal di `functions/api/[[route]].js`
+Tool `grep_search` gagal pada file dengan `[[` di nama. Gunakan terminal:
 ```bash
-# List databases
-wrangler d1 list
-
-# Create database
-wrangler d1 create "my-db"
+grep -n "pattern" "functions/api/[[route]].js"
 ```
 
-### Firebase
+## curl / SSL
 
-#### Issue: Permission denied
-```javascript
-// Check security rules
-// Firebase Console > Firestore > Rules
-```
-
-#### Issue: App not initialized
-```javascript
-// Check firebase config
-import { initializeApp } from 'firebase/app';
-const app = initializeApp(config);
-```
-
-### Git
-
-#### Issue: Merge conflict
+### Issue: `curl: (60) SSL certificate problem`
+macOS di environment ini punya CA store usang → HTTPS ke host eksternal gagal. Gunakan `-k` (insecure) atau `-sk`:
 ```bash
-# Abort merge
-git merge --abort
-
-# Resolve manually
-# Edit conflicted files
-git add .
-git commit
+curl -sk https://ekaryandigitalsolution.pages.dev/api/config
 ```
+Browser tidak terpengaruh.
 
-#### Issue: Push rejected
+## Git
+
+### Issue: Push rejected
 ```bash
-# Force push (use with caution)
-git push --force-with-lease
-
-# Or pull and merge
 git pull --rebase origin main
 git push
 ```
 
-### Node.js
-
-#### Issue: Module not found
+### Issue: File tidak sengaja ter-commit (mis. `.playwright-mcp/`)
 ```bash
-# Clear cache
-rm -rf node_modules
-npm install
-```
-
-#### Issue: Port already in use
-```bash
-# Find process
-lsof -i :3000
-
-# Kill process
-kill -9 <PID>
+git rm -r --cached .playwright-mcp/
+echo ".playwright-mcp/" >> .gitignore
+git add -A && git commit -m "chore: ignore playwright cache"
 ```
 
 ## Debug Tips
 
-### Console Logging
-```javascript
-console.log('Debug:', variable);
-console.error('Error:', error);
-console.warn('Warning:', message);
-```
-
-### Network Debug
+### Cek API live
 ```bash
-# Check connectivity
-curl -v https://api.example.com
-
-# Check DNS
-nslookup example.com
+curl -sk https://ekaryandigitalsolution.pages.dev/api/config | head -c 300
 ```
 
-### Performance
+### Cek R2
 ```bash
-# Profile Node.js
-node --prof app.js
-node --prof-process isolate-*.log > processed.txt
+curl -sk "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/r2/buckets/eka-ryan-digital-solution-assets/objects?limit=10" \
+  -H "Authorization: Bearer $TOKEN"
 ```
+
+### Log Functions
+Lihat di dashboard Cloudflare → Pages → project → Functions → Logs (atau `wrangler tail` untuk Worker, tidak untuk Pages statis).
 
 ## Getting Help
 
-### Resources
-- [Stack Overflow](https://stackoverflow.com)
-- [GitHub Issues](https://github.com/issues)
-- [Documentation](./README.md)
-
-### Contact
-- Email: support@example.com
-- Discord: Join our server
+- Dokumentasi project: `docs/` (api-registry, deployment, cloudflare-workers, features, firebase-setup→cloudflare, workflow, troubleshooting).
+- Repo: `incekaryan-create/eka-ryan-digital-solution` (private).

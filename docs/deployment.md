@@ -1,107 +1,90 @@
 # Deployment Guide
 
 ## Overview
-Panduan deployment untuk berbagai platform.
+Proyek **Eka Ryan Digital Solution** dideploy ke **Cloudflare Pages** menggunakan **GitHub Actions**. Tidak menggunakan Firebase, Vercel, Netlify, atau GitHub Pages statis.
 
-## Cloudflare Workers
+## Arsitektur Deploy
 
-### Setup
-```bash
-npm install -g wrangler
-wrangler login
-```
+- **Source**: folder `./public` (HTML statis + `db.js` fallback).
+- **Functions**: `functions/api/[[route]].js` (Pages Functions, otomatis terdeploy bersama).
+- **Build output**: dikonfigurasi via `wrangler.toml` → `pages_build_output_dir = "./public"`.
+- **Pages project**: `ekaryandigitalsolution`.
+- **Live URL**: `https://ekaryandigitalsolution.pages.dev/` (admin di `/admin`).
 
-### Deploy
-```bash
-wrangler deploy
-```
+## GitHub Actions (Cara Deploy Utama)
 
-### Environment Variables
-```bash
-wrangler secret put MY_SECRET
-```
+File: `.github/workflows/deploy.yml`
 
-## Firebase Hosting
-
-### Setup
-```bash
-npm install -g firebase-tools
-firebase login
-firebase init
-```
-
-### Deploy
-```bash
-firebase deploy
-```
-
-## GitHub Pages
-
-### Setup
-1. Create repo named `username.github.io`
-2. Push code to repo
-3. Enable GitHub Pages in Settings
-
-### Deploy with Actions
 ```yaml
-name: Deploy
+name: Deploy to Cloudflare Pages
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-      - run: npm ci
-      - run: npm run build
-      - uses: peaceiris/actions-gh-pages@v3
+      - uses: actions/checkout@v4
+      - name: Deploy
+        uses: cloudflare/wrangler-action@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy ./public --project-name=ekaryandigitalsolution --commit-dirty=true
 ```
 
-## Vercel
+**Cara deploy**: cukup `git push origin main`. GitHub Actions otomatis build & deploy.
 
-### Setup
+## Bindings (wrangler.toml)
+
+```toml
+name = "ekaryandigitalsolution"
+compatibility_date = "2024-12-01"
+pages_build_output_dir = "./public"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "eka-ryan-digital-solution-db"
+database_id = "91e5a4c5-92e1-4ae2-b027-cdab35724030"
+
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "eka-ryan-digital-solution-assets"
+
+[vars]
+ENVIRONMENT = "production"
+```
+
+> **Catatan**: `ADMIN_PASSWORD` dan `JWT_SECRET` sebaiknya diset sebagai **Pages secret** (dashboard Cloudflare → Pages → Settings → Environment variables), bukan di-commit ke repo.
+
+## Deploy Manual (Lokal, Opsional)
+
 ```bash
-npm i -g vercel
-vercel login
+# Pastikan wrangler login
+wrangler whoami
+
+# Deploy manual ke Pages
+wrangler pages deploy ./public --project-name=ekaryandigitalsolution
 ```
 
-### Deploy
-```bash
-vercel
-vercel --prod
-```
+> **Penting (macOS)**: wrangler versi lokal mungkin butuh `--remote` untuk perintah D1/R2 karena versi macOS. Gunakan `--remote` bila diperlukan.
 
-## Netlify
+## Verifikasi Setelah Deploy
 
-### Setup
-```bash
-npm i -g netlify-cli
-netlify login
-```
+1. Buka `https://ekaryandigitalsolution.pages.dev/`.
+2. Buka `/admin` → login dengan key `Ekaryan443!`.
+3. Cek GitHub Actions run terakhir = green.
+4. Uji API: `curl -sk https://ekaryandigitalsolution.pages.dev/api/config`.
 
-### Deploy
-```bash
-netlify deploy --prod
-```
+## Rollback
 
-## Best Practices
-
-1. **CI/CD**: Gunakan GitHub Actions/GitLab CI
-2. **Secrets**: Jangan commit secrets ke repo
-3. **Testing**: Test sebelum deploy
-4. **Rollback**: Siapkan plan rollback
-5. **Monitoring**: Monitor setelah deploy
+Cloudflare Pages menyimpan deployment history. Rollback via dashboard → Pages → Deployments → pilih versi → "Rollback".
 
 ## Checklist
 
-- [ ] Code tested locally
-- [ ] Environment variables set
-- [ ] Build successful
-- [ ] Security review done
-- [ ] Deploy to staging first
-- [ ] Verify in production
+- [ ] Perubahan di-commit & push ke `main`
+- [ ] GitHub Actions run sukses (green)
+- [ ] Site publik & `/admin` dapat diakses
+- [ ] API `GET /api/config` mengembalikan data
+- [ ] Tidak ada secret yang ter-commit ke repo
