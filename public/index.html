@@ -680,7 +680,7 @@
     // They start empty and are populated by the async loader below so the
     // site always reflects the latest database content, not stale localStorage.
     let SERVICES_DATA = [];
-    const WORKFLOW_DATA = db.getWorkflow();
+    let WORKFLOW_DATA = [];
     let SKILLS_LIST = [];
     const adminConfig = db.getConfig();
 
@@ -758,9 +758,10 @@
     // always reflects the latest database content instead of stale localStorage.
     (async () => {
       try {
-        const [svcRes, skRes] = await Promise.all([
+        const [svcRes, skRes, wfRes] = await Promise.all([
           fetch('/api/services'),
-          fetch('/api/skills')
+          fetch('/api/skills'),
+          fetch('/api/workflow')
         ]);
         if (svcRes.ok) {
           SERVICES_DATA = await svcRes.json();
@@ -769,6 +770,10 @@
         if (skRes.ok) {
           SKILLS_LIST = (await skRes.json()).map(s => s.name);
           renderSkills();
+        }
+        if (wfRes.ok) {
+          WORKFLOW_DATA = await wfRes.json();
+          renderWorkflow();
         }
       } catch (e) { /* keep localStorage fallback */ }
     })();
@@ -1118,17 +1123,21 @@
         return;
       }
 
-      const service = serviceId ? db.getServices().find(s => s.id === serviceId) : null;
+      const service = serviceId ? SERVICES_DATA.find(s => s.id === serviceId) : null;
 
       try {
-        db.createMessage({
-          name,
-          email,
-          whatsapp,
-          service_id: serviceId,
-          subject: service ? service.title : 'Tanpa Layanan',
-          message,
-          add_ons: selectedAddons
+        await fetch('/api/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            email,
+            whatsapp,
+            service_id: serviceId,
+            subject: service ? service.title : 'Tanpa Layanan',
+            message,
+            add_ons: selectedAddons
+          })
         });
       } catch(e) {}
 

@@ -124,12 +124,35 @@ export async function onRequest(context) {
     if (path === '/workflow' && method === 'POST') {
       return await createWorkflow(request, env, corsHeaders);
     }
+    if (path.match(/^\/workflow\/[^/]+$/) && method === 'PUT') {
+      const id = path.split('/').pop();
+      return await updateWorkflow(id, request, env, corsHeaders);
+    }
+    if (path.match(/^\/workflow\/[^/]+$/) && method === 'DELETE') {
+      const id = path.split('/').pop();
+      return await deleteWorkflow(id, env, corsHeaders);
+    }
     if (path === '/skills' && method === 'POST') {
       return await createSkill(request, env, corsHeaders);
+    }
+    if (path.match(/^\/skills\/[^/]+$/) && method === 'PUT') {
+      const id = path.split('/').pop();
+      return await updateSkill(id, request, env, corsHeaders);
+    }
+    if (path.match(/^\/skills\/[^/]+$/) && method === 'DELETE') {
+      const id = path.split('/').pop();
+      return await deleteSkill(id, env, corsHeaders);
     }
     if (path.match(/^\/messages\/[^/]+\/read$/) && method === 'PUT') {
       const id = path.split('/')[2];
       return await markMessageRead(id, env, corsHeaders);
+    }
+    if (path.match(/^\/messages\/[^/]+$/) && method === 'DELETE') {
+      const id = path.split('/').pop();
+      return await deleteMessage(id, env, corsHeaders);
+    }
+    if (path === '/messages' && method === 'DELETE') {
+      return await deleteAllMessages(env, corsHeaders);
     }
     if (path === '/addons' && method === 'POST') {
       return await createAddon(request, env, corsHeaders);
@@ -327,6 +350,22 @@ async function createWorkflow(request, env, corsHeaders) {
   return jsonResponse({ id, success: true }, 201, corsHeaders);
 }
 
+async function updateWorkflow(id, request, env, corsHeaders) {
+  const data = await request.json();
+  if (!data.title || data.title.trim().length === 0) {
+    return jsonResponse({ error: 'Title is required' }, 400, corsHeaders);
+  }
+  await env.DB.prepare('UPDATE workflow SET title = ?, short_desc = ?, long_desc = ?, sort_order = ? WHERE id = ?')
+    .bind(sanitizeInput(data.title), sanitizeInput(data.short_desc || ''), sanitizeInput(data.long_desc || ''), data.sort_order || 0, id)
+    .run();
+  return jsonResponse({ success: true }, 200, corsHeaders);
+}
+
+async function deleteWorkflow(id, env, corsHeaders) {
+  await env.DB.prepare('DELETE FROM workflow WHERE id = ?').bind(id).run();
+  return jsonResponse({ success: true }, 200, corsHeaders);
+}
+
 // ===== SKILLS =====
 async function getSkills(env, corsHeaders) {
   const { results } = await env.DB.prepare('SELECT * FROM skills ORDER BY sort_order').all();
@@ -347,6 +386,22 @@ async function createSkill(request, env, corsHeaders) {
     .run();
 
   return jsonResponse({ id, success: true }, 201, corsHeaders);
+}
+
+async function updateSkill(id, request, env, corsHeaders) {
+  const data = await request.json();
+  if (!data.name || data.name.trim().length === 0) {
+    return jsonResponse({ error: 'Name is required' }, 400, corsHeaders);
+  }
+  await env.DB.prepare('UPDATE skills SET name = ?, category = ?, sort_order = ? WHERE id = ?')
+    .bind(sanitizeInput(data.name), sanitizeInput(data.category || 'other'), data.sort_order || 0, id)
+    .run();
+  return jsonResponse({ success: true }, 200, corsHeaders);
+}
+
+async function deleteSkill(id, env, corsHeaders) {
+  await env.DB.prepare('DELETE FROM skills WHERE id = ?').bind(id).run();
+  return jsonResponse({ success: true }, 200, corsHeaders);
 }
 
 // ===== MESSAGES =====
@@ -383,6 +438,16 @@ async function createMessage(request, env, corsHeaders) {
 
 async function markMessageRead(id, env, corsHeaders) {
   await env.DB.prepare('UPDATE messages SET is_read = 1 WHERE id = ?').bind(id).run();
+  return jsonResponse({ success: true }, 200, corsHeaders);
+}
+
+async function deleteMessage(id, env, corsHeaders) {
+  await env.DB.prepare('DELETE FROM messages WHERE id = ?').bind(id).run();
+  return jsonResponse({ success: true }, 200, corsHeaders);
+}
+
+async function deleteAllMessages(env, corsHeaders) {
+  await env.DB.prepare('DELETE FROM messages').run();
   return jsonResponse({ success: true }, 200, corsHeaders);
 }
 

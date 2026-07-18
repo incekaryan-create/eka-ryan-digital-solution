@@ -740,30 +740,42 @@
     setInterval(updateTime, 1000);
 
     // ===== DASHBOARD =====
-    function loadStats() {
-      document.getElementById('stat-services').textContent = db.getServices().length;
-      document.getElementById('stat-skills').textContent = db.getSkills().length;
-      document.getElementById('stat-workflow').textContent = db.getWorkflow().length;
-      const msgs = db.getMessages();
-      const unread = db.getUnreadMessages().length;
-      document.getElementById('stat-messages').textContent = msgs.length;
-      document.getElementById('stat-unread').textContent = unread + ' belum dibaca';
-      updateBadge();
+    async function loadStats() {
+      try {
+        const [svc, skl, wf, msg] = await Promise.all([
+          fetch('/api/services').then(r => r.json()),
+          fetch('/api/skills').then(r => r.json()),
+          fetch('/api/workflow').then(r => r.json()),
+          fetch('/api/messages').then(r => r.json())
+        ]);
+        document.getElementById('stat-services').textContent = svc.length;
+        document.getElementById('stat-skills').textContent = skl.length;
+        document.getElementById('stat-workflow').textContent = wf.length;
+        const unread = msg.filter(m => !m.is_read).length;
+        document.getElementById('stat-messages').textContent = msg.length;
+        document.getElementById('stat-unread').textContent = unread + ' belum dibaca';
+        updateBadge(msg);
+      } catch (e) { /* ignore */ }
     }
-    function updateBadge() {
-      const unread = db.getUnreadMessages().length;
+    function updateBadge(messages) {
+      const unread = (messages || []).filter(m => !m.is_read).length;
       const badge = document.getElementById('sidebar-msg-badge');
       if (unread > 0) { badge.textContent = unread; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); }
     }
 
-    // ===== SERVICES CRUD =====
-    function renderServicesTable() {
+    // ===== SERVICES CRUD (D1 API) =====
+    let servicesCache = [];
+    async function renderServicesTable() {
       const search = (document.getElementById('search-services')?.value || '').toLowerCase();
-      let items = db.getServices();
+      try {
+        const res = await fetch('/api/services');
+        servicesCache = await res.json();
+      } catch (e) { servicesCache = []; }
+      let items = servicesCache;
       if (search) items = items.filter(s => s.title.toLowerCase().includes(search) || s.subtitle.toLowerCase().includes(search) || s.description.toLowerCase().includes(search));
       document.getElementById('count-services').textContent = items.length + ' item';
       document.getElementById('tbody-services').innerHTML = items.map(s => {
-        const tags = db.getServiceTags(s.id);
+        const tags = s.tags || [];
         return `<tr class="border-b border-zinc-800/50 row-hover">
           <td class="px-4 py-3 text-xs text-zinc-600 font-mono">${String(s.sort_order).padStart(2,'0')}</td>
           <td class="px-4 py-3"><p class="text-xs font-bold">${s.title}</p><p class="text-[10px] text-zinc-500 font-mono">${s.subtitle}</p></td>
@@ -778,7 +790,7 @@
         </tr>`;
       }).join('');
     }
-    function openServiceModal(id) {
+    function openServiceModal() {
       document.getElementById('svc-id').value = '';
       document.getElementById('svc-title').value = '';
       document.getElementById('svc-subtitle').value = '';
@@ -792,7 +804,7 @@
       openModal('modal-service');
     }
     function editService(id) {
-      const s = db.getService(id);
+      const s = servicesCache.find(x => x.id === id);
       if (!s) return;
       document.getElementById('svc-id').value = s.id;
       document.getElementById('svc-title').value = s.title;
@@ -806,12 +818,12 @@
       } else {
         document.getElementById('svc-image-preview').classList.add('hidden');
       }
-      document.getElementById('svc-tags').value = db.getServiceTags(s.id).join(', ');
-      document.getElementById('svc-details').value = db.getServiceDetails(s.id).join('\n');
+      document.getElementById('svc-tags').value = (s.tags || []).join(', ');
+      document.getElementById('svc-details').value = (s.details || []).join('\n');
       document.getElementById('modal-service-title').textContent = 'Edit Layanan';
       openModal('modal-service');
     }
-    function saveService() {
+    async function saveService() {
       const id = document.getElementById('svc-id').value;
       const data = {
         title: document.getElementById('svc-title').value.trim(),
@@ -823,21 +835,35 @@
         details: document.getElementById('svc-details').value.split('\n').filter(x => x.trim())
       };
       if (!data.title) return;
-      if (id) { db.updateService(id, data); toast('Layanan diperbarui!'); }
-      else { db.createService(data); toast('Layanan ditambahkan!'); }
+      try {
+        if (id) {
+          await fetch('/api/services/' + id + '?key=' + encodeURIComponent(ADMIN_KEY), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+          toast('Layanan diperbarui!');
+        } else {
+          await fetch('/api/services?key=' + encodeURIComponent(ADMIN_KEY), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+          toast('Layanan ditambahkan!');
+        }
+      } catch (e) { toast('Gagal menyimpan layanan.'); }
       closeModal('modal-service');
       renderServicesTable();
     }
-    function deleteService(id) {
+    async function deleteService(id) {
       if (!confirm('Yakin hapus layanan ini?')) return;
-      db.deleteService(id);
+      try {
+        await fetch('/api/services/' + id + '?key=' + encodeURIComponent(ADMIN_KEY), { method: 'DELETE' });
+        toast('Layanan dihapus!');
+      } catch (e) { toast('Gagal menghapus layanan.'); }
       renderServicesTable();
-      toast('Layanan dihapus!');
     }
 
-    // ===== WORKFLOW CRUD =====
-    function renderWorkflowTable() {
-      const items = db.getWorkflow();
+    // ===== WORKFLOW CRUD (D1 API) =====
+    let workflowCache = [];
+    async function renderWorkflowTable() {
+      try {
+        const res = await fetch('/api/workflow');
+        workflowCache = await res.json();
+      } catch (e) { workflowCache = []; }
+      const items = workflowCache;
       document.getElementById('count-workflow').textContent = items.length + ' langkah';
       document.getElementById('tbody-workflow').innerHTML = items.map(w => `<tr class="border-b border-zinc-800/50 row-hover">
         <td class="px-4 py-3 text-xs text-zinc-600 font-mono">${String(w.sort_order).padStart(2,'0')}</td>
@@ -858,7 +884,7 @@
       openModal('modal-workflow');
     }
     function editWorkflow(id) {
-      const w = db.getWorkflow().find(x => x.id === id);
+      const w = workflowCache.find(x => x.id === id);
       if (!w) return;
       document.getElementById('wf-id').value = w.id;
       document.getElementById('wf-title').value = w.title;
@@ -867,26 +893,40 @@
       document.getElementById('modal-workflow-title').textContent = 'Edit Langkah';
       openModal('modal-workflow');
     }
-    function saveWorkflow() {
+    async function saveWorkflow() {
       const id = document.getElementById('wf-id').value;
       const data = { title: document.getElementById('wf-title').value.trim(), short_desc: document.getElementById('wf-short').value.trim(), long_desc: document.getElementById('wf-long').value.trim() };
       if (!data.title) return;
-      if (id) { db.updateWorkflow(id, data); toast('Langkah diperbarui!'); }
-      else { db.createWorkflow(data); toast('Langkah ditambahkan!'); }
+      try {
+        if (id) {
+          await fetch('/api/workflow/' + id + '?key=' + encodeURIComponent(ADMIN_KEY), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+          toast('Langkah diperbarui!');
+        } else {
+          await fetch('/api/workflow?key=' + encodeURIComponent(ADMIN_KEY), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+          toast('Langkah ditambahkan!');
+        }
+      } catch (e) { toast('Gagal menyimpan langkah.'); }
       closeModal('modal-workflow');
       renderWorkflowTable();
     }
-    function deleteWorkflow(id) {
+    async function deleteWorkflow(id) {
       if (!confirm('Yakin hapus langkah ini?')) return;
-      db.deleteWorkflow(id);
+      try {
+        await fetch('/api/workflow/' + id + '?key=' + encodeURIComponent(ADMIN_KEY), { method: 'DELETE' });
+        toast('Langkah dihapus!');
+      } catch (e) { toast('Gagal menghapus langkah.'); }
       renderWorkflowTable();
-      toast('Langkah dihapus!');
     }
 
-    // ===== SKILLS CRUD =====
-    function renderSkillsTable() {
+    // ===== SKILLS CRUD (D1 API) =====
+    let skillsCache = [];
+    async function renderSkillsTable() {
       const search = (document.getElementById('search-skills')?.value || '').toLowerCase();
-      let items = db.getSkills();
+      try {
+        const res = await fetch('/api/skills');
+        skillsCache = await res.json();
+      } catch (e) { skillsCache = []; }
+      let items = skillsCache;
       if (search) items = items.filter(s => s.name.toLowerCase().includes(search) || s.category.toLowerCase().includes(search));
       document.getElementById('count-skills').textContent = items.length + ' item';
       document.getElementById('tbody-skills').innerHTML = items.map(s => `<tr class="border-b border-zinc-800/50 row-hover">
@@ -907,7 +947,7 @@
       openModal('modal-skill');
     }
     function editSkill(id) {
-      const s = db.getSkills().find(x => x.id === id);
+      const s = skillsCache.find(x => x.id === id);
       if (!s) return;
       document.getElementById('sk-id').value = s.id;
       document.getElementById('sk-name').value = s.name;
@@ -915,20 +955,29 @@
       document.getElementById('modal-skill-title').textContent = 'Edit Keahlian';
       openModal('modal-skill');
     }
-    function saveSkill() {
+    async function saveSkill() {
       const id = document.getElementById('sk-id').value;
       const data = { name: document.getElementById('sk-name').value.trim().toUpperCase(), category: document.getElementById('sk-category').value };
       if (!data.name) return;
-      if (id) { db.updateSkill(id, data); toast('Keahlian diperbarui!'); }
-      else { db.createSkill(data); toast('Keahlian ditambahkan!'); }
+      try {
+        if (id) {
+          await fetch('/api/skills/' + id + '?key=' + encodeURIComponent(ADMIN_KEY), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+          toast('Keahlian diperbarui!');
+        } else {
+          await fetch('/api/skills?key=' + encodeURIComponent(ADMIN_KEY), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+          toast('Keahlian ditambahkan!');
+        }
+      } catch (e) { toast('Gagal menyimpan keahlian.'); }
       closeModal('modal-skill');
       renderSkillsTable();
     }
-    function deleteSkill(id) {
+    async function deleteSkill(id) {
       if (!confirm('Yakin hapus keahlian ini?')) return;
-      db.deleteSkill(id);
+      try {
+        await fetch('/api/skills/' + id + '?key=' + encodeURIComponent(ADMIN_KEY), { method: 'DELETE' });
+        toast('Keahlian dihapus!');
+      } catch (e) { toast('Gagal menghapus keahlian.'); }
       renderSkillsTable();
-      toast('Keahlian dihapus!');
     }
 
     // ===== ADD-ONS CRUD =====
@@ -1000,9 +1049,14 @@
       toast('Fitur dihapus!');
     }
 
-    // ===== MESSAGES =====
-    function renderMessagesTable() {
-      const items = db.getMessages();
+    // ===== MESSAGES (D1 API) =====
+    let messagesCache = [];
+    async function renderMessagesTable() {
+      try {
+        const res = await fetch('/api/messages');
+        messagesCache = await res.json();
+      } catch (e) { messagesCache = []; }
+      const items = messagesCache;
       document.getElementById('count-messages').textContent = items.length + ' pesan';
       document.getElementById('tbody-messages').innerHTML = items.map(m => `<tr class="border-b border-zinc-800/50 row-hover ${!m.is_read ? 'bg-red-600/5' : ''}">
         <td class="px-4 py-3">${!m.is_read ? '<span class="h-2 w-2 rounded-full bg-red-500 inline-block"></span>' : ''}</td>
@@ -1017,10 +1071,10 @@
       </tr>`).join('');
       updateBadge();
     }
-    function viewMessage(id) {
-      const m = db.getMessages().find(x => x.id === id);
+    async function viewMessage(id) {
+      const m = messagesCache.find(x => x.id === id);
       if (!m) return;
-      db.markMessageRead(id);
+      try { await fetch('/api/messages/' + id + '/read?key=' + encodeURIComponent(ADMIN_KEY), { method: 'PUT' }); } catch (e) {}
       document.getElementById('msg-name').textContent = m.name;
       document.getElementById('msg-email').textContent = m.email;
       document.getElementById('msg-whatsapp').textContent = m.whatsapp || '-';
@@ -1029,8 +1083,10 @@
       document.getElementById('msg-body').textContent = m.message;
       const addonsEl = document.getElementById('msg-addons');
       const addonsRow = document.getElementById('msg-addons-row');
-      if (m.add_ons && Array.isArray(m.add_ons) && m.add_ons.length > 0) {
-        addonsEl.innerHTML = m.add_ons.map(a => `<span class="inline-block rounded-md bg-zinc-800 border border-zinc-700 px-2 py-0.5 text-[10px] text-zinc-300 font-mono">${escapeHtml(a)}</span>`).join('');
+      let addons = m.add_ons;
+      if (typeof addons === 'string') { try { addons = JSON.parse(addons); } catch (e) { addons = []; } }
+      if (addons && Array.isArray(addons) && addons.length > 0) {
+        addonsEl.innerHTML = addons.map(a => `<span class="inline-block rounded-md bg-zinc-800 border border-zinc-700 px-2 py-0.5 text-[10px] text-zinc-300 font-mono">${escapeHtml(a)}</span>`).join('');
         addonsRow.classList.remove('hidden');
       } else {
         addonsRow.classList.add('hidden');
@@ -1038,17 +1094,21 @@
       openModal('modal-message');
       renderMessagesTable();
     }
-    function deleteMsg(id) {
+    async function deleteMsg(id) {
       if (!confirm('Hapus pesan ini?')) return;
-      db.deleteMessage(id);
+      try {
+        await fetch('/api/messages/' + id + '?key=' + encodeURIComponent(ADMIN_KEY), { method: 'DELETE' });
+        toast('Pesan dihapus!');
+      } catch (e) { toast('Gagal menghapus pesan.'); }
       renderMessagesTable();
-      toast('Pesan dihapus!');
     }
-    function clearAllMessages() {
+    async function clearAllMessages() {
       if (!confirm('Hapus SEMUA pesan? Tindakan ini tidak bisa dibatalkan.')) return;
-      db.deleteAllMessages();
+      try {
+        await fetch('/api/messages?key=' + encodeURIComponent(ADMIN_KEY), { method: 'DELETE' });
+        toast('Semua pesan dihapus!');
+      } catch (e) { toast('Gagal menghapus pesan.'); }
       renderMessagesTable();
-      toast('Semua pesan dihapus!');
     }
 
     // ===== CONFIG =====
