@@ -1019,8 +1019,14 @@
     }
 
     // ===== CONFIG =====
-    function loadConfig() {
-      const c = db.getConfig();
+    async function loadConfig() {
+      // Read from D1 (single source of truth) so the admin panel reflects
+      // what the public site actually shows. Fall back to localStorage defaults.
+      let c = db.getConfig();
+      try {
+        const res = await fetch('/api/config');
+        if (res.ok) c = await res.json();
+      } catch (e) { /* keep localStorage fallback */ }
       document.getElementById('cfg-hero-greeting').value = c.hero_greeting;
       document.getElementById('cfg-hero-name').value = c.hero_name;
       document.getElementById('cfg-hero-tagline').value = c.hero_tagline;
@@ -1049,8 +1055,8 @@
       document.getElementById('cfg-quality-p2').value = c.quality_p2;
       document.getElementById('cfg-quality-p3').value = c.quality_p3;
     }
-    function saveConfig() {
-      db.updateConfig({
+    async function saveConfig() {
+      const payload = {
         hero_greeting: document.getElementById('cfg-hero-greeting').value,
         hero_name: document.getElementById('cfg-hero-name').value,
         hero_tagline: document.getElementById('cfg-hero-tagline').value,
@@ -1074,8 +1080,21 @@
         quality_p1: document.getElementById('cfg-quality-p1').value,
         quality_p2: document.getElementById('cfg-quality-p2').value,
         quality_p3: document.getElementById('cfg-quality-p3').value
-      });
-      toast('Pengaturan tersimpan!');
+      };
+      // Persist to D1 (single source of truth) so the public site reflects it.
+      try {
+        const res = await fetch('/api/config?key=' + encodeURIComponent(ADMIN_KEY), {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('save failed');
+        // Also update localStorage mirror for offline admin convenience
+        db.updateConfig(payload);
+        toast('Pengaturan tersimpan!');
+      } catch (e) {
+        toast('Gagal menyimpan ke server, coba lagi.');
+      }
     }
 
     // ===== DATA =====
