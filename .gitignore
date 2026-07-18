@@ -9,3 +9,6 @@ dist/
 
 # Large audio served from R2 (not committed)
 public/src/assets/sound/backsound.mp3
+
+# Playwright MCP session files
+.playwright-mcp/
