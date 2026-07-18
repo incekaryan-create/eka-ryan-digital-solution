@@ -676,12 +676,15 @@
   <script src="db.js"></script>
   <script>
     // ===== LOAD DATA FROM DATABASE =====
-    const SERVICES_DATA = db.getAllServicesWithDetails();
+    // Services & skills are fetched LIVE from D1 (single source of truth).
+    // They start empty and are populated by the async loader below so the
+    // site always reflects the latest database content, not stale localStorage.
+    let SERVICES_DATA = [];
     const WORKFLOW_DATA = db.getWorkflow();
-    const SKILLS_LIST = db.getSkills().map(s => s.name);
+    let SKILLS_LIST = [];
     const adminConfig = db.getConfig();
 
-    // ===== APPLY CONFIG OVERRIDES =====
+    // ===== APPLY CONFIG OVERRIDES (localStorage / defaults) =====
     if (adminConfig) {
       const c = adminConfig;
       // Hero
@@ -728,6 +731,47 @@
         };
       }
     }
+
+    // ===== APPLY CONFIG FROM D1 (single source of truth) =====
+    // The admin panel writes to D1; fetch it so desktop & mobile always match,
+    // overriding any per-device localStorage value.
+    (async () => {
+      try {
+        const res = await fetch('/api/config');
+        if (!res.ok) return;
+        const c = await res.json();
+        const heroImg = document.querySelector('.hero-float img');
+        if (heroImg && c.hero_image) heroImg.src = c.hero_image;
+        const setText = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+        setText('hero-greeting', c.hero_greeting);
+        if (c.hero_name) {
+          const el = document.getElementById('hero-name');
+          if (el) el.innerHTML = `${c.hero_name.split(' ')[0]} <span class="text-red-600">${c.hero_name.split(' ').slice(1).join(' ')}</span>`;
+        }
+        setText('hero-tagline', c.hero_tagline);
+        setText('hero-desc', c.hero_description);
+      } catch (e) { /* keep localStorage fallback */ }
+    })();
+
+    // ===== LOAD SERVICES & SKILLS FROM D1 (single source of truth) =====
+    // The admin panel writes services & skills to D1; fetch them so the site
+    // always reflects the latest database content instead of stale localStorage.
+    (async () => {
+      try {
+        const [svcRes, skRes] = await Promise.all([
+          fetch('/api/services'),
+          fetch('/api/skills')
+        ]);
+        if (svcRes.ok) {
+          SERVICES_DATA = await svcRes.json();
+          renderServices();
+        }
+        if (skRes.ok) {
+          SKILLS_LIST = (await skRes.json()).map(s => s.name);
+          renderSkills();
+        }
+      } catch (e) { /* keep localStorage fallback */ }
+    })();
 
     // ===== STATE =====
     let searchTerm = "";
@@ -957,15 +1001,21 @@
     }
 
     // ===== RENDER SERVICE DROPDOWN =====
-    function renderServiceDropdown() {
+    async function renderServiceDropdown() {
       const select = document.getElementById('form-service');
-      const services = db.getServices();
-      services.forEach(s => {
-        const opt = document.createElement('option');
-        opt.value = s.id;
-        opt.textContent = `${s.title} — ${s.price}`;
-        select.appendChild(opt);
-      });
+      // Keep the placeholder option, clear any previously loaded options
+      select.querySelectorAll('option:not([value=""])').forEach(o => o.remove());
+      try {
+        const res = await fetch('/api/services');
+        if (!res.ok) return;
+        const services = await res.json();
+        services.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.id;
+          opt.textContent = `${s.title} — ${s.price}`;
+          select.appendChild(opt);
+        });
+      } catch (e) { /* keep localStorage fallback */ }
     }
 
     // ===== RENDER ADD-ONS IN FORM =====
@@ -1305,23 +1355,26 @@ PENGALAMAN:
     // Default state: paused -> show the play icon so the user knows it's off.
     updateBgIcon();
     // Try to autoplay on homepage open; browsers block it until the user
-    // interacts, so also start on the first user interaction of any kind.
+    // interacts. Start on the FIRST interaction of ANY kind, using the
+    // capture phase so it fires even if the first tap is on the toggle button
+    // (whose own handler calls stopPropagation).
     playBgAudio();
     const startOnInteraction = () => {
       if (!bgPlaying) playBgAudio();
       if (bgPlaying) {
-        window.removeEventListener('pointerdown', startOnInteraction);
-        window.removeEventListener('click', startOnInteraction);
-        window.removeEventListener('keydown', startOnInteraction);
-        window.removeEventListener('scroll', startOnInteraction);
-        window.removeEventListener('touchstart', startOnInteraction);
+        document.removeEventListener('pointerdown', startOnInteraction, true);
+        document.removeEventListener('click', startOnInteraction, true);
+        document.removeEventListener('keydown', startOnInteraction, true);
+        document.removeEventListener('scroll', startOnInteraction, true);
+        document.removeEventListener('touchstart', startOnInteraction, true);
+        bgToggle.classList.remove('animate-pulse');
       }
     };
-    window.addEventListener('pointerdown', startOnInteraction, { once: false });
-    window.addEventListener('click', startOnInteraction);
-    window.addEventListener('keydown', startOnInteraction);
-    window.addEventListener('scroll', startOnInteraction);
-    window.addEventListener('touchstart', startOnInteraction);
+    document.addEventListener('pointerdown', startOnInteraction, true);
+    document.addEventListener('click', startOnInteraction, true);
+    document.addEventListener('keydown', startOnInteraction, true);
+    document.addEventListener('scroll', startOnInteraction, true);
+    document.addEventListener('touchstart', startOnInteraction, true);
 
     // ===== INIT =====
     renderServices();
