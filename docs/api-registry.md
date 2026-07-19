@@ -2,6 +2,8 @@
 
 API untuk **Eka Ryan Digital Solution** — diimplementasikan sebagai Cloudflare Pages Function di `functions/api/[[route]].js`. Semua endpoint berada di bawah prefix `/api`.
 
+> Dokumen ini merujuk ke [schema.md](./schema.md) untuk struktur tabel D1 dan [cloudflare.md](./cloudflare.md) untuk bindings.
+
 ## Base URL
 
 - Production: `https://ekaryandigitalsolution.pages.dev/api`

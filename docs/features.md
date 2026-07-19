@@ -2,6 +2,8 @@
 
 Fitur nyata **Eka Ryan Digital Solution** — portfolio digital freelancer (Eka Ryan).
 
+> Ringkasan produk ada di [prd.md](./prd.md); arsitektur di [architecture.md](./architecture.md).
+
 ## Feature Index
 
 | Fitur | Status | Penyimpanan | Akses |

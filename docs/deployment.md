@@ -1,5 +1,7 @@
 # Deployment Guide
 
+> Lihat [cloudflare.md](./cloudflare.md) untuk bindings & setup, dan [workflow.md](./workflow.md) untuk git workflow.
+
 ## Overview
 Proyek **Eka Ryan Digital Solution** dideploy ke **Cloudflare Pages** menggunakan **GitHub Actions**. Tidak menggunakan Firebase, Vercel, Netlify, atau GitHub Pages statis.
 

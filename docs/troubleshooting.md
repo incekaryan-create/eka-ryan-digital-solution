@@ -89,5 +89,5 @@ Lihat di dashboard Cloudflare → Pages → project → Functions → Logs (atau
 
 ## Getting Help
 
-- Dokumentasi project: `docs/` (api-registry, deployment, cloudflare-workers, features, firebase-setup→cloudflare, workflow, troubleshooting).
+- Dokumentasi project: `docs/` — [architecture.md](./architecture.md), [design.md](./design.md), [prd.md](./prd.md), [rules.md](./rules.md), [schema.md](./schema.md), [api.md](./api-registry.md), [cloudflare.md](./cloudflare.md), [deployment.md](./deployment.md), [features.md](./features.md), [workflow.md](./workflow.md), [troubleshooting.md](./troubleshooting.md).
 - Repo: `incekaryan-create/eka-ryan-digital-solution` (private).

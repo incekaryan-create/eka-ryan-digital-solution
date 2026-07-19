@@ -32,13 +32,17 @@ eka-ryan-digital-solution/
 │   └── api/
 │       └── [[route]].js   # API handler (catch-all)
 ├── docs/                  # Dokumentasi project
-│   ├── api-registry.md
-│   ├── deployment.md
-│   ├── cloudflare-workers.md
-│   ├── features.md
-│   ├── firebase-setup.md  # sebenarnya: Cloudflare setup (D1+R2)
-│   ├── workflow.md
-│   └── troubleshooting.md
+│   ├── architecture.md     # Arsitektur sistem (Pages + D1 + R2)
+│   ├── design.md           # Design system & UI guidelines
+│   ├── prd.md              # Product Requirements Document
+│   ├── rules.md            # Aturan & konvensi project
+│   ├── schema.md           # Skema D1 (tabel & kolom)
+│   ├── api-registry.md     # Daftar endpoint API
+│   ├── cloudflare.md       # Setup Cloudflare (D1+R2+Pages Functions)
+│   ├── deployment.md       # Panduan deploy (GitHub Actions)
+│   ├── features.md         # Daftar fitur
+│   ├── workflow.md         # Git & dev workflow
+│   └── troubleshooting.md  # Masalah umum & solusi
 ├── wrangler.toml          # Cloudflare Pages config + bindings
 └── .github/workflows/deploy.yml  # Auto-deploy ke Pages
 ```

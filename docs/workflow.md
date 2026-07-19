@@ -1,5 +1,7 @@
 # Development Workflow
 
+> Aturan kode & konvensi ada di [rules.md](./rules.md).
+
 ## Git Workflow (Sederhana)
 
 Proyek ini menggunakan **satu branch utama: `main`**. Tidak ada branch `develop`, `feature/*`, atau `hotfix/*`.
