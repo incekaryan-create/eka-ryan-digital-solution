@@ -327,18 +327,22 @@
   }
 
   async function listStorage() {
-    const buckets = [ASSET_BUCKET];
+    const buckets = [ASSET_BUCKET, AUDIO_BUCKET];
     const objects = [];
     for (const bucket of buckets) {
       const { data: root, error: errRoot } = await sb.storage.from(bucket).list('', { limit: 1000 });
       const { data: uploads, error: errUploads } = await sb.storage.from(bucket).list('uploads', { limit: 1000 });
-      if (errRoot && errUploads) continue;
+      const { data: cvFiles, error: errCv } = await sb.storage.from(bucket).list('cv', { limit: 1000 });
+      if (errRoot && errUploads && errCv) continue;
       const sizeOf = o => Number((o.metadata && (o.metadata.size || o.metadata.contentLength)) || 0);
       (root || []).forEach(o => {
         if (o.id) objects.push({ key: bucket + '/' + o.name, url: publicUrl(bucket, o.name), size: sizeOf(o) });
       });
       (uploads || []).forEach(o => {
         if (o.id) objects.push({ key: bucket + '/uploads/' + o.name, url: publicUrl(bucket, 'uploads/' + o.name), size: sizeOf(o) });
+      });
+      (cvFiles || []).forEach(o => {
+        if (o.id) objects.push({ key: bucket + '/cv/' + o.name, url: publicUrl(bucket, 'cv/' + o.name), size: sizeOf(o) });
       });
     }
     return { objects };
