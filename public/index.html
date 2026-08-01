@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" class="dark">
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -82,17 +82,17 @@
           },
           colors: {
             zinc: {
-              50: '#f5fbf9',
-              100: '#e9f6f2',
-              200: '#d3ece5',
-              300: '#b1ded4',
-              400: '#8acabf',
-              500: '#63b5a8',
-              600: '#45a395',
-              700: '#2b8f80',
-              800: '#177a6b',
-              850: '#106b5d',
-              900: '#0b5c50',
+              50: '#f6faf8',
+              100: '#e9f2ef',
+              200: '#d5e6e0',
+              300: '#bcd8cf',
+              400: '#9cc3b8',
+              500: '#6f9c91',
+              600: '#4c7d72',
+              700: '#3a635a',
+              800: '#294b44',
+              850: '#213e38',
+              900: '#17332e',
               950: '#014D43'
             },
             primary: {
@@ -129,8 +129,8 @@
   <style>
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    .dark ::-webkit-scrollbar-thumb { background: #0d6055; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #CEED6B; }
+    ::-webkit-scrollbar-thumb { background: #4c7d72; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #014D43; }
     html { scroll-behavior: smooth; }
     body { overflow-x: hidden; }
     main { overflow-x: hidden; }
@@ -140,7 +140,7 @@
     .animate-fade-in { animation: fade-in 0.3s ease-out; }
     .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #0d6055; border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #4c7d72; border-radius: 4px; }
 
     /* Scroll Animations */
     .scroll-hidden {
@@ -169,19 +169,19 @@
     .scroll-stagger-6 { transition-delay: 0.3s; }
   </style>
 </head>
-<body class="min-h-screen font-sans bg-zinc-950 text-white">
+<body class="min-h-screen font-sans bg-white text-zinc-900">
 
   <!-- Background music (autoplay on homepage open, with user-interaction fallback) -->
   <audio id="bg-audio" src="" loop preload="auto"></audio>
   <button id="bg-audio-toggle" aria-label="Putar musik latar" title="Putar musik latar"
-    class="group fixed bottom-4 left-4 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900/80 text-white backdrop-blur transition-colors hover:border-accent-500 hover:text-accent-500 cursor-pointer animate-pulse">
+    class="group fixed bottom-4 left-4 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-zinc-300 bg-white/90 text-zinc-900 backdrop-blur transition-colors hover:border-accent-500 hover:text-primary-700 cursor-pointer animate-pulse">
     <svg id="bg-audio-icon-play" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
     <svg id="bg-audio-icon-pause" class="h-5 w-5 hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>
   </button>
 
   <!-- Decorative background grid -->
   <div class="pointer-events-none fixed inset-0 z-0 opacity-10">
-    <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,#014d4318_1px,transparent_1px),linear-gradient(to_bottom,#014d4318_1px,transparent_1px)] bg-[size:24px_24px]"></div>
   </div>
 
   <!-- ===================== HEADER / NAVBAR ===================== -->
@@ -191,15 +191,15 @@
         <!-- Logo -->
         <a href="#" class="flex items-center gap-2 group focus:outline-none">
           <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-500 font-display text-lg font-extrabold text-primary-950 group-hover:scale-105 transition-transform duration-300">ER</span>
-          <span class="hidden sm:block font-heading text-sm font-bold tracking-wider text-white transition-colors duration-300">EKA <span class="text-accent-500">RYAN</span></span>
+          <span class="hidden sm:block font-heading text-sm font-bold tracking-wider text-zinc-900 transition-colors duration-300">EKA <span class="text-primary-700">RYAN</span></span>
         </a>
 
         <!-- Desktop Search -->
         <div class="hidden md:relative flex-1 max-w-xs">
           <div class="relative group">
-            <svg class="absolute top-2.5 left-3 h-4 w-4 text-zinc-400 group-focus-within:text-accent-500 transition-colors" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-            <input id="search-desktop" type="text" placeholder="Cari proyek, skill..." class="w-full rounded-full border border-zinc-800 bg-zinc-900 py-2 pl-9 pr-4 text-xs text-white placeholder-zinc-400 focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500 transition-all duration-300" />
-            <button id="clear-search-desktop" class="absolute top-2 right-3 rounded-full p-0.5 text-zinc-400 hover:bg-zinc-800 hover:text-white cursor-pointer hidden">
+            <svg class="absolute top-2.5 left-3 h-4 w-4 text-zinc-600 group-focus-within:text-primary-700 transition-colors" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input id="search-desktop" type="text" placeholder="Cari proyek, skill..." class="w-full rounded-full border border-zinc-200 bg-zinc-100 py-2 pl-9 pr-4 text-xs text-zinc-900 placeholder-zinc-500 focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500 transition-all duration-300" />
+            <button id="clear-search-desktop" class="absolute top-2 right-3 rounded-full p-0.5 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 cursor-pointer hidden">
               <svg class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
             </button>
           </div>
@@ -207,10 +207,10 @@
 
         <!-- Desktop Nav -->
         <nav class="hidden lg:flex items-center gap-6">
-          <a href="#services" class="font-sans text-xs font-semibold tracking-widest text-zinc-300 hover:text-accent-400 transition-colors uppercase">Layanan</a>
-          <a href="#workflow" class="font-sans text-xs font-semibold tracking-widest text-zinc-300 hover:text-accent-400 transition-colors uppercase">Alur Kerja</a>
-          <a href="#skills" class="font-sans text-xs font-semibold tracking-widest text-zinc-300 hover:text-accent-400 transition-colors uppercase">Keahlian</a>
-          <a href="#collaborate" class="font-sans text-xs font-semibold tracking-widest text-zinc-300 hover:text-accent-400 transition-colors uppercase">Kolaborasi</a>
+          <a href="#services" class="font-sans text-xs font-semibold tracking-widest text-zinc-700 hover:text-primary-700 transition-colors uppercase">Layanan</a>
+          <a href="#workflow" class="font-sans text-xs font-semibold tracking-widest text-zinc-700 hover:text-primary-700 transition-colors uppercase">Alur Kerja</a>
+          <a href="#skills" class="font-sans text-xs font-semibold tracking-widest text-zinc-700 hover:text-primary-700 transition-colors uppercase">Keahlian</a>
+          <a href="#collaborate" class="font-sans text-xs font-semibold tracking-widest text-zinc-700 hover:text-primary-700 transition-colors uppercase">Kolaborasi</a>
         </nav>
 
         <!-- Right actions -->
@@ -219,10 +219,10 @@
             <svg class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg>
             <span>WhatsApp</span>
           </a>
-          <button id="share-trigger" class="rounded-full p-2 text-zinc-300 hover:bg-zinc-900 transition-all shadow-sm border border-zinc-800/50 cursor-pointer" title="Share Portfolio">
-            <svg class="h-4 w-4 hover:text-accent-400 transition-colors" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>
+          <button id="share-trigger" class="rounded-full p-2 text-zinc-700 hover:bg-zinc-100 transition-all shadow-sm border border-zinc-200 cursor-pointer" title="Share Portfolio">
+            <svg class="h-4 w-4 hover:text-primary-700 transition-colors" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>
           </button>
-          <button id="mobile-hamburger" class="lg:hidden rounded-full p-2 text-white hover:bg-zinc-900 transition-all border border-zinc-800/50">
+          <button id="mobile-hamburger" class="lg:hidden rounded-full p-2 text-zinc-900 hover:bg-zinc-100 transition-all border border-zinc-200">
             <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
           </button>
         </div>
@@ -232,27 +232,27 @@
 
   <!-- Mobile Drawer -->
   <div id="mobile-drawer-backdrop" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden"></div>
-  <div id="mobile-drawer" class="fixed top-0 right-0 bottom-0 z-50 flex w-full max-w-xs flex-col bg-zinc-950 p-6 shadow-2xl text-white transform transition-transform duration-300 translate-x-full">
-    <div class="flex items-center justify-between border-b border-zinc-900 pb-4">
-      <span class="font-heading text-sm font-bold tracking-wider">MENU <span class="text-accent-500">PORTFOLIO</span></span>
-      <button id="mobile-drawer-close" class="rounded-full p-1.5 text-zinc-400 hover:bg-zinc-900 transition-colors">
+  <div id="mobile-drawer" class="fixed top-0 right-0 bottom-0 z-50 flex w-full max-w-xs flex-col bg-white p-6 shadow-2xl text-zinc-900 transform transition-transform duration-300 translate-x-full">
+    <div class="flex items-center justify-between border-b border-zinc-200 pb-4">
+      <span class="font-heading text-sm font-bold tracking-wider">MENU <span class="text-primary-700">PORTFOLIO</span></span>
+      <button id="mobile-drawer-close" class="rounded-full p-1.5 text-zinc-600 hover:bg-zinc-100 transition-colors">
         <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
       </button>
     </div>
     <div class="relative mt-6">
-      <svg class="absolute top-2.5 left-3 h-4 w-4 text-zinc-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-      <input id="search-mobile" type="text" placeholder="Cari proyek atau skill..." class="w-full rounded-lg border border-zinc-800 bg-zinc-900 py-2 pl-9 pr-4 text-xs text-white placeholder-zinc-400 focus:outline-none focus:border-accent-500" />
+      <svg class="absolute top-2.5 left-3 h-4 w-4 text-zinc-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="search-mobile" type="text" placeholder="Cari proyek atau skill..." class="w-full rounded-lg border border-zinc-200 bg-zinc-100 py-2 pl-9 pr-4 text-xs text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-accent-500" />
     </div>
     <nav class="mt-8 flex flex-col gap-5">
-      <a href="#services" class="mobile-nav-link font-sans text-sm font-bold tracking-widest text-zinc-300 hover:text-accent-400 transition-colors uppercase border-b border-zinc-900/50 pb-2">Layanan</a>
-      <a href="#workflow" class="mobile-nav-link font-sans text-sm font-bold tracking-widest text-zinc-300 hover:text-accent-400 transition-colors uppercase border-b border-zinc-900/50 pb-2">Alur Kerja</a>
-      <a href="#skills" class="mobile-nav-link font-sans text-sm font-bold tracking-widest text-zinc-300 hover:text-accent-400 transition-colors uppercase border-b border-zinc-900/50 pb-2">Keahlian</a>
-      <a href="#collaborate" class="mobile-nav-link font-sans text-sm font-bold tracking-widest text-zinc-300 hover:text-accent-400 transition-colors uppercase border-b border-zinc-900/50 pb-2">Kolaborasi</a>
-      <a href="admin.html" target="_blank" class="font-sans text-sm font-bold tracking-widest text-zinc-500 hover:text-accent-400 transition-colors uppercase">Admin Panel</a>
+      <a href="#services" class="mobile-nav-link font-sans text-sm font-bold tracking-widest text-zinc-700 hover:text-primary-700 transition-colors uppercase border-b border-zinc-200/70 pb-2">Layanan</a>
+      <a href="#workflow" class="mobile-nav-link font-sans text-sm font-bold tracking-widest text-zinc-700 hover:text-primary-700 transition-colors uppercase border-b border-zinc-200/70 pb-2">Alur Kerja</a>
+      <a href="#skills" class="mobile-nav-link font-sans text-sm font-bold tracking-widest text-zinc-700 hover:text-primary-700 transition-colors uppercase border-b border-zinc-200/70 pb-2">Keahlian</a>
+      <a href="#collaborate" class="mobile-nav-link font-sans text-sm font-bold tracking-widest text-zinc-700 hover:text-primary-700 transition-colors uppercase border-b border-zinc-200/70 pb-2">Kolaborasi</a>
+      <a href="admin.html" target="_blank" class="font-sans text-sm font-bold tracking-widest text-zinc-700 hover:text-primary-700 transition-colors uppercase">Admin Panel</a>
     </nav>
-    <div class="mt-auto border-t border-zinc-900 pt-6 text-center">
-      <span class="text-[10px] font-bold tracking-widest text-zinc-400 uppercase">Tersedia untuk kolaborasi</span>
-      <p class="text-xs text-accent-500 font-semibold mt-1">inc.ekaryan@gmail.com</p>
+    <div class="mt-auto border-t border-zinc-200 pt-6 text-center">
+      <span class="text-[10px] font-bold tracking-widest text-zinc-600 uppercase">Tersedia untuk kolaborasi</span>
+      <p class="text-xs text-primary-700 font-semibold mt-1">inc.ekaryan@gmail.com</p>
       <div class="mt-4 flex justify-center gap-3">
         <a href="https://wa.me/6285857854360?text=Halo%20Eka%20Ryan%2C%20saya%20tertarik%20dengan%20portfolio%20Anda%20dan%20ingin%20berkolaborasi." target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 rounded-full bg-accent-500 hover:bg-accent-600 text-primary-950 px-4 py-2 text-xs font-bold cursor-pointer transition-transform duration-200 active:scale-95 shadow-md shadow-accent-500/20">
           <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg>
@@ -275,16 +275,16 @@
   <main class="relative z-10">
 
     <!-- ====== HERO SECTION ====== -->
-    <section id="hero" class="relative min-h-screen w-full overflow-hidden bg-transparent pt-24 pb-12 flex flex-col justify-between text-white transition-colors duration-500">
+    <section id="hero" class="relative min-h-screen w-full overflow-hidden bg-transparent pt-24 pb-12 flex flex-col justify-between text-zinc-900 transition-colors duration-500">
       <!-- Background huge text -->
       <div class="absolute top-[25%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center pointer-events-none select-none z-0">
-        <h1 class="font-display text-[15vw] sm:text-[18vw] font-extrabold leading-none tracking-tighter text-accent-500/15 select-none uppercase">PORTFOLIO</h1>
+        <h1 class="font-display text-[15vw] sm:text-[18vw] font-extrabold leading-none tracking-tighter text-primary-700/15 select-none uppercase">PORTFOLIO</h1>
       </div>
 
       <!-- Top Banner Ticker -->
-      <div class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-b border-zinc-900 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-        <span class="font-mono text-xs text-zinc-400 tracking-widest uppercase">PENGEMBANG WEBSITE, SOFTWARE & APLIKASI</span>
-        <a href="#collaborate" class="group flex items-center gap-1 font-mono text-xs text-accent-400 hover:text-white transition-colors tracking-widest uppercase">
+      <div class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-b border-zinc-200 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+        <span class="font-mono text-xs text-zinc-600 tracking-widest uppercase">PENGEMBANG WEBSITE, SOFTWARE & APLIKASI</span>
+        <a href="#collaborate" class="group flex items-center gap-1 font-mono text-xs text-primary-700 hover:text-zinc-900 transition-colors tracking-widest uppercase">
           <span>TERSEDIA UNTUK FREELANCE & KOLABORASI</span>
           <svg class="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
         </a>
@@ -296,20 +296,20 @@
           
           <!-- Left Text -->
           <div class="lg:col-span-4 flex flex-col justify-center order-2 lg:order-1 text-left max-w-md md:max-w-lg lg:max-w-none mx-auto lg:mx-0 w-full">
-            <span id="hero-greeting" class="font-heading text-sm font-semibold tracking-widest text-zinc-400 uppercase">HAI, SAYA</span>
-            <h2 id="hero-name" class="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tighter text-white mt-1 uppercase">EKA <span class="text-accent-500">RYAN</span></h2>
-            <p id="hero-tagline" class="font-mono text-xs text-accent-400 tracking-wider font-semibold mt-2 uppercase">PENGEMBANG WEBSITE, SOFTWARE & APLIKASI</p>
-            <p id="hero-desc" class="font-sans text-xs sm:text-sm text-zinc-400 leading-relaxed mt-4 max-w-md">Saya merancang sistem web dan mobile modern yang cepat, intuitif, dan siap skalabilitas. Dari desain database hingga aplikasi klien berperforma tinggi, saya menulis kode dengan presisi absolut.</p>
+            <span id="hero-greeting" class="font-heading text-sm font-semibold tracking-widest text-zinc-600 uppercase">HAI, SAYA</span>
+            <h2 id="hero-name" class="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tighter text-zinc-900 mt-1 uppercase">EKA <span class="text-primary-700">RYAN</span></h2>
+            <p id="hero-tagline" class="font-mono text-xs text-primary-700 tracking-wider font-semibold mt-2 uppercase">PENGEMBANG WEBSITE, SOFTWARE & APLIKASI</p>
+            <p id="hero-desc" class="font-sans text-xs sm:text-sm text-zinc-600 leading-relaxed mt-4 max-w-md">Saya merancang sistem web dan mobile modern yang cepat, intuitif, dan siap skalabilitas. Dari desain database hingga aplikasi klien berperforma tinggi, saya menulis kode dengan presisi absolut.</p>
             <div class="mt-6 flex flex-wrap gap-3">
               <a href="#services" class="rounded-lg bg-accent-500 px-5 py-2.5 text-xs font-bold tracking-widest text-primary-950 hover:bg-accent-600 hover:shadow-lg hover:shadow-accent-500/20 active:scale-95 transition-all uppercase">Lihat Layanan</a>
-              <a href="#collaborate" class="rounded-lg border border-zinc-800 bg-zinc-900 px-5 py-2.5 text-xs font-bold tracking-widest text-zinc-300 hover:text-white hover:border-zinc-700 active:scale-95 transition-all uppercase shadow-sm">Hubungi Saya</a>
+              <a href="#collaborate" class="rounded-lg border border-zinc-200 bg-zinc-100 px-5 py-2.5 text-xs font-bold tracking-widest text-zinc-700 hover:text-zinc-900 hover:border-zinc-300 active:scale-95 transition-all uppercase shadow-sm">Hubungi Saya</a>
             </div>
           </div>
 
           <!-- Center Portrait -->
           <div class="lg:col-span-4 flex justify-center order-1 lg:order-2 relative w-full">
             <div class="relative hero-float">
-              <div class="relative w-64 h-80 sm:w-72 sm:h-96 md:w-80 md:h-[400px] overflow-hidden rounded-2xl border-2 border-accent-500/30 bg-zinc-900 shadow-2xl shadow-accent-500/20 group">
+              <div class="relative w-64 h-80 sm:w-72 sm:h-96 md:w-80 md:h-[400px] overflow-hidden rounded-2xl border-2 border-accent-500/30 bg-zinc-100 shadow-2xl shadow-accent-500/20 group">
                 <img src="" alt="Eka Ryan Portrait" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" referrerpolicy="no-referrer" />
                 <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-accent-500"></div>
                 <div class="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-accent-500"></div>
@@ -319,10 +319,10 @@
               </div>
               <!-- Rotating Badge -->
               <div class="absolute -bottom-5 -right-5 sm:-bottom-6 sm:-right-8 z-20 pointer-events-none select-none">
-                <div class="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center rounded-full bg-zinc-950 border border-zinc-800 p-1 shadow-lg">
+                <div class="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center rounded-full bg-white border border-zinc-200 p-1 shadow-lg">
                   <svg class="absolute w-full h-full animate-spin-slow" viewBox="0 0 100 100">
                     <path id="circlePath" d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0" fill="none" />
-                    <text class="font-mono text-[7px] font-bold fill-accent-400 tracking-[0.2em] uppercase">
+                    <text class="font-mono text-[7px] font-bold fill-primary-700 tracking-[0.2em] uppercase">
                       <textPath href="#circlePath" startOffset="0%">BUILDING DIGITAL EXPERIENCES * CODE WITH PRECISION *</textPath>
                     </text>
                   </svg>
@@ -334,28 +334,28 @@
 
           <!-- Right Metadata -->
           <div class="lg:col-span-4 flex flex-col justify-center order-3 text-left w-full lg:pl-6 max-w-md md:max-w-lg lg:max-w-none mx-auto lg:mx-0">
-            <div class="border border-zinc-900 bg-zinc-950/50 rounded-xl p-6 divide-y divide-zinc-900 backdrop-blur-sm shadow-sm">
+            <div class="border border-zinc-200 bg-white/70 rounded-xl p-6 divide-y divide-zinc-200 backdrop-blur-sm shadow-sm">
               <div class="pb-4 flex justify-between items-center gap-4">
-                <span class="font-mono text-[10px] text-zinc-500 uppercase tracking-widest">BERDOMISILI DI</span>
-                <span class="font-heading text-xs font-bold text-white tracking-wider uppercase">BALI, INDONESIA</span>
+                <span class="font-mono text-[10px] text-zinc-700 uppercase tracking-widest">BERDOMISILI DI</span>
+                <span class="font-heading text-xs font-bold text-zinc-900 tracking-wider uppercase">BALI, INDONESIA</span>
               </div>
               <div class="py-4 flex justify-between items-center gap-4">
-                <span class="font-mono text-[10px] text-zinc-500 uppercase tracking-widest">PENGALAMAN</span>
-                <span class="font-heading text-xs font-bold text-white tracking-wider uppercase">5+ TAHUN</span>
+                <span class="font-mono text-[10px] text-zinc-700 uppercase tracking-widest">PENGALAMAN</span>
+                <span class="font-heading text-xs font-bold text-zinc-900 tracking-wider uppercase">5+ TAHUN</span>
               </div>
               <div class="pt-4 flex justify-between items-center gap-4">
-                <span class="font-mono text-[10px] text-zinc-500 uppercase tracking-widest">TERSEDIA UNTUK</span>
-                <span class="font-heading text-xs font-bold text-accent-400 tracking-wider uppercase">SELURUH DUNIA</span>
+                <span class="font-mono text-[10px] text-zinc-700 uppercase tracking-widest">TERSEDIA UNTUK</span>
+                <span class="font-heading text-xs font-bold text-primary-700 tracking-wider uppercase">SELURUH DUNIA</span>
               </div>
             </div>
             <div class="mt-6 grid grid-cols-2 gap-4">
-              <div class="p-4 rounded-xl bg-zinc-900/30 border border-zinc-900 shadow-sm">
-                <p class="font-display text-2xl font-black text-accent-400">45+</p>
-                <p class="font-mono text-[9px] text-zinc-500 uppercase tracking-wider mt-1">Layanan Tersedia</p>
+              <div class="p-4 rounded-xl bg-zinc-50 border border-zinc-200 shadow-sm">
+                <p class="font-display text-2xl font-black text-primary-700">45+</p>
+                <p class="font-mono text-[9px] text-zinc-700 uppercase tracking-wider mt-1">Layanan Tersedia</p>
               </div>
-              <div class="p-4 rounded-xl bg-zinc-900/30 border border-zinc-900 shadow-sm">
-                <p class="font-display text-2xl font-black text-accent-400">20+</p>
-                <p class="font-mono text-[9px] text-zinc-500 uppercase tracking-wider mt-1">Klien Puas</p>
+              <div class="p-4 rounded-xl bg-zinc-50 border border-zinc-200 shadow-sm">
+                <p class="font-display text-2xl font-black text-primary-700">20+</p>
+                <p class="font-mono text-[9px] text-zinc-700 uppercase tracking-wider mt-1">Klien Puas</p>
               </div>
             </div>
           </div>
@@ -363,24 +363,24 @@
       </div>
 
       <!-- Bottom Scroll Indicator -->
-      <div class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center pt-4 text-zinc-600 font-mono text-[10px] uppercase tracking-widest">
+      <div class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center pt-4 text-zinc-700 font-mono text-[10px] uppercase tracking-widest">
         <span>GULIR KE BAWAH UNTUK MENJELAJAHI</span>
         <div class="flex gap-1.5 items-center">
           <span class="w-2.5 h-2.5 rounded-full bg-accent-500 animate-pulse"></span>
-          <span class="text-zinc-400">SISTEM LIVE</span>
+          <span class="text-zinc-600">SISTEM LIVE</span>
         </div>
       </div>
     </section>
 
     <!-- ====== SERVICES SECTION ====== -->
-    <section id="services" class="w-full bg-zinc-950 px-4 py-20 text-white sm:px-6 lg:px-8 border-y border-zinc-900/50 transition-colors duration-500">
+    <section id="services" class="w-full bg-white px-4 py-20 text-zinc-900 sm:px-6 lg:px-8 border-y border-zinc-200/70 transition-colors duration-500">
       <div class="mx-auto max-w-7xl">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 border-b border-zinc-900 pb-6 mb-12 scroll-hidden">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 border-b border-zinc-200 pb-6 mb-12 scroll-hidden">
           <div>
-            <span class="font-mono text-xs text-accent-400 tracking-widest uppercase font-semibold">Yang Saya Tawarkan</span>
-            <h3 class="font-display text-3xl sm:text-4xl font-extrabold tracking-tight mt-1 uppercase text-white">Layanan</h3>
+            <span class="font-mono text-xs text-primary-700 tracking-widest uppercase font-semibold">Yang Saya Tawarkan</span>
+            <h3 class="font-display text-3xl sm:text-4xl font-extrabold tracking-tight mt-1 uppercase text-zinc-900">Layanan</h3>
           </div>
-          <span id="service-count" class="font-mono text-xs text-zinc-400 tracking-widest uppercase">Menampilkan 3 layanan</span>
+          <span id="service-count" class="font-mono text-xs text-zinc-600 tracking-widest uppercase">Menampilkan 3 layanan</span>
         </div>
 
         <!-- Services Grid -->
@@ -389,33 +389,33 @@
     </section>
 
     <!-- ====== WORKFLOW SECTION ====== -->
-    <section id="workflow" class="w-full bg-transparent px-4 py-20 text-white sm:px-6 lg:px-8 border-t border-zinc-900 transition-colors duration-500">
+    <section id="workflow" class="w-full bg-transparent px-4 py-20 text-zinc-900 sm:px-6 lg:px-8 border-t border-zinc-200 transition-colors duration-500">
       <div class="mx-auto max-w-7xl">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 border-b border-zinc-900 pb-6 mb-12 scroll-hidden">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 border-b border-zinc-200 pb-6 mb-12 scroll-hidden">
           <div>
-            <span class="font-mono text-xs text-accent-400 tracking-widest uppercase font-semibold">Metode Kreatif Saya</span>
-            <h3 class="font-display text-3xl sm:text-4xl font-extrabold tracking-tight mt-1 uppercase text-white">Alur Kerja Saya</h3>
+            <span class="font-mono text-xs text-primary-700 tracking-widest uppercase font-semibold">Metode Kreatif Saya</span>
+            <h3 class="font-display text-3xl sm:text-4xl font-extrabold tracking-tight mt-1 uppercase text-zinc-900">Alur Kerja Saya</h3>
           </div>
-          <span class="font-mono text-xs text-zinc-400 tracking-widest uppercase">Jalur terstruktur dari konsep ke kode</span>
+          <span class="font-mono text-xs text-zinc-600 tracking-widest uppercase">Jalur terstruktur dari konsep ke kode</span>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <!-- Left: Accordion -->
-          <div id="workflow-list" class="lg:col-span-8 flex flex-col divide-y divide-zinc-900 border-t border-b border-zinc-900"></div>
+          <div id="workflow-list" class="lg:col-span-8 flex flex-col divide-y divide-zinc-200 border-t border-b border-zinc-200"></div>
 
           <!-- Right: Quality Card -->
           <div class="lg:col-span-4 lg:sticky lg:top-28">
-            <div class="rounded-2xl border border-zinc-900 bg-zinc-950 p-6 shadow-md relative overflow-hidden group">
+            <div class="rounded-2xl border border-zinc-200 bg-white p-6 shadow-md relative overflow-hidden group">
               <div class="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-accent-500/5 blur-2xl group-hover:bg-accent-500/10 transition-colors"></div>
-              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-500/10 text-accent-400 mb-5">
+              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-500/10 text-primary-700 mb-5">
                 <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
               </div>
-              <h4 class="font-display text-lg font-bold tracking-tight text-white uppercase">Jaminan Kualitas Saya</h4>
-              <p class="font-sans text-xs text-zinc-400 leading-relaxed mt-3">Setiap pixel yang dirancang memiliki fungsi jelas. Saya memadukan estetika desain dengan psikologi pengguna untuk menghasilkan tata letak yang meningkatkan metrik, mempertahankan pengguna, dan memberikan kesan.</p>
+              <h4 class="font-display text-lg font-bold tracking-tight text-zinc-900 uppercase">Jaminan Kualitas Saya</h4>
+              <p class="font-sans text-xs text-zinc-600 leading-relaxed mt-3">Setiap pixel yang dirancang memiliki fungsi jelas. Saya memadukan estetika desain dengan psikologi pengguna untuk menghasilkan tata letak yang meningkatkan metrik, mempertahankan pengguna, dan memberikan kesan.</p>
               <div class="mt-6 space-y-3">
-                <div class="flex items-center gap-2 text-xs text-zinc-300 font-medium"><span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span><span>100% Tata Letak Kustom</span></div>
-                <div class="flex items-center gap-2 text-xs text-zinc-300 font-medium"><span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span><span>Desain kontras aksesibel (WCAG)</span></div>
-                <div class="flex items-center gap-2 text-xs text-zinc-300 font-medium"><span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span><span>Siap coding React yang mulus</span></div>
+                <div class="flex items-center gap-2 text-xs text-zinc-700 font-medium"><span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span><span>100% Tata Letak Kustom</span></div>
+                <div class="flex items-center gap-2 text-xs text-zinc-700 font-medium"><span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span><span>Desain kontras aksesibel (WCAG)</span></div>
+                <div class="flex items-center gap-2 text-xs text-zinc-700 font-medium"><span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span><span>Siap coding React yang mulus</span></div>
               </div>
             </div>
           </div>
@@ -424,43 +424,43 @@
     </section>
 
     <!-- ====== SKILLS SECTION ====== -->
-    <section id="skills" class="w-full bg-transparent px-4 py-20 text-white sm:px-6 lg:px-8 border-t border-zinc-900 transition-colors duration-500">
+    <section id="skills" class="w-full bg-transparent px-4 py-20 text-zinc-900 sm:px-6 lg:px-8 border-t border-zinc-200 transition-colors duration-500">
       <div class="mx-auto max-w-7xl">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 border-b border-zinc-900 pb-6 mb-12 scroll-hidden">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 border-b border-zinc-200 pb-6 mb-12 scroll-hidden">
           <div>
-            <span class="font-mono text-xs text-accent-400 tracking-widest uppercase font-semibold">Keahlian Teknis</span>
-            <h3 class="font-display text-3xl sm:text-4xl font-extrabold tracking-tight mt-1 uppercase text-white">Keahlian & Kemampuan</h3>
+            <span class="font-mono text-xs text-primary-700 tracking-widest uppercase font-semibold">Keahlian Teknis</span>
+            <h3 class="font-display text-3xl sm:text-4xl font-extrabold tracking-tight mt-1 uppercase text-zinc-900">Keahlian & Kemampuan</h3>
           </div>
-          <span class="font-mono text-xs text-zinc-400 tracking-widest uppercase">Daftar teknologi yang dikuasai</span>
+          <span class="font-mono text-xs text-zinc-600 tracking-widest uppercase">Daftar teknologi yang dikuasai</span>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           <!-- Skills Grid -->
           <div class="lg:col-span-8 flex flex-col justify-center scroll-hidden">
-            <p class="font-mono text-[10px] text-zinc-400 uppercase tracking-widest font-bold mb-4">Teknologi & Metodologi Inti</p>
+            <p class="font-mono text-[10px] text-zinc-600 uppercase tracking-widest font-bold mb-4">Teknologi & Metodologi Inti</p>
             <div id="skills-tags" class="flex flex-wrap gap-2.5"></div>
           </div>
 
           <!-- Trophy Card -->
           <div class="lg:col-span-4 scroll-hidden">
-            <div class="h-full rounded-2xl border-2 border-accent-500/20 bg-gradient-to-br from-zinc-950 via-zinc-900/40 to-zinc-950 p-6 shadow-xl flex flex-col justify-between relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+            <div class="h-full rounded-2xl border-2 border-accent-500/20 bg-gradient-to-br from-zinc-50 via-zinc-100/60 to-zinc-50 p-6 shadow-xl flex flex-col justify-between relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
               <div class="absolute inset-0 bg-accent-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div class="flex justify-between items-start">
-                <div class="rounded-xl bg-accent-500/10 p-3 text-accent-400 group-hover:bg-accent-500 group-hover:text-primary-950 transition-all duration-300">
+                <div class="rounded-xl bg-accent-500/10 p-3 text-primary-700 group-hover:bg-accent-500 group-hover:text-primary-950 transition-all duration-300">
                   <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
                 </div>
                 <span class="font-mono text-[9px] bg-accent-500 text-primary-950 font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">JAMINAN 100%</span>
               </div>
               <div class="mt-6">
-                <span class="font-mono text-[9px] text-zinc-400 uppercase tracking-widest block font-bold">JAMINAN KEPUASAN</span>
-                <h4 class="font-display text-xl font-extrabold tracking-tight text-white mt-1 uppercase">Jaminan Uang Kembali</h4>
-                <p class="font-mono text-xs text-accent-400 mt-1 uppercase tracking-wide">Tanpa Syarat Ribet</p>
-                <p class="font-sans text-xs text-zinc-400 leading-relaxed mt-3">Jika hasil pekerjaan tidak sesuai dengan kesepakatan awal, saya menjamin pengembalian uang penuh. Kepuasan Anda adalah prioritas utama saya.</p>
+                <span class="font-mono text-[9px] text-zinc-600 uppercase tracking-widest block font-bold">JAMINAN KEPUASAN</span>
+                <h4 class="font-display text-xl font-extrabold tracking-tight text-zinc-900 mt-1 uppercase">Jaminan Uang Kembali</h4>
+                <p class="font-mono text-xs text-primary-700 mt-1 uppercase tracking-wide">Tanpa Syarat Ribet</p>
+                <p class="font-sans text-xs text-zinc-600 leading-relaxed mt-3">Jika hasil pekerjaan tidak sesuai dengan kesepakatan awal, saya menjamin pengembalian uang penuh. Kepuasan Anda adalah prioritas utama saya.</p>
               </div>
-              <div class="mt-6 pt-4 border-t border-zinc-900 space-y-3">
-                <div class="flex items-center gap-2 text-xs text-zinc-300 font-medium"><span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span><span>Revisi tanpa batas hingga disetujui</span></div>
-                <div class="flex items-center gap-2 text-xs text-zinc-300 font-medium"><span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span><span>Pengembalian dana 100% jika tidak puas</span></div>
-                <div class="flex items-center gap-2 text-xs text-zinc-300 font-medium"><span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span><span>Transparansi proses dari awal hingga akhir</span></div>
+              <div class="mt-6 pt-4 border-t border-zinc-200 space-y-3">
+                <div class="flex items-center gap-2 text-xs text-zinc-700 font-medium"><span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span><span>Revisi tanpa batas hingga disetujui</span></div>
+                <div class="flex items-center gap-2 text-xs text-zinc-700 font-medium"><span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span><span>Pengembalian dana 100% jika tidak puas</span></div>
+                <div class="flex items-center gap-2 text-xs text-zinc-700 font-medium"><span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span><span>Transparansi proses dari awal hingga akhir</span></div>
               </div>
             </div>
           </div>
@@ -469,114 +469,114 @@
     </section>
 
     <!-- ====== CONTACT SECTION ====== -->
-    <section id="collaborate" class="w-full bg-transparent px-4 py-20 text-white sm:px-6 lg:px-8 border-t border-zinc-900 transition-colors duration-500">
+    <section id="collaborate" class="w-full bg-transparent px-4 py-20 text-zinc-900 sm:px-6 lg:px-8 border-t border-zinc-200 transition-colors duration-500">
       <div class="mx-auto max-w-7xl">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 border-b border-zinc-900 pb-6 mb-12 scroll-hidden">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 border-b border-zinc-200 pb-6 mb-12 scroll-hidden">
           <div>
-            <span class="font-mono text-xs text-accent-400 tracking-widest uppercase font-semibold">Hubungi Saya</span>
-            <h3 class="font-display text-3xl sm:text-4xl font-extrabold tracking-tight mt-1 uppercase text-white">Ayo Berkolaborasi</h3>
+            <span class="font-mono text-xs text-primary-700 tracking-widest uppercase font-semibold">Hubungi Saya</span>
+            <h3 class="font-display text-3xl sm:text-4xl font-extrabold tracking-tight mt-1 uppercase text-zinc-900">Ayo Berkolaborasi</h3>
           </div>
-          <span class="font-mono text-xs text-zinc-400 tracking-widest uppercase">Mari buat sesuatu yang luar biasa</span>
+          <span class="font-mono text-xs text-zinc-600 tracking-widest uppercase">Mari buat sesuatu yang luar biasa</span>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           <!-- Left Contact Info -->
           <div class="lg:col-span-5 flex flex-col justify-between scroll-hidden">
             <div>
-              <h4 class="font-display text-xl sm:text-2xl font-black text-accent-500 uppercase tracking-tight">PUNYA PROYEK YANG IDE?</h4>
-              <p class="font-sans text-xs sm:text-sm text-zinc-400 leading-relaxed mt-3 max-w-md">Saya selalu terbuka untuk mendiskusikan proyek baru, ide kreatif, atau kesempatan untuk menjadi bagian dari visi Anda.</p>
+              <h4 class="font-display text-xl sm:text-2xl font-black text-primary-700 uppercase tracking-tight">PUNYA PROYEK YANG IDE?</h4>
+              <p class="font-sans text-xs sm:text-sm text-zinc-600 leading-relaxed mt-3 max-w-md">Saya selalu terbuka untuk mendiskusikan proyek baru, ide kreatif, atau kesempatan untuk menjadi bagian dari visi Anda.</p>
               <div class="mt-8 space-y-4">
                 <!-- Email -->
-                <div class="group rounded-xl border border-zinc-900 bg-zinc-950 p-4 hover:border-accent-500/50 transition-all duration-300 shadow-sm">
+                <div class="group rounded-xl border border-zinc-200 bg-white p-4 hover:border-accent-500/50 transition-all duration-300 shadow-sm">
                   <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                      <div class="rounded-lg bg-accent-500/10 p-2 text-accent-400">
+                      <div class="rounded-lg bg-accent-500/10 p-2 text-primary-700">
                         <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                       </div>
                       <div>
-                        <span class="block font-mono text-[9px] text-zinc-400 uppercase tracking-widest font-bold">EMAIL</span>
-                        <a href="mailto:inc.ekaryan@gmail.com" class="font-heading text-xs font-bold text-white hover:text-accent-400 transition-colors block mt-0.5">inc.ekaryan@gmail.com</a>
+                        <span class="block font-mono text-[9px] text-zinc-600 uppercase tracking-widest font-bold">EMAIL</span>
+                        <a href="mailto:inc.ekaryan@gmail.com" class="font-heading text-xs font-bold text-zinc-900 hover:text-primary-700 transition-colors block mt-0.5">inc.ekaryan@gmail.com</a>
                       </div>
                     </div>
-                    <button id="copy-email-btn" class="rounded-lg bg-zinc-900 p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors" title="Salin Alamat Email">
+                    <button id="copy-email-btn" class="rounded-lg bg-zinc-100 p-2 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200 transition-colors" title="Salin Alamat Email">
                       <svg id="copy-icon" class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                       <svg id="check-icon" class="h-3.5 w-3.5 text-emerald-500 hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                     </button>
                   </div>
                 </div>
                 <!-- Location -->
-                <div class="rounded-xl border border-zinc-900 bg-zinc-950 p-4 shadow-sm">
+                <div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
                   <div class="flex items-center gap-3">
-                    <div class="rounded-lg bg-accent-500/10 p-2 text-accent-400">
+                    <div class="rounded-lg bg-accent-500/10 p-2 text-primary-700">
                       <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
                     </div>
                     <div>
-                      <span class="block font-mono text-[9px] text-zinc-400 uppercase tracking-widest font-bold">LOKASI</span>
-                      <span class="font-heading text-xs font-bold text-white block mt-0.5">Bali, Indonesia</span>
+                      <span class="block font-mono text-[9px] text-zinc-600 uppercase tracking-widest font-bold">LOKASI</span>
+                      <span class="font-heading text-xs font-bold text-zinc-900 block mt-0.5">Bali, Indonesia</span>
                     </div>
                   </div>
                 </div>
                 <!-- Website -->
-                <div class="rounded-xl border border-zinc-900 bg-zinc-950 p-4 shadow-sm">
+                <div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
                   <div class="flex items-center gap-3">
-                    <div class="rounded-lg bg-accent-500/10 p-2 text-accent-400">
+                    <div class="rounded-lg bg-accent-500/10 p-2 text-primary-700">
                       <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
                     </div>
                     <div>
-                      <span class="block font-mono text-[9px] text-zinc-400 uppercase tracking-widest font-bold">WEBSITE</span>
-                      <a href="https://ekaryandigitalsolution.pages.dev" class="font-heading text-xs font-bold text-white hover:text-accent-400 transition-colors block mt-0.5">ekaryandigitalsolution.pages.dev</a>
+                      <span class="block font-mono text-[9px] text-zinc-600 uppercase tracking-widest font-bold">WEBSITE</span>
+                      <a href="https://ekaryandigitalsolution.pages.dev" class="font-heading text-xs font-bold text-zinc-900 hover:text-primary-700 transition-colors block mt-0.5">ekaryandigitalsolution.pages.dev</a>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="mt-8 border-t border-zinc-900 pt-6 hidden lg:block">
-              <span class="font-mono text-[9px] text-zinc-400 tracking-widest uppercase">Mari buat sesuatu yang luar biasa bersama</span>
+            <div class="mt-8 border-t border-zinc-200 pt-6 hidden lg:block">
+              <span class="font-mono text-[9px] text-zinc-600 tracking-widest uppercase">Mari buat sesuatu yang luar biasa bersama</span>
             </div>
           </div>
 
           <!-- Right Contact Form -->
-          <div class="lg:col-span-7 bg-zinc-900/30 border border-zinc-900 rounded-2xl p-6 sm:p-8 relative shadow-md scroll-hidden">
+          <div class="lg:col-span-7 bg-zinc-50 border border-zinc-200 rounded-2xl p-6 sm:p-8 relative shadow-md scroll-hidden">
             <form id="contact-form" class="space-y-4">
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label class="block font-mono text-[9px] text-zinc-400 uppercase tracking-widest font-bold mb-1.5">Nama Lengkap *</label>
-                  <input id="form-name" type="text" placeholder="Eka Ryan" class="w-full rounded-lg border border-zinc-800 bg-zinc-950 py-2.5 px-3.5 text-xs text-white placeholder-zinc-600 focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500 transition-all" required />
+                  <label class="block font-mono text-[9px] text-zinc-600 uppercase tracking-widest font-bold mb-1.5">Nama Lengkap *</label>
+                  <input id="form-name" type="text" placeholder="Eka Ryan" class="w-full rounded-lg border border-zinc-200 bg-white py-2.5 px-3.5 text-xs text-zinc-900 placeholder-zinc-500 focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500 transition-all" required />
                 </div>
                 <div>
-                  <label class="block font-mono text-[9px] text-zinc-400 uppercase tracking-widest font-bold mb-1.5">Email *</label>
-                  <input id="form-email" type="email" placeholder="email@contoh.com" class="w-full rounded-lg border border-zinc-800 bg-zinc-950 py-2.5 px-3.5 text-xs text-white placeholder-zinc-600 focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500 transition-all" required />
+                  <label class="block font-mono text-[9px] text-zinc-600 uppercase tracking-widest font-bold mb-1.5">Email *</label>
+                  <input id="form-email" type="email" placeholder="email@contoh.com" class="w-full rounded-lg border border-zinc-200 bg-white py-2.5 px-3.5 text-xs text-zinc-900 placeholder-zinc-500 focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500 transition-all" required />
                 </div>
               </div>
               <div>
-                <label class="block font-mono text-[9px] text-zinc-400 uppercase tracking-widest font-bold mb-1.5">Nomor WhatsApp *</label>
-                <input id="form-whatsapp" type="tel" placeholder="08123456789" class="w-full rounded-lg border border-zinc-800 bg-zinc-950 py-2.5 px-3.5 text-xs text-white placeholder-zinc-600 focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500 transition-all" required />
+                <label class="block font-mono text-[9px] text-zinc-600 uppercase tracking-widest font-bold mb-1.5">Nomor WhatsApp *</label>
+                <input id="form-whatsapp" type="tel" placeholder="08123456789" class="w-full rounded-lg border border-zinc-200 bg-white py-2.5 px-3.5 text-xs text-zinc-900 placeholder-zinc-500 focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500 transition-all" required />
               </div>
               <div>
-                <label class="block font-mono text-[9px] text-zinc-400 uppercase tracking-widest font-bold mb-1.5">Layanan yang Dibutuhkan *</label>
-                <select id="form-service" class="w-full rounded-lg border border-zinc-800 bg-zinc-950 py-2.5 px-3.5 text-xs text-white focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500 transition-all" required>
+                <label class="block font-mono text-[9px] text-zinc-600 uppercase tracking-widest font-bold mb-1.5">Layanan yang Dibutuhkan *</label>
+                <select id="form-service" class="w-full rounded-lg border border-zinc-200 bg-white py-2.5 px-3.5 text-xs text-zinc-900 focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500 transition-all" required>
                   <option value="">-- Pilih Layanan --</option>
                 </select>
               </div>
               <div>
-                <label class="block font-mono text-[9px] text-zinc-400 uppercase tracking-widest font-bold mb-1.5">Pesan Anda *</label>
-                <textarea id="form-message" rows="3" placeholder="Ceritakan tentang visi proyek Anda, fitur, platform, dan tujuan..." class="w-full rounded-lg border border-zinc-800 bg-zinc-950 py-2.5 px-3.5 text-xs text-white placeholder-zinc-600 focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500 transition-all resize-none" required></textarea>
+                <label class="block font-mono text-[9px] text-zinc-600 uppercase tracking-widest font-bold mb-1.5">Pesan Anda *</label>
+                <textarea id="form-message" rows="3" placeholder="Ceritakan tentang visi proyek Anda, fitur, platform, dan tujuan..." class="w-full rounded-lg border border-zinc-200 bg-white py-2.5 px-3.5 text-xs text-zinc-900 placeholder-zinc-500 focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500 transition-all resize-none" required></textarea>
               </div>
               <!-- Fitur / Add-ons -->
               <div class="relative">
-                <label class="block font-mono text-[9px] text-zinc-400 uppercase tracking-widest font-bold mb-2">Fitur Tambahan <span class="text-zinc-600">(opsional)</span></label>
-                <button type="button" id="addons-dropdown-btn" class="w-full rounded-lg border border-zinc-800 bg-zinc-950 py-2.5 px-3.5 text-xs text-left text-zinc-400 hover:border-zinc-700 focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500 transition-all flex items-center justify-between">
+                <label class="block font-mono text-[9px] text-zinc-600 uppercase tracking-widest font-bold mb-2">Fitur Tambahan <span class="text-zinc-700">(opsional)</span></label>
+                <button type="button" id="addons-dropdown-btn" class="w-full rounded-lg border border-zinc-200 bg-white py-2.5 px-3.5 text-xs text-left text-zinc-600 hover:border-zinc-300 focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500 transition-all flex items-center justify-between">
                   <span id="addons-selected-text">Pilih fitur tambahan...</span>
-                  <svg class="h-4 w-4 text-zinc-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  <svg class="h-4 w-4 text-zinc-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
-                <div id="addons-dropdown" class="hidden absolute z-50 w-full mt-1 rounded-lg border border-zinc-800 bg-zinc-900 shadow-xl max-h-60 overflow-y-auto custom-scrollbar">
+                <div id="addons-dropdown" class="hidden absolute z-50 w-full mt-1 rounded-lg border border-zinc-200 bg-zinc-100 shadow-xl max-h-60 overflow-y-auto custom-scrollbar">
                   <div id="addons-dropdown-list" class="p-1">
-                    <p class="text-[10px] text-zinc-500 p-2">Memuat fitur...</p>
+                    <p class="text-[10px] text-zinc-700 p-2">Memuat fitur...</p>
                   </div>
                 </div>
                 <input type="hidden" id="form-addons-hidden" value="[]" />
               </div>
-              <div id="form-error" class="hidden rounded-lg bg-red-600/10 border border-red-500/20 px-4 py-2.5 text-xs text-red-400"></div>
+              <div id="form-error" class="hidden rounded-lg bg-red-600/10 border border-red-500/20 px-4 py-2.5 text-xs text-red-600"></div>
               <button type="submit" class="w-full group flex items-center justify-center gap-2 rounded-xl bg-accent-500 hover:bg-accent-600 py-3 text-xs font-bold tracking-widest text-primary-950 transition-all uppercase cursor-pointer">
                 <span>KIRIM & MINTA PENAWARAN</span>
                 <svg class="h-4 w-4 group-hover:translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
@@ -587,19 +587,19 @@
               <div class="rounded-full bg-emerald-600/10 p-4 text-emerald-500 mb-4 border border-emerald-500/20">
                 <svg class="h-10 w-10 animate-pulse" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
               </div>
-              <h4 class="font-display text-xl sm:text-2xl font-extrabold tracking-tight text-white uppercase">Pesan Terkirim!</h4>
-              <p class="font-sans text-xs sm:text-sm text-zinc-400 mt-2 max-w-sm leading-relaxed">Terima kasih telah menghubungi! Pesan Anda telah berhasil dikirim. Saya akan membalas dalam 24 jam via WhatsApp.</p>
-              <div id="submission-log" class="mt-6 w-full rounded-xl bg-zinc-950 p-4 text-left border border-zinc-900">
-                <span class="block font-mono text-[9px] text-zinc-400 uppercase tracking-widest mb-2 font-bold">Ringkasan Log Pengiriman</span>
+              <h4 class="font-display text-xl sm:text-2xl font-extrabold tracking-tight text-zinc-900 uppercase">Pesan Terkirim!</h4>
+              <p class="font-sans text-xs sm:text-sm text-zinc-600 mt-2 max-w-sm leading-relaxed">Terima kasih telah menghubungi! Pesan Anda telah berhasil dikirim. Saya akan membalas dalam 24 jam via WhatsApp.</p>
+              <div id="submission-log" class="mt-6 w-full rounded-xl bg-white p-4 text-left border border-zinc-200">
+                <span class="block font-mono text-[9px] text-zinc-600 uppercase tracking-widest mb-2 font-bold">Ringkasan Log Pengiriman</span>
                 <div class="space-y-1 text-xs">
-                  <p><span class="text-zinc-400">Nama:</span> <span class="text-zinc-300 font-semibold" id="log-name"></span></p>
-                  <p><span class="text-zinc-400">Email:</span> <span class="text-zinc-300 font-mono text-[11px]" id="log-email"></span></p>
-                  <p><span class="text-zinc-400">WhatsApp:</span> <span class="text-zinc-300 font-mono text-[11px]" id="log-whatsapp"></span></p>
-                  <p><span class="text-zinc-400">Layanan:</span> <span class="text-zinc-300" id="log-service"></span></p>
-                  <p id="log-addons-row" class="hidden"><span class="text-zinc-400">Fitur Tambahan:</span> <span class="text-zinc-300" id="log-addons"></span></p>
+                  <p><span class="text-zinc-600">Nama:</span> <span class="text-zinc-700 font-semibold" id="log-name"></span></p>
+                  <p><span class="text-zinc-600">Email:</span> <span class="text-zinc-700 font-mono text-[11px]" id="log-email"></span></p>
+                  <p><span class="text-zinc-600">WhatsApp:</span> <span class="text-zinc-700 font-mono text-[11px]" id="log-whatsapp"></span></p>
+                  <p><span class="text-zinc-600">Layanan:</span> <span class="text-zinc-700" id="log-service"></span></p>
+                  <p id="log-addons-row" class="hidden"><span class="text-zinc-600">Fitur Tambahan:</span> <span class="text-zinc-700" id="log-addons"></span></p>
                 </div>
               </div>
-              <button id="reset-form-btn" class="mt-6 rounded-xl border border-zinc-800 bg-zinc-900 hover:text-white hover:border-zinc-700 px-6 py-2.5 text-xs font-bold tracking-widest text-zinc-400 transition-all uppercase cursor-pointer">Kirim Pesan Lain</button>
+              <button id="reset-form-btn" class="mt-6 rounded-xl border border-zinc-200 bg-zinc-100 hover:text-zinc-900 hover:border-zinc-300 px-6 py-2.5 text-xs font-bold tracking-widest text-zinc-600 transition-all uppercase cursor-pointer">Kirim Pesan Lain</button>
             </div>
           </div>
         </div>
@@ -608,76 +608,76 @@
   </main>
 
   <!-- ===================== FOOTER ===================== -->
-  <footer id="main-footer" class="w-full bg-transparent text-white border-t border-zinc-900 pt-16 pb-8 px-4 sm:px-6 lg:px-8 transition-colors duration-500">
+  <footer id="main-footer" class="w-full bg-transparent text-zinc-900 border-t border-zinc-200 pt-16 pb-8 px-4 sm:px-6 lg:px-8 transition-colors duration-500">
     <div class="mx-auto max-w-7xl">
       <!-- Mobile/Tablet: Centered layout -->
-      <div class="md:hidden flex flex-col items-center gap-8 pb-12 border-b border-zinc-900 text-center">
+      <div class="md:hidden flex flex-col items-center gap-8 pb-12 border-b border-zinc-200 text-center">
         <!-- Social Links -->
         <div class="flex flex-col items-center">
-          <span class="font-mono text-[9px] text-zinc-400 uppercase tracking-widest font-bold">HUBUNGKAN DENGAN SAYA</span>
+          <span class="font-mono text-[9px] text-zinc-600 uppercase tracking-widest font-bold">HUBUNGKAN DENGAN SAYA</span>
           <div class="mt-4 flex items-center gap-3">
-            <a href="https://linkedin.com/in/placeholder" target="_blank" rel="noopener noreferrer" class="group rounded-full bg-zinc-900 hover:bg-accent-500 hover:text-primary-950 p-3 text-zinc-400 hover:-translate-y-1 transition-all duration-300 border border-zinc-900/50 shadow-sm" title="LinkedIn">
+            <a href="https://linkedin.com/in/placeholder" target="_blank" rel="noopener noreferrer" class="group rounded-full bg-zinc-100 hover:bg-accent-500 hover:text-primary-950 p-3 text-zinc-600 hover:-translate-y-1 transition-all duration-300 border border-zinc-200/70 shadow-sm" title="LinkedIn">
               <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
             </a>
-            <a href="https://instagram.com/placeholder" target="_blank" rel="noopener noreferrer" class="group rounded-full bg-zinc-900 hover:bg-accent-500 hover:text-primary-950 p-3 text-zinc-400 hover:-translate-y-1 transition-all duration-300 border border-zinc-900/50 shadow-sm" title="Instagram">
+            <a href="https://instagram.com/placeholder" target="_blank" rel="noopener noreferrer" class="group rounded-full bg-zinc-100 hover:bg-accent-500 hover:text-primary-950 p-3 text-zinc-600 hover:-translate-y-1 transition-all duration-300 border border-zinc-200/70 shadow-sm" title="Instagram">
               <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
             </a>
-            <a href="https://tiktok.com/@placeholder" target="_blank" rel="noopener noreferrer" class="group rounded-full bg-zinc-900 hover:bg-accent-500 hover:text-primary-950 p-3 text-zinc-400 hover:-translate-y-1 transition-all duration-300 border border-zinc-900/50 shadow-sm" title="TikTok">
+            <a href="https://tiktok.com/@placeholder" target="_blank" rel="noopener noreferrer" class="group rounded-full bg-zinc-100 hover:bg-accent-500 hover:text-primary-950 p-3 text-zinc-600 hover:-translate-y-1 transition-all duration-300 border border-zinc-200/70 shadow-sm" title="TikTok">
               <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
             </a>
-            <a href="https://x.com/placeholder" target="_blank" rel="noopener noreferrer" class="group rounded-full bg-zinc-900 hover:bg-accent-500 hover:text-primary-950 p-3 text-zinc-400 hover:-translate-y-1 transition-all duration-300 border border-zinc-900/50 shadow-sm" title="X">
+            <a href="https://x.com/placeholder" target="_blank" rel="noopener noreferrer" class="group rounded-full bg-zinc-100 hover:bg-accent-500 hover:text-primary-950 p-3 text-zinc-600 hover:-translate-y-1 transition-all duration-300 border border-zinc-200/70 shadow-sm" title="X">
               <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
             </a>
           </div>
         </div>
         <!-- Quote -->
-        <p class="font-display text-xs sm:text-sm font-semibold text-zinc-300 tracking-wide uppercase italic leading-relaxed">&ldquo;TALK IS CHEAP. SHOW ME THE CODE.&rdquo;</p>
+        <p class="font-display text-xs sm:text-sm font-semibold text-zinc-700 tracking-wide uppercase italic leading-relaxed">&ldquo;TALK IS CHEAP. SHOW ME THE CODE.&rdquo;</p>
         <!-- Download Resume -->
-        <button id="download-resume-btn" class="group relative flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 px-5 py-3 text-xs font-bold tracking-widest text-zinc-300 hover:text-white hover:border-accent-500/50 hover:shadow-lg hover:shadow-accent-500/10 active:scale-95 transition-all duration-300 uppercase cursor-pointer shadow-sm">
+        <button id="download-resume-btn" class="group relative flex items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-100 px-5 py-3 text-xs font-bold tracking-widest text-zinc-700 hover:text-zinc-900 hover:border-accent-500/50 hover:shadow-lg hover:shadow-accent-500/10 active:scale-95 transition-all duration-300 uppercase cursor-pointer shadow-sm">
           <svg class="h-4 w-4 group-hover:-translate-y-0.5 transition-transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
           <span>Unduh CV Saya</span>
         </button>
       </div>
       <!-- Desktop: Left-Center-Right layout -->
-      <div class="hidden md:grid md:grid-cols-12 gap-8 items-center pb-12 border-b border-zinc-900">
+      <div class="hidden md:grid md:grid-cols-12 gap-8 items-center pb-12 border-b border-zinc-200">
         <!-- Social Links - Left -->
         <div class="col-span-4 flex flex-col items-start">
-          <span class="font-mono text-[9px] text-zinc-400 uppercase tracking-widest font-bold">HUBUNGKAN DENGAN SAYA</span>
+          <span class="font-mono text-[9px] text-zinc-600 uppercase tracking-widest font-bold">HUBUNGKAN DENGAN SAYA</span>
           <div class="mt-4 flex items-center gap-3">
-            <a href="https://linkedin.com/in/placeholder" target="_blank" rel="noopener noreferrer" class="group rounded-full bg-zinc-900 hover:bg-accent-500 hover:text-primary-950 p-3 text-zinc-400 hover:-translate-y-1 transition-all duration-300 border border-zinc-900/50 shadow-sm" title="LinkedIn">
+            <a href="https://linkedin.com/in/placeholder" target="_blank" rel="noopener noreferrer" class="group rounded-full bg-zinc-100 hover:bg-accent-500 hover:text-primary-950 p-3 text-zinc-600 hover:-translate-y-1 transition-all duration-300 border border-zinc-200/70 shadow-sm" title="LinkedIn">
               <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
             </a>
-            <a href="https://instagram.com/placeholder" target="_blank" rel="noopener noreferrer" class="group rounded-full bg-zinc-900 hover:bg-accent-500 hover:text-primary-950 p-3 text-zinc-400 hover:-translate-y-1 transition-all duration-300 border border-zinc-900/50 shadow-sm" title="Instagram">
+            <a href="https://instagram.com/placeholder" target="_blank" rel="noopener noreferrer" class="group rounded-full bg-zinc-100 hover:bg-accent-500 hover:text-primary-950 p-3 text-zinc-600 hover:-translate-y-1 transition-all duration-300 border border-zinc-200/70 shadow-sm" title="Instagram">
               <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
             </a>
-            <a href="https://tiktok.com/@placeholder" target="_blank" rel="noopener noreferrer" class="group rounded-full bg-zinc-900 hover:bg-accent-500 hover:text-primary-950 p-3 text-zinc-400 hover:-translate-y-1 transition-all duration-300 border border-zinc-900/50 shadow-sm" title="TikTok">
+            <a href="https://tiktok.com/@placeholder" target="_blank" rel="noopener noreferrer" class="group rounded-full bg-zinc-100 hover:bg-accent-500 hover:text-primary-950 p-3 text-zinc-600 hover:-translate-y-1 transition-all duration-300 border border-zinc-200/70 shadow-sm" title="TikTok">
               <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
             </a>
-            <a href="https://x.com/placeholder" target="_blank" rel="noopener noreferrer" class="group rounded-full bg-zinc-900 hover:bg-accent-500 hover:text-primary-950 p-3 text-zinc-400 hover:-translate-y-1 transition-all duration-300 border border-zinc-900/50 shadow-sm" title="X">
+            <a href="https://x.com/placeholder" target="_blank" rel="noopener noreferrer" class="group rounded-full bg-zinc-100 hover:bg-accent-500 hover:text-primary-950 p-3 text-zinc-600 hover:-translate-y-1 transition-all duration-300 border border-zinc-200/70 shadow-sm" title="X">
               <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
             </a>
           </div>
         </div>
         <!-- Quote - Center -->
         <div class="col-span-4 text-center px-4">
-          <p class="font-display text-xs sm:text-sm font-semibold text-zinc-300 tracking-wide uppercase italic leading-relaxed">&ldquo;TALK IS CHEAP. SHOW ME THE CODE.&rdquo;</p>
+          <p class="font-display text-xs sm:text-sm font-semibold text-zinc-700 tracking-wide uppercase italic leading-relaxed">&ldquo;TALK IS CHEAP. SHOW ME THE CODE.&rdquo;</p>
         </div>
         <!-- Download Resume - Right -->
         <div class="col-span-4 flex justify-end relative">
-          <button id="download-resume-btn-desktop" class="group relative flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 px-5 py-3 text-xs font-bold tracking-widest text-zinc-300 hover:text-white hover:border-accent-500/50 hover:shadow-lg hover:shadow-accent-500/10 active:scale-95 transition-all duration-300 uppercase cursor-pointer shadow-sm">
+          <button id="download-resume-btn-desktop" class="group relative flex items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-100 px-5 py-3 text-xs font-bold tracking-widest text-zinc-700 hover:text-zinc-900 hover:border-accent-500/50 hover:shadow-lg hover:shadow-accent-500/10 active:scale-95 transition-all duration-300 uppercase cursor-pointer shadow-sm">
             <svg class="h-4 w-4 group-hover:-translate-y-0.5 transition-transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
             <span>Unduh CV Saya</span>
           </button>
         </div>
       </div>
       <div class="mt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-center">
-        <span class="font-mono text-[10px] text-zinc-600 uppercase tracking-widest">&copy; 2026 EKA RYAN. HAK CIPTA DIPERTAHANKAN.</span>
-        <div class="flex gap-4 font-mono text-[10px] text-zinc-600">
-          <a href="admin.html" target="_blank" class="hover:text-accent-400 transition-colors uppercase">Admin</a>
+        <span class="font-mono text-[10px] text-zinc-700 uppercase tracking-widest">&copy; 2026 EKA RYAN. HAK CIPTA DIPERTAHANKAN.</span>
+        <div class="flex gap-4 font-mono text-[10px] text-zinc-700">
+          <a href="admin.html" target="_blank" class="hover:text-primary-700 transition-colors uppercase">Admin</a>
           <span>&bull;</span>
-          <a href="#" class="hover:text-accent-400 transition-colors uppercase">Kebijakan Privasi</a>
+          <a href="#" class="hover:text-primary-700 transition-colors uppercase">Kebijakan Privasi</a>
           <span>&bull;</span>
-          <a href="#" class="hover:text-accent-400 transition-colors uppercase">Ketentuan Layanan</a>
+          <a href="#" class="hover:text-primary-700 transition-colors uppercase">Ketentuan Layanan</a>
         </div>
       </div>
     </div>
@@ -686,28 +686,28 @@
   <!-- ===================== SHARE MODAL ===================== -->
   <div id="share-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
     <div id="share-backdrop" class="fixed inset-0 bg-black/80 backdrop-blur-md"></div>
-    <div class="relative z-10 w-full max-w-md overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl text-white">
-      <div class="flex items-center justify-between border-b border-zinc-900 pb-4">
+    <div class="relative z-10 w-full max-w-md overflow-hidden rounded-2xl border border-zinc-200 bg-white p-6 shadow-2xl text-zinc-900">
+      <div class="flex items-center justify-between border-b border-zinc-200 pb-4">
         <div>
           <h3 class="font-heading text-lg font-bold tracking-tight">Bagikan Portfolio</h3>
-          <p class="text-xs text-zinc-400">Bagikan karya terbaik dengan teman dan komunitas Anda</p>
+          <p class="text-xs text-zinc-600">Bagikan karya terbaik dengan teman dan komunitas Anda</p>
         </div>
-        <button id="close-share-modal" class="rounded-full p-1.5 text-zinc-400 hover:bg-zinc-900 hover:text-white transition-colors">
+        <button id="close-share-modal" class="rounded-full p-1.5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 transition-colors">
           <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </button>
       </div>
       <div class="mt-5">
-        <label class="block text-xs font-medium text-zinc-400 mb-2">Tautan Portfolio</label>
-        <div class="flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 p-2">
-          <input id="share-url" type="text" readonly class="w-full bg-transparent text-xs text-zinc-300 outline-none select-all" />
-          <button id="copy-share-url" class="flex items-center gap-1 rounded-md bg-white px-3 py-1.5 text-xs font-medium text-zinc-950 hover:bg-zinc-100 transition-colors">
+        <label class="block text-xs font-medium text-zinc-600 mb-2">Tautan Portfolio</label>
+        <div class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-zinc-100 p-2">
+          <input id="share-url" type="text" readonly class="w-full bg-transparent text-xs text-zinc-700 outline-none select-all" />
+          <button id="copy-share-url" class="flex items-center gap-1 rounded-md bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-950 hover:bg-zinc-200 transition-colors">
             <svg class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
             <span>Salin</span>
           </button>
         </div>
       </div>
       <div class="mt-6">
-        <label class="block text-xs font-medium text-zinc-400 mb-3">Bagikan Melalui Sosial Media</label>
+        <label class="block text-xs font-medium text-zinc-600 mb-3">Bagikan Melalui Sosial Media</label>
         <div class="grid grid-cols-2 gap-3">
           <a id="share-linkedin" href="#" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 rounded-xl bg-[#0077b5] hover:bg-[#0077b5]/90 text-white py-3 text-xs font-medium transition-all duration-300">
             <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
@@ -727,7 +727,7 @@
           </a>
         </div>
       </div>
-      <div class="mt-6 flex items-center justify-center gap-1 text-[10px] text-zinc-400">
+      <div class="mt-6 flex items-center justify-center gap-1 text-[10px] text-zinc-600">
         <svg class="h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
         <span>Ada masukan? Hubungi kami langsung.</span>
       </div>
@@ -737,33 +737,33 @@
   <!-- ===================== SERVICE MODAL ===================== -->
   <div id="service-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
     <div id="service-modal-backdrop" class="fixed inset-0 bg-black/80 backdrop-blur-md"></div>
-    <div id="service-modal-box" class="relative z-10 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl border border-zinc-850 bg-zinc-950 p-6 sm:p-8 text-white shadow-2xl custom-scrollbar">
-      <button id="close-service-modal" class="absolute top-4 right-4 rounded-full p-2 bg-zinc-900 text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors">
+    <div id="service-modal-box" class="relative z-10 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8 text-zinc-900 shadow-2xl custom-scrollbar">
+      <button id="close-service-modal" class="absolute top-4 right-4 rounded-full p-2 bg-zinc-100 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 transition-colors">
         <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
       </button>
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-4">
         <div class="lg:col-span-7 flex flex-col gap-6">
-          <div class="relative aspect-video overflow-hidden rounded-xl border border-zinc-900">
+          <div class="relative aspect-video overflow-hidden rounded-xl border border-zinc-200">
             <img id="modal-image" src="" alt="" class="h-full w-full object-cover object-center" referrerpolicy="no-referrer" />
           </div>
         </div>
         <div class="lg:col-span-5 flex flex-col justify-between">
           <div>
-            <span id="modal-subtitle" class="font-mono text-xs text-accent-400 tracking-widest uppercase font-semibold"></span>
-            <h3 id="modal-title" class="font-display text-2xl sm:text-3xl font-extrabold tracking-tight uppercase mt-1 text-white"></h3>
-            <p id="modal-description" class="font-sans text-xs text-zinc-400 mt-3 leading-relaxed"></p>
+            <span id="modal-subtitle" class="font-mono text-xs text-primary-700 tracking-widest uppercase font-semibold"></span>
+            <h3 id="modal-title" class="font-display text-2xl sm:text-3xl font-extrabold tracking-tight uppercase mt-1 text-zinc-900"></h3>
+            <p id="modal-description" class="font-sans text-xs text-zinc-600 mt-3 leading-relaxed"></p>
             <div id="modal-tags" class="mt-4 flex flex-wrap gap-1.5"></div>
-            <div class="mt-6 border-t border-zinc-900 pt-6">
-              <p class="font-mono text-[10px] text-zinc-400 uppercase tracking-widest font-bold mb-3">Yang Termasuk</p>
-              <div id="modal-details" class="space-y-3 font-sans text-xs sm:text-sm text-zinc-300 leading-relaxed"></div>
+            <div class="mt-6 border-t border-zinc-200 pt-6">
+              <p class="font-mono text-[10px] text-zinc-600 uppercase tracking-widest font-bold mb-3">Yang Termasuk</p>
+              <div id="modal-details" class="space-y-3 font-sans text-xs sm:text-sm text-zinc-700 leading-relaxed"></div>
             </div>
           </div>
-          <div class="mt-8 pt-4 border-t border-zinc-900 flex flex-wrap gap-3">
+          <div class="mt-8 pt-4 border-t border-zinc-200 flex flex-wrap gap-3">
             <a href="#contact" onclick="closeServiceModal()" class="flex-1 flex items-center justify-center gap-2 rounded-xl bg-accent-500 hover:bg-accent-600 py-3 text-xs font-bold tracking-widest text-primary-950 transition-all uppercase">
               <span>Hubungi Saya</span>
               <svg class="h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </a>
-            <button id="modal-close-footer" class="flex-1 rounded-xl border border-zinc-800 bg-zinc-900 hover:text-white hover:border-zinc-700 py-3 text-xs font-bold tracking-widest text-zinc-400 transition-all uppercase">Tutup</button>
+            <button id="modal-close-footer" class="flex-1 rounded-xl border border-zinc-200 bg-zinc-100 hover:text-zinc-900 hover:border-zinc-300 py-3 text-xs font-bold tracking-widest text-zinc-600 transition-all uppercase">Tutup</button>
           </div>
         </div>
       </div>
@@ -799,7 +799,7 @@
       const heroGreeting = document.getElementById('hero-greeting');
       if (heroGreeting) heroGreeting.textContent = c.hero_greeting;
       const heroName = document.getElementById('hero-name');
-      if (heroName) heroName.innerHTML = `${c.hero_name.split(' ')[0]} <span class="text-accent-500">${c.hero_name.split(' ').slice(1).join(' ')}</span>`;
+      if (heroName) heroName.innerHTML = `${c.hero_name.split(' ')[0]} <span class="text-primary-700">${c.hero_name.split(' ').slice(1).join(' ')}</span>`;
       const heroTagline = document.getElementById('hero-tagline');
       if (heroTagline) heroTagline.textContent = c.hero_tagline;
       const heroDesc = document.getElementById('hero-desc');
@@ -810,7 +810,7 @@
       document.querySelectorAll('a[href*="wa.me"]').forEach(el => {
         el.href = `https://wa.me/${c.contact_wa}?text=Halo%20${encodeURIComponent(c.hero_name)}%2C%20saya%20tertarik%20dengan%20portfolio%20Anda%20dan%20ingin%20berkolaborasi.`;
       });
-      document.querySelectorAll('.font-heading.text-xs.font-bold.text-white').forEach(el => {
+      document.querySelectorAll('.font-heading.text-xs.font-bold.text-zinc-900').forEach(el => {
         if (el.textContent.includes('@')) el.textContent = c.contact_email;
         if (el.textContent.includes('Indonesia') || el.textContent.includes('Bali')) el.textContent = c.contact_location;
         if (el.textContent.includes('pages.dev') || el.textContent.includes('ekaryan')) el.textContent = c.contact_website;
@@ -851,7 +851,7 @@
         setText('hero-greeting', c.hero_greeting);
         if (c.hero_name) {
           const el = document.getElementById('hero-name');
-          if (el) el.innerHTML = `${c.hero_name.split(' ')[0]} <span class="text-accent-500">${c.hero_name.split(' ').slice(1).join(' ')}</span>`;
+          if (el) el.innerHTML = `${c.hero_name.split(' ')[0]} <span class="text-primary-700">${c.hero_name.split(' ').slice(1).join(' ')}</span>`;
         }
         setText('hero-tagline', c.hero_tagline);
         setText('hero-desc', c.hero_description);
@@ -899,10 +899,10 @@
     const header = document.getElementById('main-header');
     window.addEventListener('scroll', () => {
       if (window.scrollY > 25) {
-        header.classList.add('bg-zinc-950/80', 'backdrop-blur-md', 'border-b', 'border-zinc-900', 'shadow-sm');
+        header.classList.add('bg-white/80', 'backdrop-blur-md', 'border-b', 'border-zinc-200', 'shadow-sm');
         header.classList.remove('bg-transparent');
       } else {
-        header.classList.remove('bg-zinc-950/80', 'backdrop-blur-md', 'border-b', 'border-zinc-900', 'shadow-sm');
+        header.classList.remove('bg-white/80', 'backdrop-blur-md', 'border-b', 'border-zinc-200', 'shadow-sm');
         header.classList.add('bg-transparent');
       }
     });
@@ -996,23 +996,23 @@
       count.textContent = `Menampilkan ${filtered.length} layanan`;
 
       grid.innerHTML = filtered.map((p, i) => `
-        <div class="scroll-hidden scroll-stagger-${(i % 6) + 1} group relative flex flex-col justify-between overflow-hidden rounded-xl border border-zinc-900 bg-zinc-950 p-6 hover:border-accent-500/50 hover:shadow-xl hover:shadow-accent-500/10 transition-all duration-300 shadow-sm">
+        <div class="scroll-hidden scroll-stagger-${(i % 6) + 1} group relative flex flex-col justify-between overflow-hidden rounded-xl border border-zinc-200 bg-white p-6 hover:border-accent-500/50 hover:shadow-xl hover:shadow-accent-500/10 transition-all duration-300 shadow-sm">
           <div>
             <div class="flex items-center justify-between">
-              <span class="font-display text-4xl font-black text-accent-500 select-none opacity-80 group-hover:scale-110 transition-transform duration-300">${String(p.sort_order).padStart(2, '0')}</span>
-              <span class="font-mono text-[10px] text-zinc-400 tracking-widest uppercase bg-zinc-900 px-2.5 py-1 rounded-full group-hover:text-accent-400 transition-colors">${p.subtitle}</span>
+              <span class="font-display text-4xl font-black text-primary-700 select-none opacity-80 group-hover:scale-110 transition-transform duration-300">${String(p.sort_order).padStart(2, '0')}</span>
+              <span class="font-mono text-[10px] text-zinc-600 tracking-widest uppercase bg-zinc-100 px-2.5 py-1 rounded-full group-hover:text-primary-700 transition-colors">${p.subtitle}</span>
             </div>
-            <div class="relative mt-6 aspect-video overflow-hidden rounded-lg bg-zinc-900 border border-zinc-900">
+            <div class="relative mt-6 aspect-video overflow-hidden rounded-lg bg-zinc-100 border border-zinc-200">
               <img src="${p.image}" alt="${p.title}" loading="lazy" onerror="this.style.display='none'" class="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105" referrerpolicy="no-referrer" />
             </div>
-            <h4 class="font-display text-xl font-bold tracking-tight mt-6 text-white group-hover:text-accent-400 transition-colors uppercase">${p.title}</h4>
-            <p class="font-sans text-xs text-zinc-400 mt-2 line-clamp-2 leading-relaxed">${p.description}</p>
+            <h4 class="font-display text-xl font-bold tracking-tight mt-6 text-zinc-900 group-hover:text-primary-700 transition-colors uppercase">${p.title}</h4>
+            <p class="font-sans text-xs text-zinc-600 mt-2 line-clamp-2 leading-relaxed">${p.description}</p>
           </div>
-          <div class="mt-6 pt-4 border-t border-zinc-900">
+          <div class="mt-6 pt-4 border-t border-zinc-200">
             <div class="flex flex-wrap gap-1.5 mb-3">
-              ${p.tags.slice(0, 3).map(t => `<span class="font-mono text-[9px] text-zinc-400 uppercase tracking-wider">#${t}</span>`).join('')}
+              ${p.tags.slice(0, 3).map(t => `<span class="font-mono text-[9px] text-zinc-600 uppercase tracking-wider">#${t}</span>`).join('')}
             </div>
-            <p class="font-mono text-xs text-accent-400 font-bold">${p.price}</p>
+            <p class="font-mono text-xs text-primary-700 font-bold">${p.price}</p>
           </div>
         </div>
       `).join('');
@@ -1032,7 +1032,7 @@
       document.getElementById('modal-subtitle').textContent = p.subtitle;
       document.getElementById('modal-title').textContent = p.title;
       document.getElementById('modal-description').textContent = p.description;
-      document.getElementById('modal-tags').innerHTML = p.tags.map(t => `<span class="font-mono text-[9px] bg-zinc-900 text-zinc-400 px-2.5 py-1 rounded-full uppercase tracking-wider">#${escapeHtml(t)}</span>`).join('');
+      document.getElementById('modal-tags').innerHTML = p.tags.map(t => `<span class="font-mono text-[9px] bg-zinc-100 text-zinc-600 px-2.5 py-1 rounded-full uppercase tracking-wider">#${escapeHtml(t)}</span>`).join('');
       document.getElementById('modal-details').innerHTML = p.details.map(d => `<p>${escapeHtml(d)}</p>`).join('');
       document.getElementById('modal-price').textContent = p.price;
       document.getElementById('service-modal').classList.remove('hidden');
@@ -1055,31 +1055,31 @@
         const num = String(s.sort_order).padStart(2, '0');
         const isOpen = activeWorkflowStep === num;
         return `
-          <div class="scroll-hidden scroll-stagger-${(i % 6) + 1} py-6 transition-colors duration-300 ${isOpen ? 'bg-zinc-900/10' : 'hover:bg-zinc-900/5'}">
+          <div class="scroll-hidden scroll-stagger-${(i % 6) + 1} py-6 transition-colors duration-300 ${isOpen ? 'bg-zinc-100/60' : 'hover:bg-zinc-100/40'}">
             <div onclick="toggleWorkflow('${num}')" class="flex items-start justify-between gap-6 cursor-pointer group">
               <div class="flex items-start gap-4 sm:gap-6">
-                <span class="font-display text-3xl sm:text-4xl font-black text-accent-500 select-none opacity-80 group-hover:scale-105 transition-transform duration-300">${num}</span>
+                <span class="font-display text-3xl sm:text-4xl font-black text-primary-700 select-none opacity-80 group-hover:scale-105 transition-transform duration-300">${num}</span>
                 <div class="flex-1">
-                  <h4 class="font-display text-lg sm:text-xl font-bold tracking-tight text-white group-hover:text-accent-400 transition-colors uppercase">${s.title}</h4>
-                  <p class="font-sans text-xs text-zinc-400 mt-1 max-w-xl">${s.short_desc}</p>
+                  <h4 class="font-display text-lg sm:text-xl font-bold tracking-tight text-zinc-900 group-hover:text-primary-700 transition-colors uppercase">${s.title}</h4>
+                  <p class="font-sans text-xs text-zinc-600 mt-1 max-w-xl">${s.short_desc}</p>
                 </div>
               </div>
-              <div class="rounded-full bg-zinc-900 p-2 text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors">
+              <div class="rounded-full bg-zinc-100 p-2 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 transition-colors">
                 ${isOpen
-                  ? '<svg class="h-4 w-4 text-accent-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>'
+                  ? '<svg class="h-4 w-4 text-primary-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>'
                   : '<svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>'
                 }
               </div>
             </div>
             <div class="overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}">
               <div class="pl-14 sm:pl-16 pr-6 pt-4 pb-2">
-                <p class="font-sans text-xs sm:text-sm text-zinc-300 leading-relaxed max-w-xl">${s.long_desc}</p>
+                <p class="font-sans text-xs sm:text-sm text-zinc-700 leading-relaxed max-w-xl">${s.long_desc}</p>
                 <div class="mt-4 flex flex-wrap gap-2">
-                  <span class="font-mono text-[9px] bg-accent-500/10 border border-accent-500/20 text-accent-400 px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
+                  <span class="font-mono text-[9px] bg-accent-500/10 border border-accent-500/20 text-primary-700 px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
                     <svg class="h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
                     Tinjauan Klien
                   </span>
-                  <span class="font-mono text-[9px] bg-zinc-900 border border-zinc-800 text-zinc-400 px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
+                  <span class="font-mono text-[9px] bg-zinc-100 border border-zinc-200 text-zinc-600 px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
                     <svg class="h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
                     Prototipe Interaktif
                   </span>
@@ -1106,7 +1106,7 @@
       const container = document.getElementById('skills-tags');
       container.innerHTML = SKILLS_LIST.map((skill, i) => {
         return `
-          <span class="scroll-hidden scroll-stagger-${(i % 6) + 1} rounded-lg px-4 py-2.5 font-mono text-[11px] font-bold tracking-wider uppercase border transition-all duration-300 shadow-sm bg-zinc-900/30 border-zinc-900 text-zinc-400 hover:border-accent-400/50 hover:text-white hover:bg-zinc-900">
+          <span class="scroll-hidden scroll-stagger-${(i % 6) + 1} rounded-lg px-4 py-2.5 font-mono text-[11px] font-bold tracking-wider uppercase border transition-all duration-300 shadow-sm bg-zinc-50 border-zinc-200 text-zinc-600 hover:border-accent-500/50 hover:text-zinc-900 hover:bg-zinc-100">
             <span>${skill}</span>
           </span>
         `;
@@ -1148,7 +1148,7 @@
         const categories = Object.keys(addons);
         
         if (categories.length === 0) {
-          listContainer.innerHTML = '<p class="text-[10px] text-zinc-500 p-2">Tidak ada fitur tersedia</p>';
+          listContainer.innerHTML = '<p class="text-[10px] text-zinc-700 p-2">Tidak ada fitur tersedia</p>';
           return;
         }
 
@@ -1156,14 +1156,14 @@
           const items = addons[cat];
           return `
             <div class="px-2 pt-2 pb-1">
-              <span class="font-mono text-[8px] text-accent-400 uppercase tracking-widest font-bold">${cat}</span>
+              <span class="font-mono text-[8px] text-primary-700 uppercase tracking-widest font-bold">${cat}</span>
             </div>
             ${items.map(a => `
-              <label class="flex items-center gap-2 cursor-pointer px-2 py-1.5 rounded hover:bg-zinc-800 transition-colors">
-                <input type="checkbox" value="${a.name}" data-price="${a.price}" class="addon-checkbox w-3.5 h-3.5 rounded border-zinc-700 bg-zinc-950 text-accent-500 focus:ring-accent-500 focus:ring-offset-0" />
+              <label class="flex items-center gap-2 cursor-pointer px-2 py-1.5 rounded hover:bg-zinc-200 transition-colors">
+                <input type="checkbox" value="${a.name}" data-price="${a.price}" class="addon-checkbox w-3.5 h-3.5 rounded border-zinc-300 bg-white text-primary-700 focus:ring-accent-500 focus:ring-offset-0" />
                 <div class="flex-1 min-w-0">
-                  <span class="text-[11px] text-zinc-300 font-semibold block truncate">${a.name}</span>
-                  <span class="text-[9px] text-zinc-600 font-mono">${a.price}</span>
+                  <span class="text-[11px] text-zinc-700 font-semibold block truncate">${a.name}</span>
+                  <span class="text-[9px] text-zinc-700 font-mono">${a.price}</span>
                 </div>
               </label>
             `).join('')}
@@ -1177,7 +1177,7 @@
           });
         });
       } catch(e) {
-        listContainer.innerHTML = '<p class="text-[10px] text-zinc-500 p-2">Gagal memuat fitur</p>';
+        listContainer.innerHTML = '<p class="text-[10px] text-zinc-700 p-2">Gagal memuat fitur</p>';
       }
 
       // Toggle dropdown
@@ -1203,12 +1203,12 @@
       
       if (selectedAddons.length === 0) {
         displayText.textContent = 'Pilih fitur tambahan...';
-        displayText.classList.remove('text-white');
-        displayText.classList.add('text-zinc-400');
+        displayText.classList.remove('text-zinc-900');
+        displayText.classList.add('text-zinc-600');
       } else {
         displayText.textContent = `${selectedAddons.length} fitur dipilih`;
-        displayText.classList.remove('text-zinc-400');
-        displayText.classList.add('text-white');
+        displayText.classList.remove('text-zinc-600');
+        displayText.classList.add('text-zinc-900');
       }
     }
 
@@ -1289,7 +1289,7 @@
     // ===== DOWNLOAD RESUME =====
     document.getElementById('download-resume-btn').addEventListener('click', function() {
       const btn = this;
-      btn.innerHTML = '<span class="h-3.5 w-3.5 animate-spin rounded-full border-2 border-zinc-400 border-t-white inline-block"></span><span>Menyiapkan CV...</span>';
+      btn.innerHTML = '<span class="h-3.5 w-3.5 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-900 inline-block"></span><span>Menyiapkan CV...</span>';
       btn.disabled = true;
       setTimeout(() => {
         const content = `
@@ -1332,7 +1332,7 @@ PENGALAMAN:
     if (desktopBtn) {
       desktopBtn.addEventListener('click', function() {
         const btn = this;
-        btn.innerHTML = '<span class="h-3.5 w-3.5 animate-spin rounded-full border-2 border-zinc-400 border-t-white inline-block"></span><span>Menyiapkan CV...</span>';
+        btn.innerHTML = '<span class="h-3.5 w-3.5 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-900 inline-block"></span><span>Menyiapkan CV...</span>';
         btn.disabled = true;
         setTimeout(() => {
           const content = `
