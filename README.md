@@ -15,7 +15,10 @@ Portfolio website untuk Eka Ryan Digital Solution. Hosting **Cloudflare Pages** 
 - Responsive portfolio website
 - Admin panel untuk content management
 - Contact form tersimpan ke Supabase
+- CV/Resume download (PDF) — admin upload via panel, footer button fetch dari Supabase
 - File upload ke Supabase Storage
+- Logo & favicon (image-based, `#CEED6B` background)
+- Social media links (LinkedIn, Instagram, TikTok, X) — admin edit via config
 - SEO optimized
 - Fast global CDN delivery
 
@@ -29,7 +32,11 @@ eka-ryan-digital-solution/
 │   ├── db.js              # LocalStorage fallback + backup (bukan sumber utama)
 │   ├── supabase-config.js # Kredensial Supabase (url, anonKey — aman publik)
 │   ├── supabase-api.js    # Wrapper `window.sbApi` (semua akses data)
-│   └── src/               # Assets (images, css, js)
+│   ├── logo.png           # Brand logo (1080×1080, #CEED6B bg)
+│   ├── favicon.ico        # Favicon (ICO format)
+│   ├── favicon-16x16.png  # Favicon 16×16
+│   ├── favicon-32x32.png  # Favicon 32×32
+│   └── apple-touch-icon.png # Apple Touch Icon 180×180
 ├── supabase/
 │   ├── schema.sql         # DDL + RLS + buckets (jalankan di SQL Editor)
 │   ├── migrate-data.mjs   # Migrasi data & gambar dari D1/R2 lama
@@ -117,11 +124,11 @@ Tidak ada REST API server. Halaman memakai `window.sbApi` (lihat `docs/api-regis
 | Skills | `getSkills`, `saveSkill`, `deleteSkill` |
 | Add-ons | `getAddOns`, `saveAddon`, `deleteAddon` |
 | Messages | `getMessages`, `saveMessage`, `markMessageRead`, `deleteMessage`, `clearMessages` |
-| Storage | `uploadImage`, `deleteImage`, `listStorage`, `deleteStorageObject`, `publicUrl` |
+| Storage | `uploadImage`, `deleteImage`, `uploadCV`, `deleteCV`, `listStorage`, `deleteStorageObject`, `publicUrl` |
 
 ## Database Tables
 
-- **config**: konfigurasi seluruh situs
+- **config**: konfigurasi seluruh situs (termasuk `cv_url` untuk CV/Resume PDF)
 - **services** / **service_details** / **service_tags**: layanan + detail + tag
 - **workflow**: langkah alur kerja
 - **skills**: keahlian

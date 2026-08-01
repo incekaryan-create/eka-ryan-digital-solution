@@ -9,6 +9,7 @@ Fitur nyata **Eka Ryan Digital Solution** — portfolio digital freelancer (Eka 
 | Fitur | Status | Penyimpanan | Akses |
 |-------|--------|-------------|-------|
 | Hero & Config | Active | Supabase `config` | Publik baca / Admin edit |
+| CV/Resume Download | Active | Supabase `config.cv_url` + Storage `assets/cv/` | Publik unduh / Admin upload |
 | Layanan (Services) | Active | Supabase `services` + `service_details` + `service_tags` | Publik baca / Admin CRUD |
 | Workflow | Active | Supabase `workflow` | Publik baca / Admin CRUD |
 | Skills | Active | Supabase `skills` | Publik baca / Admin CRUD |
@@ -21,11 +22,14 @@ Fitur nyata **Eka Ryan Digital Solution** — portfolio digital freelancer (Eka 
 ## Halaman Publik (`index.html`)
 
 - **Hero**: nama, greeting, deskripsi, tagline, gambar hero (Supabase Storage), jaminan & kualitas.
+- **Logo & Favicon**: logo image (`logo.png`) + favicon (`favicon.ico`, `favicon-32x32.png`, `favicon-16x16.png`, `apple-touch-icon.png`) — background `#CEED6B` (hijau terang/lime).
 - **Layanan**: grid layanan dari `sbApi.getServices()` (judul, subtitle, gambar, harga, tags, details).
 - **Workflow**: langkah alur kerja dari `sbApi.getWorkflow()`.
 - **Skills**: keahlian dari `sbApi.getSkills()`.
 - **Add-ons**: checkbox pilihan fitur tambahan dari `sbApi.getAddOns()` (dikelompokkan per kategori).
 - **Form Kontak**: kirim pesan via `sbApi.saveMessage()` (publik, tanpa login).
+- **CV/Resume Download**: tombol "Unduh CV Saya" di footer → download PDF dari `cv_url` (config Supabase). Fallback ke text file bila belum ada PDF.
+- **Social Links**: LinkedIn, Instagram, TikTok, X/Twitter — URL di-update dari Supabase config (overrides placeholder di HTML).
 - **Music**: `<audio>` dari URL storage Supabase (`audio/backsound.mp3`).
 - **Config fallback**: bila Supabase gagal, `db.getConfig()` (localStorage) dipakai sebagai cadangan.
 
@@ -39,14 +43,15 @@ Login Admin Panel memakai **Supabase Auth** (`sbApi.signIn(email, password)`); u
 - **Skills CRUD**: via `sbApi.saveSkill/deleteSkill`.
 - **Add-ons CRUD**: via `sbApi.saveAddon/deleteAddon`.
 - **Messages**: lihat, tandai dibaca (`sbApi.markMessageRead`), hapus (`sbApi.deleteMessage`), hapus semua (`sbApi.clearMessages`).
-- **Config**: edit hero & kontak via `sbApi.saveConfig` (mirror ke `db.updateConfig()`).
+- **Config**: edit hero, kontak, sosial media, CV/Resume via `sbApi.saveConfig` (mirror ke `db.updateConfig()`). Upload CV PDF ke Supabase Storage (`sbApi.uploadCV`).
 - **Storage Manager**: list objek (`sbApi.listStorage`), upload (`sbApi.uploadImage`), hapus (`sbApi.deleteStorageObject`).
 - **Backup/Restore**: `db.exportAll()` / `db.importAll()` untuk cadangan JSON lokal.
 
 ## Storage (Supabase)
 
-- Bucket: `assets` (gambar), `audio` (backsound).
+- Bucket: `assets` (gambar + CV PDF), `audio` (backsound).
 - Path gambar: `assets/uploads/<timestamp>_<nama>`.
+- Path CV: `assets/cv/<timestamp>_<nama>.pdf`.
 - URL publik: `https://sqimmcecwuoadjbjiyfd.supabase.co/storage/v1/object/public/<bucket>/<path>`.
 - Gambar dikompresi klien-side (`optimizeImage`) sebelum upload.
 - Batas ukuran objek Supabase: 50 MB (audio backsound harus < 50 MB).

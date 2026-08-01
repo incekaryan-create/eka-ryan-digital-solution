@@ -41,6 +41,7 @@ create table if not exists public.config (
   social_instagram   text not null default '',
   social_tiktok      text not null default '',
   social_twitter     text not null default '',
+  cv_url             text not null default '',
   updated_at         timestamptz not null default now()
 );
 

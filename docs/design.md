@@ -74,6 +74,7 @@ Class helper: `font-heading` (Syne/Space Grotesk), `font-mono` (JetBrains Mono).
 
 | Komponen | Catatan |
 |----------|---------|
+| Logo & Favicon | `logo.png` (1080×1080, background `#CEED6B`, teks `#014D43`), favicon `favicon.ico`/`favicon-32x32.png`/`favicon-16x16.png`, `apple-touch-icon.png` (180×180). Brand badge di navbar & hero menggunakan `<img src="logo.png">`. |
 | Tombol CTA | `bg-accent-500 hover:bg-accent-600 text-primary-950`, rounded-full, shadow aksen |
 | Kartu layanan | border `zinc-200`, hover border aksen + scale, lazy-load gambar |
 | Input form | `bg-white border-zinc-300 text-zinc-900`, focus ring aksen |

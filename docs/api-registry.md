@@ -45,8 +45,8 @@ Client dibuat di `public/supabase-api.js` memakai supabase-js v2 (CDN). Tidak ad
 ### Config
 | Fungsi | Keterangan |
 |--------|-----------|
-| `getConfig()` | Baris `config` (`id='main'`) atau `null` |
-| `saveConfig(payload)` | Upsert seluruh kolom config |
+| `getConfig()` | Baris `config` (`id='main'`) atau `null` — termasuk `cv_url` |
+| `saveConfig(payload)` | Upsert seluruh kolom config (termasuk `cv_url`) |
 
 ### Messages
 | Fungsi | Keterangan |
@@ -60,8 +60,10 @@ Client dibuat di `public/supabase-api.js` memakai supabase-js v2 (CDN). Tidak ad
 ### Storage
 | Fungsi | Keterangan |
 |--------|-----------|
-| `uploadImage(file)` | Upload ke bucket `assets/uploads/` → `{ url, path }` |
+| `uploadImage(file)` | Upload gambar ke bucket `assets/uploads/` → `{ url, path }` |
 | `deleteImage(urlOrPath)` | Hapus objek (terima URL publik / path). URL R2 lama diabaikan |
+| `uploadCV(file)` | Upload PDF ke bucket `assets/cv/` → `{ url, path }` |
+| `deleteCV(urlOrPath)` | Hapus file CV dari storage |
 | `extractImagePath(url)` | Ambil path dari URL storage, atau `null` |
 | `listStorage()` | `{ objects: [{ key, url, size }] }` |
 | `deleteStorageObject(key)` | Hapus berdasarkan `key` (`assets/uploads/...`) |

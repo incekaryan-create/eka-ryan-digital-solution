@@ -21,6 +21,7 @@ Satu baris (`id = 'main'`). Menyimpan hero & kontak.
 | `quality_title` / `quality_desc` / `quality_p1..p3` | text | Blok kualitas |
 | `contact_email` / `contact_wa` / `contact_location` / `contact_website` | text | Info kontak |
 | `social_linkedin` / `social_instagram` / `social_tiktok` / `social_twitter` | text | URL sosial |
+| `cv_url` | text | URL file CV/resume (PDF) di Supabase Storage |
 | `updated_at` | timestamptz | Update otomatis |
 
 ### `services`
@@ -73,7 +74,15 @@ Skrip ini otomatis men-download gambar dari storage R2 lama, upload ke bucket `a
 ## Akses di Kode
 
 - **Publik** (`index.html`): `sbApi.getConfig/getServices/getWorkflow/getSkills/getAddOns/saveMessage`.
-- **Admin** (`admin.html`): `sbApi.saveXxx/deleteXxx/getMessages/uploadImage/listStorage/...`.
+- **Admin** (`admin.html`): `sbApi.saveXxx/deleteXxx/getMessages/uploadImage/uploadCV/deleteCV/listStorage/...`.
 - Seluruh fungsi bungkus ada di `public/supabase-api.js`.
+
+## Migration: tambah kolom `cv_url`
+
+Kolom `cv_url` belum ada di tabel `config` yang dibuat oleh `schema.sql` awal. Jalankan SQL berikut di **Supabase Dashboard → SQL Editor**:
+
+```sql
+ALTER TABLE public.config ADD COLUMN IF NOT EXISTS cv_url text not null default '';
+```
 
 Lihat juga: [supabase.md](./supabase.md), [api-registry.md](./api-registry.md), [architecture.md](./architecture.md).

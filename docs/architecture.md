@@ -22,7 +22,7 @@ Arsitektur **Eka Ryan Digital Solution** — portfolio digital freelancer (Eka R
 │  Supabase (sqimmcecwuoadjbjiyfd, region ap-southeast-1)        │
 │  ├─ PostgreSQL  : config, services(+details/tags), workflow,   │
 │  │                skills, add_ons, messages   (RLS)            │
-│  └─ Storage     : bucket `assets` (gambar) & `audio` (backsound)│
+│  └─ Storage     : bucket `assets` (gambar + CV) & `audio` (backsound)│
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -44,14 +44,17 @@ Arsitektur **Eka Ryan Digital Solution** — portfolio digital freelancer (Eka R
 1. Load HTML statis + `db.js` (fallback localStorage).
 2. `sbApi.getConfig()` / `getServices()` / `getWorkflow()` / `getSkills()` / `getAddOns()` — baca dari Supabase dengan anon key (dibatasi RLS ke SELECT).
 3. Render konten dari Supabase (single source of truth).
-4. Gambar di-render dari URL storage Supabase (`/storage/v1/object/public/assets/...`), audio dari `/storage/v1/object/public/audio/backsound.mp3`.
+4. Social links (LinkedIn, Instagram, TikTok, X) di-update dari config Supabase, meng-override placeholder di HTML.
+5. Gambar di-render dari URL storage Supabase (`/storage/v1/object/public/assets/...`), audio dari `/storage/v1/object/public/audio/backsound.mp3`.
+6. Tombol "Unduh CV Saya" mengambil `cv_url` dari config → download PDF. Bila belum ada, fallback ke text file.
 5. Bila fetch gagal → fallback ke `db.getConfig()` (localStorage).
 
 ### Admin Panel (`admin.html`)
 1. Login via **Supabase Auth** (`sbApi.signIn(email, password)`); sesi otomatis dilampirkan ke client supabase-js.
 2. CRUD via `sbApi.saveXxx/deleteXxx` — berjalan sebagai `authenticated`, diizinkan RLS karena user adalah admin (`is_admin()`).
 3. Upload gambar → `sbApi.uploadImage()` → Supabase Storage `assets/uploads/<timestamp>_<nama>`.
-4. Respons di-mirror ke `db.js` (localStorage) sebagai backup lokal.
+4. Upload CV → `sbApi.uploadCV()` → Supabase Storage `assets/cv/<timestamp>_<nama>.pdf`.
+5. Respons di-mirror ke `db.js` (localStorage) sebagai backup lokal.
 
 ### Contact Form
 - `sbApi.saveMessage()` — INSERT `messages` dengan anon key (policy RLS `insert` khusus form).
