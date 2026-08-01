@@ -15,7 +15,7 @@ Fitur nyata **Eka Ryan Digital Solution** — portfolio digital freelancer (Eka 
 | Add-ons | Active | Supabase `add_ons` | Publik baca / Admin CRUD |
 | Pesan Kontak | Active | Supabase `messages` | Publik kirim / Admin baca-hapus |
 | Storage | Active | Supabase Storage (`assets`, `audio`) | Admin upload/delete |
-| Admin Panel | Active | Supabase (service_role) | Login shared key |
+| Admin Panel | Active | Supabase Auth + RLS | Login email/password admin |
 | Backup/Restore | Active | localStorage (`db.js`) | Admin export/import |
 
 ## Halaman Publik (`index.html`)
@@ -31,7 +31,7 @@ Fitur nyata **Eka Ryan Digital Solution** — portfolio digital freelancer (Eka 
 
 ## Admin Panel (`admin.html`)
 
-Login shared key (`Eka Ryan` / `Ekaryan443!`). Panel mencakup:
+Login Admin Panel memakai **Supabase Auth** (`sbApi.signIn(email, password)`); user harus email admin yang ditetapkan di RLS (`is_admin()`). Panel mencakup:
 
 - **Dashboard**: statistik jumlah layanan, workflow, skills, pesan.
 - **Services CRUD**: tabel + form tambah/edit/hapus via `sbApi.saveService/deleteService`.

@@ -38,18 +38,23 @@ psql "postgresql://postgres.sqimmcecwuoadjbjiyfd:<PASSWORD>@aws-0-ap-southeast-1
 
 Atau copy-paste isi `supabase/schema.sql` ke **Supabase Dashboard → SQL Editor → Run**.
 
-## Kredensial (2 kunci berbeda)
+## Kredensial & Autentikasi
 
-File `public/supabase-config.js` memuat:
+File `public/supabase-config.js` hanya memuat **satu** kunci:
 
 | Kunci | Nama di config | Dipakai oleh | Hak |
 |-------|----------------|--------------|-----|
-| Publishable (anon) | `anonKey` | `index.html` (situs publik) | baca semua + insert `messages` |
-| Secret (service_role) | `serviceKey` | `admin.html` (Admin Panel) | tulis/hapus semua + storage |
+| Publishable (anon) | `anonKey` | `index.html` + `admin.html` | baca semua + insert `messages` |
 
-- Kedua kunci diambil dari **Supabase Dashboard → Project Settings → API Keys**.
-- `serviceKey` **TIDAK boleh commit** ke repositori publik. Karena repo ini public di GitHub, `serviceKey` ditaruh di file terpisah **`public/supabase-key.js`** (di-gitignore, hanya lokal). `supabase-config.js` otomatis membaca `window.SUPABASE_SERVICE_KEY` dari file itu, dan memakai placeholder bila tidak ada. Admin Panel memuat `supabase-key.js` lebih dulu. Setelah deploy, isi `serviceKey` manual di file bila Admin Panel perlu berjalan.
-- Publishable key aman untuk dipakai di browser (dibatasi RLS).
+- `anonKey` diambil dari **Supabase Dashboard → Project Settings → API Keys** dan aman untuk dipakai di browser (dibatasi RLS).
+- **Tidak ada lagi `serviceKey` di sisi browser.** Semua tulis/hapus admin dikendalikan oleh **Supabase Auth + RLS**.
+- Login Admin Panel (`/admin`) memakai **Supabase Auth** (email + password), bukan shared key.
+
+### Setup user admin (Supabase Auth)
+
+1. **Dashboard → Authentication → Users → Add user** — buat user dengan email & password yang akan dipakai login panel admin (mis. `inc.ekaryan@gmail.com`).
+2. Pastikan email tersebut cocok dengan email di fungsi `public.is_admin()` pada `supabase/schema.sql` (RLS hanya mengizinkan admin menulis bila email JWT sama).
+3. Login `/admin` dengan email + password tersebut.
 
 ## RLS (Row Level Security)
 
@@ -57,8 +62,9 @@ Ringkasan policy (detail di `supabase/schema.sql`):
 
 - Semua tabel `public.*` mengaktifkan RLS.
 - `anon` (publishable key) → **SELECT** semua tabel publik + **INSERT** ke `messages` (form kontak).
-- Tulis/hapus **hanya** lewat service_role key (mem-bypass RLS) di Admin Panel.
-- Storage buckets `assets` & `audio` bersifat **public read** (URL gambar/audio bisa diakses tanpa login).
+- Tulis/hapus (tabel + storage) **hanya** untuk pengguna `authenticated` yang lolos `public.is_admin()` (klaim email di JWT = email admin).
+- Storage buckets `assets` & `audio` bersifat **public read** (URL gambar/audio bisa diakses tanpa login); upload/hapus hanya admin.
+- `service_role` key tetap ada (untuk operasi admin/backup lewat server, mis. skrip migrasi) dan otomatis mem-bypass RLS — **jangan dipakai di browser/repo**. Bagian kode browser hanya memakai `anonKey`.
 
 ## Storage
 

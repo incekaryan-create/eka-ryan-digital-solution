@@ -19,16 +19,16 @@ Aturan wajib untuk **Eka Ryan Digital Solution**. Patuhi saat mengubah kode, doc
 ## 3. Keamanan
 
 - Publik (anon key) hanya bisa **baca** + kirim pesan kontak (diatur RLS).
-- Write/hapus **hanya** lewat service_role key (`supabase-config.js` → `serviceKey`).
-- **JANGAN commit service_role key** ke repositori publik (repo GitHub ini public!). Ganti setelah mengambilnya & putar kunci bila bocor.
-- Login Admin Panel = shared key (`adminUsername`/`adminPassword` di `supabase-config.js`).
+- Write/hapus **hanya** untuk pengguna **Supabase Auth** yang lolos `public.is_admin()` (email JWT = email admin di `supabase/schema.sql`). Tidak ada service_role key di browser.
+- **JANGAN commit service_role key** ke repositori publik (repo GitHub ini public!). Service key hanya dipakai operasi server/backup (mis. `migrate-data.mjs`), bukan di kode browser.
+- Login Admin Panel = **Supabase Auth** (email/password) di `/admin`.
 - Selalu sanitasi output saat render (`escapeHtml`).
 
 ## 4. Data Access
 
 - Akses data lewat `window.sbApi` (`public/supabase-api.js`) — **jangan** akses supabase-js langsung di halaman.
 - Halaman publik hanya memakai fungsi read + `saveMessage`.
-- Halaman admin memakai fungsi write + storage (service role).
+- Halaman admin memakai fungsi write + storage (diizinkan RLS setelah login sebagai admin).
 
 ## 5. Git Workflow
 
@@ -46,7 +46,7 @@ Aturan wajib untuk **Eka Ryan Digital Solution**. Patuhi saat mengubah kode, doc
 
 - [ ] Tidak ada referensi `/api/*`, `functions/`, `wrangler`, D1, atau R2 tersisa.
 - [ ] `db.js` hanya fallback/backup, bukan sumber utama.
-- [ ] Tidak ada secret ter-commit (terutama `serviceKey` di `supabase-config.js`).
+- [ ] Tidak ada secret ter-commit (service_role key tidak boleh ada di kode/deploy).
 - [ ] Semua gambar → Supabase Storage (tidak ada URL luar / URL R2 lama).
 - [ ] Docs (`docs/`) diperbarui bila ada perubahan API/fitur.
 - [ ] GitHub Actions deploy sukses (green).

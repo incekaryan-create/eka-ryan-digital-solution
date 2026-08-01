@@ -16,12 +16,13 @@ Masalah nyata yang ditemui di proyek **Eka Ryan Digital Solution** (Cloudflare P
 - Policy RLS `anon read ...` belum dibuat, atau memakai key yang salah (mis. admin memakai anon key untuk tulis). Cek bagian RLS di `supabase/schema.sql`.
 
 ### Issue: Admin gagal simpan/hapus
-- `serviceKey` di `supabase-config.js` masih placeholder (`ISI_SERVICE_ROLE_KEY_DARI_DASHBOARD`) atau salah.
-- Ambil service_role/secret key: **Supabase Dashboard → Project Settings → API Keys**.
+- Belum login / sesi berakhir → login ulang di `/admin` dengan **Supabase Auth**.
+- Email login ≠ email admin di `public.is_admin()` (`supabase/schema.sql`) → RLS menolak tulis. Cocokkan emailnya.
+- Cek Network tab: status `401/403` pada `PATCH/POST/DELETE /rest/v1/...` → masalah RLS/auth, bukan key.
 
 ### Issue: Upload gambar `401/403`
-- Upload memakai service_role key (bukan publishable). Pastikan `serviceKey` benar.
-- Cek bucket `assets` ada & public.
+- Pastikan sudah login sebagai admin (upload butuh `authenticated` + `is_admin()`).
+- Cek bucket `assets` ada & public; policy storage `admin all storage` ada di `supabase/schema.sql`.
 
 ### Issue: Audio backsound tidak bunyi
 - Bucket `audio` harus ada & public; objek `backsound.mp3` harus ter-upload.

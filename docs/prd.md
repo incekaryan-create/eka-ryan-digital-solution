@@ -27,7 +27,7 @@
 - **SEO**: meta OG/Twitter, JSON-LD.
 
 ### 3.2 Admin Panel
-- Login key `Ekaryan443!`.
+- Login via Supabase Auth (email/password admin; diatur RLS `is_admin()`).
 - Dashboard statistik.
 - CRUD: Services, Workflow, Skills, Add-ons, Messages (baca/hapus).
 - Edit Config (hero & kontak).

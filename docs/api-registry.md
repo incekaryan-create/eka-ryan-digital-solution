@@ -6,10 +6,9 @@ Proyek **tidak lagi punya REST API server**. Halaman browser berkomunikasi langs
 
 ## Client
 
-- **Publik (`sb`)**: anon/publishable key → dibatasi RLS (SELECT + INSERT messages).
-- **Admin (`sbAdm`)**: service_role key → write/hapus + storage.
+- **Tunggal (`sb`)**: anon/publishable key → dibatasi RLS (SELECT + INSERT messages). Setelah admin login via **Supabase Auth**, supabase-js otomatis melampirkan sesi JWT user ke klien yang sama sehingga tulis/hapus diizinkan RLS (authenticated + `is_admin()`).
 
-Kedua client dibuat di `public/supabase-api.js` memakai supabase-js v2 (CDN).
+Client dibuat di `public/supabase-api.js` memakai supabase-js v2 (CDN). Tidak ada lagi client service_role (`sbAdm`) di sisi browser.
 
 ## Fungsi `window.sbApi`
 
@@ -68,9 +67,17 @@ Kedua client dibuat di `public/supabase-api.js` memakai supabase-js v2 (CDN).
 | `deleteStorageObject(key)` | Hapus berdasarkan `key` (`assets/uploads/...`) |
 | `publicUrl(bucket, path)` | URL publik storage |
 
+### Auth
+| Fungsi | Keterangan |
+|--------|-----------|
+| `signIn(email, password)` | Login Supabase Auth (panel admin) |
+| `signOut()` | Logout |
+| `getSession()` | Ambil sesi saat ini (atau `null`) |
+| `onAuthStateChange(cb)` | Subscribe perubahan sesi (`SIGNED_IN` / `SIGNED_OUT`) |
+
 ## Autentikasi Admin
 
-Login Admin Panel tetap **shared key sederhana** (bukan Supabase Auth). Kredensial ada di `public/supabase-config.js` → `adminUsername` / `adminPassword` (default `Eka Ryan` / `Ekaryan443!`). Setelah login, `sessionStorage.admin_logged` = `'1'`.
+Login Admin Panel memakai **Supabase Auth** (`sbApi.signIn`). Sesi disimpan oleh supabase-js (localStorage) sehingga login bertahan antar kunjungan. Akses tulis/hapus dikendalikan oleh RLS (`public.is_admin()` — klaim email JWT harus cocok dengan email admin di `supabase/schema.sql`). Tidak ada shared key / secret di browser.
 
 ## Validasi
 

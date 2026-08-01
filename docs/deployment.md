@@ -59,13 +59,13 @@ npx wrangler pages deploy ./public --project-name=ekaryandigitalsolution
 
 1. `supabase/schema.sql` sudah dijalankan di SQL Editor (tabel + RLS + buckets).
 2. Data & gambar sudah dimigrasi dari D1/R2 lama: `SUPABASE_SERVICE_KEY=<key> node supabase/migrate-data.mjs` (lihat [supabase.md](./supabase.md)).
-3. `public/supabase-config.js` berisi `url` + `anonKey` (publishable); `serviceKey` diisi dari `public/supabase-key.js` (gitignored, hanya lokal).
+3. `public/supabase-config.js` berisi `url` + `anonKey` (publishable, aman untuk publik). User admin sudah dibuat di **Supabase Auth** (lihat [supabase.md](./supabase.md)).
 4. `backsound.mp3` sudah diupload ke bucket `audio` (**< 50 MB**, saat ini 28,9 MB).
 
 ## Verifikasi Setelah Deploy
 
 1. Buka `https://ekaryandigitalsolution.pages.dev/` — konten harus muncul (bukan kosong).
-2. Buka `/admin` → login `Eka Ryan` / `Ekaryan443!`.
+2. Buka `/admin` → login dengan **email & password Supabase Auth admin** (mis. `inc.ekaryan@gmail.com`).
 3. Cek GitHub Actions run terakhir = green.
 4. Cek Network tab → request ke `https://sqimmcecwuoadjbjiyfd.supabase.co/...` berhasil (HTTP 200).
 5. `/api/*` harus **404** (tidak ada Functions — benar).
@@ -77,7 +77,7 @@ Cloudflare Pages menyimpan deployment history. Rollback via dashboard → Pages 
 ## Checklist
 
 - [ ] Schema Supabase terpasang (DDL + RLS + buckets)
-- [ ] `supabase-config.js` berisi kunci yang benar (serviceKey tidak di-commit di repo publik)
+- [ ] `supabase-config.js` berisi `url` + `anonKey` yang benar (tidak ada secret)
 - [ ] Audio & gambar sudah diupload ke Supabase Storage
 - [ ] Perubahan di-commit & push ke `main`
 - [ ] GitHub Actions run sukses (green)

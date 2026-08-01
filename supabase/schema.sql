@@ -5,9 +5,10 @@
 -- Cara pakai:
 --   1. Buat project baru di https://supabase.com/dashboard
 --   2. Buka SQL Editor dan paste seluruh isi file ini, lalu RUN.
---   3. Salin Project URL + anon key + service_role key ke public/supabase-config.js
---   4. Buat bucket audio (otomatis dibuat lewat skrip di bawah) dan upload
---      public/src/assets/sound/backsound.mp3 sebagai `backsound.mp3`.
+--   3. Salin Project URL + anon key ke public/supabase-config.js (tidak perlu
+--      service_role key — akses admin diatur oleh RLS + Supabase Auth).
+--   4. Buat user admin di Authentication > Users (lihat bagian RLS di bawah),
+--      lalu upload public/src/assets/sound/backsound.mp3 ke bucket `audio`.
 -- ============================================================================
 
 -- ---------------------------------------------------------------------------
@@ -124,8 +125,33 @@ create index if not exists idx_messages_created         on public.messages(creat
 -- ---------------------------------------------------------------------------
 -- 2. ROW LEVEL SECURITY
 -- ---------------------------------------------------------------------------
--- Situs publik hanya membaca (pakai anon key). Semua tulis/hapus admin
--- dilakukan lewat service_role key yang otomatis mem-bypass RLS.
+-- Situs publik hanya membaca (pakai anon key) + INSERT pesan dari form kontak.
+-- Semua tulis/hapus (tabel + storage) hanya boleh pengguna yang sudah login
+-- melalui Supabase Auth dan lolos fungsi is_admin() (email admin). Tidak ada
+-- lagi service_role key di sisi browser — akses diatur sepenuhnya oleh RLS.
+--
+-- Setup admin:
+--   1. Buat user di Supabase Auth (Authentication > Users > Add user):
+--        email: <email admin>  password: <password kuat>
+--   2. Pastikan email admin di bawah cocok dengan email user tersebut.
+--      (auth.jwt() -> klaim "email")
+
+-- Helper: cek pengguna yang login adalah admin (lewat klaim email di JWT).
+create or replace function public.is_admin()
+returns boolean
+language sql
+stable
+as $$
+  select coalesce(auth.jwt() ->> 'email', '') = 'inc.ekaryan@gmail.com';
+$$;
+
+revoke all on function public.is_admin() from public;
+grant execute on function public.is_admin() to anon, authenticated;
+
+grant select, insert, update, delete on public.config, public.services,
+      public.service_details, public.service_tags, public.workflow,
+      public.skills, public.add_ons, public.messages to anon, authenticated;
+grant select, insert, update, delete on storage.objects to anon, authenticated;
 
 alter table public.config           enable row level security;
 alter table public.services         enable row level security;
@@ -136,6 +162,8 @@ alter table public.skills           enable row level security;
 alter table public.add_ons          enable row level security;
 alter table public.messages         enable row level security;
 
+-- Baca: anon + authenticated (situs publik + panel admin).
+-- Tulis: hanya admin (authenticated yang lolos is_admin()).
 drop policy if exists "anon read config"          on public.config;
 drop policy if exists "anon read services"        on public.services;
 drop policy if exists "anon read service_details" on public.service_details;
@@ -143,18 +171,36 @@ drop policy if exists "anon read service_tags"    on public.service_tags;
 drop policy if exists "anon read workflow"        on public.workflow;
 drop policy if exists "anon read skills"          on public.skills;
 drop policy if exists "anon read add_ons"         on public.add_ons;
+drop policy if exists "admin all config"          on public.config;
+drop policy if exists "admin all services"        on public.services;
+drop policy if exists "admin all service_details" on public.service_details;
+drop policy if exists "admin all service_tags"    on public.service_tags;
+drop policy if exists "admin all workflow"        on public.workflow;
+drop policy if exists "admin all skills"          on public.skills;
+drop policy if exists "admin all add_ons"         on public.add_ons;
 drop policy if exists "anon insert messages"      on public.messages;
+drop policy if exists "admin all messages"        on public.messages;
 
-create policy "anon read config"          on public.config           for select to anon using (true);
-create policy "anon read services"        on public.services         for select to anon using (true);
-create policy "anon read service_details" on public.service_details  for select to anon using (true);
-create policy "anon read service_tags"    on public.service_tags     for select to anon using (true);
-create policy "anon read workflow"        on public.workflow         for select to anon using (true);
-create policy "anon read skills"          on public.skills           for select to anon using (true);
-create policy "anon read add_ons"         on public.add_ons          for select to anon using (true);
+create policy "anon read config"          on public.config           for select to anon, authenticated using (true);
+create policy "anon read services"        on public.services         for select to anon, authenticated using (true);
+create policy "anon read service_details" on public.service_details  for select to anon, authenticated using (true);
+create policy "anon read service_tags"    on public.service_tags     for select to anon, authenticated using (true);
+create policy "anon read workflow"        on public.workflow         for select to anon, authenticated using (true);
+create policy "anon read skills"          on public.skills           for select to anon, authenticated using (true);
+create policy "anon read add_ons"         on public.add_ons          for select to anon, authenticated using (true);
+
+create policy "admin all config"          on public.config           for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "admin all services"        on public.services         for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "admin all service_details" on public.service_details  for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "admin all service_tags"    on public.service_tags     for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "admin all workflow"        on public.workflow         for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "admin all skills"          on public.skills           for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "admin all add_ons"         on public.add_ons          for all to authenticated using (public.is_admin()) with check (public.is_admin());
 
 -- Formulir kontak memakai anon key, jadi izinkan INSERT tanpa autentikasi.
-create policy "anon insert messages" on public.messages for insert to anon with check (true);
+-- Read/update/delete pesan hanya untuk admin.
+create policy "anon insert messages" on public.messages for insert to anon, authenticated with check (true);
+create policy "admin all messages"   on public.messages for all to authenticated using (public.is_admin()) with check (public.is_admin());
 
 -- ---------------------------------------------------------------------------
 -- 3. STORAGE BUCKETS
@@ -163,19 +209,24 @@ create policy "anon insert messages" on public.messages for insert to anon with 
 -- bucket `audio` : backsound.mp3 (bisa dibuat manual lalu upload file, atau
 --                  cukup jalankan insert bucket di bawah).
 -- Keduanya public = bisa diakses lewat URL publik tanpa autentikasi.
+-- Upload/hapus hanya admin (authenticated + is_admin).
 
 insert into storage.buckets (id, name, public)
 values ('assets', 'assets', true),
        ('audio', 'audio', true)
 on conflict (id) do nothing;
 
-drop policy if exists "public read assets" on storage.objects;
-drop policy if exists "public read audio"  on storage.objects;
+drop policy if exists "public read storage" on storage.objects;
+drop policy if exists "admin all storage"   on storage.objects;
 
-create policy "public read assets" on storage.objects
-  for select using (bucket_id = 'assets');
-create policy "public read audio" on storage.objects
-  for select using (bucket_id = 'audio');
+create policy "public read storage" on storage.objects
+  for select to anon, authenticated
+  using (bucket_id = 'assets' or bucket_id = 'audio');
+
+create policy "admin all storage" on storage.objects
+  for all to authenticated
+  using (public.is_admin() and (bucket_id = 'assets' or bucket_id = 'audio'))
+  with check (public.is_admin() and (bucket_id = 'assets' or bucket_id = 'audio'));
 
 -- ---------------------------------------------------------------------------
 -- 4. DATA

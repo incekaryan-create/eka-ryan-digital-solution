@@ -27,7 +27,7 @@ eka-ryan-digital-solution/
 │   ├── index.html         # Halaman portfolio utama
 │   ├── admin.html         # Admin panel
 │   ├── db.js              # LocalStorage fallback + backup (bukan sumber utama)
-│   ├── supabase-config.js # Kredensial Supabase (url, anonKey, serviceKey)
+│   ├── supabase-config.js # Kredensial Supabase (url, anonKey — aman publik)
 │   ├── supabase-api.js    # Wrapper `window.sbApi` (semua akses data)
 │   └── src/               # Assets (images, css, js)
 ├── supabase/
@@ -74,8 +74,8 @@ Men-download gambar dari R2 lama, upload ke bucket `assets`, lalu mengisi semua 
 
 `public/supabase-config.js`:
 - `url` → `https://sqimmcecwuoadjbjiyfd.supabase.co` (sudah terisi)
-- `anonKey` → Publishable/anon key (sudah terisi)
-- `serviceKey` → **Secret/service_role key** — ditaruh di file **`public/supabase-key.js`** yang di-gitignore (bukan di `supabase-config.js`). `supabase-config.js` otomatis memakai `window.SUPABASE_SERVICE_KEY` dari file itu. **Jangan commit ke repo publik.**
+- `anonKey` → Publishable/anon key (sudah terisi; aman untuk publik)
+- **Tidak ada `serviceKey`** — semua tulis admin diatur **Supabase Auth + RLS** (`public.is_admin()`). Buat user admin di **Supabase Dashboard → Authentication → Users** dan pastikan emailnya cocok dengan email di `supabase/schema.sql`.
 
 ### 3. Upload Asset
 
@@ -97,13 +97,13 @@ npx wrangler pages deploy ./public --project-name=ekaryandigitalsolution
 
 - **Website**: https://ekaryandigitalsolution.pages.dev
 - **Admin Panel**: https://ekaryandigitalsolution.pages.dev/admin
-  - Login: `Eka Ryan` / `Ekaryan443!` (dapat diubah di `supabase-config.js`)
+  - Login: **email + password Supabase Auth** (email admin yang ditetapkan di RLS, mis. `inc.ekaryan@gmail.com`)
 
 ## Local Development
 
 Tidak ada build step. Edit `public/` langsung. Buka `public/index.html` di browser (data dari Supabase berjalan via HTTPS). Deploy lewat `git push`.
 
-> Catatan: `supabase-config.js` berisi `anonKey` (aman untuk publik). `serviceKey` di file lokal Anda JANGAN di-commit ke GitHub (repo ini public).
+> Catatan: `supabase-config.js` berisi `anonKey` (aman untuk publik). Tidak ada secret key di kode browser — admin diizinkan menulis via Supabase Auth + RLS.
 
 ## Data Access (sbApi)
 
@@ -131,7 +131,7 @@ Tidak ada REST API server. Halaman memakai `window.sbApi` (lihat `docs/api-regis
 ## Environment / Secrets
 
 - GitHub Actions: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` (repo Settings → Secrets).
-- Supabase keys: `public/supabase-config.js` (jangan commit `serviceKey`).
+- Supabase keys: hanya `anonKey` di `public/supabase-config.js` (publik). Service key hanya untuk operasi server, tidak pernah di repo.
 
 ## Documentation
 

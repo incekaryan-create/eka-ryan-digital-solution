@@ -88,15 +88,15 @@
       <p class="text-xs text-zinc-500 mb-6">Masuk untuk mengelola portfolio</p>
       <form id="login-form" class="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
         <div class="mb-4 text-left">
-          <label class="block text-[10px] text-zinc-400 uppercase tracking-widest mb-1.5 font-semibold">Username</label>
-          <input id="login-user" type="text" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-white" />
+          <label class="block text-[10px] text-zinc-400 uppercase tracking-widest mb-1.5 font-semibold">Email</label>
+          <input id="login-user" type="email" autocomplete="username" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-white" />
         </div>
         <div class="mb-5 text-left">
           <label class="block text-[10px] text-zinc-400 uppercase tracking-widest mb-1.5 font-semibold">Password</label>
-          <input id="login-pass" type="password" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-white" />
+          <input id="login-pass" type="password" autocomplete="current-password" class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-white" />
         </div>
-        <button type="submit" class="w-full rounded-lg bg-accent-500 hover:bg-accent-600 py-2.5 text-xs font-bold tracking-widest text-primary-950 transition-all uppercase">MASUK</button>
-        <p id="login-error" class="text-xs text-red-400 mt-3 hidden">Username atau password salah</p>
+        <button id="login-submit" type="submit" class="w-full rounded-lg bg-accent-500 hover:bg-accent-600 py-2.5 text-xs font-bold tracking-widest text-primary-950 transition-all uppercase">MASUK</button>
+        <p id="login-error" class="text-xs text-red-400 mt-3 hidden">Email atau password salah</p>
       </form>
     </div>
   </div>
@@ -639,7 +639,6 @@
   <div id="toast-container" class="fixed top-4 right-4 z-[60] space-y-2"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-key.js"></script>
   <script src="supabase-config.js"></script>
   <script src="supabase-api.js"></script>
   <script src="db.js"></script>
@@ -653,9 +652,6 @@
     }
 
     // ===== IMAGE UPLOAD HELPERS =====
-    const ADMIN_USER = (window.SUPABASE_CONFIG && SUPABASE_CONFIG.adminUsername) || 'Eka Ryan';
-    const ADMIN_PASS = (window.SUPABASE_CONFIG && SUPABASE_CONFIG.adminPassword) || 'Ekaryan443!';
-
     // Compress + resize an image client-side before uploading so it renders
     // fast and consistently (avoids 1.6MB+ unoptimized PNGs on the page).
     async function optimizeImage(file, maxDim = 1600, quality = 0.85) {
@@ -750,28 +746,58 @@
       toast('Gambar layanan dihapus!');
     }
 
-    // ===== AUTH =====
-    function checkAuth() {
-      if (sessionStorage.getItem('admin_logged') === '1') {
-        document.getElementById('login-overlay').classList.add('hidden');
-        document.getElementById('dashboard').classList.remove('hidden');
-        init();
+    // ===== AUTH (Supabase Auth) =====
+    let adminReady = false;
+    function enterDashboard() {
+      if (adminReady) return;
+      adminReady = true;
+      document.getElementById('login-overlay').classList.add('hidden');
+      document.getElementById('dashboard').classList.remove('hidden');
+      init();
+    }
+    function leaveDashboard() {
+      adminReady = false;
+      document.getElementById('login-overlay').classList.remove('hidden');
+      document.getElementById('dashboard').classList.add('hidden');
+    }
+    function showLoginError(msg) {
+      const el = document.getElementById('login-error');
+      if (msg) el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+    async function checkAuth() {
+      sbApi.onAuthStateChange(evt => {
+        if (evt === 'SIGNED_IN') enterDashboard();
+        if (evt === 'SIGNED_OUT') leaveDashboard();
+      });
+      try {
+        const session = await sbApi.getSession();
+        if (session) enterDashboard();
+      } catch (e) {
+        showLoginError('Tidak bisa terhubung ke server. Coba lagi.');
       }
     }
-    document.getElementById('login-form').addEventListener('submit', e => {
+    document.getElementById('login-form').addEventListener('submit', async e => {
       e.preventDefault();
-      const u = document.getElementById('login-user').value;
+      const btn = document.getElementById('login-submit');
+      btn.disabled = true;
+      btn.textContent = 'MEMPROSES...';
+      document.getElementById('login-error').classList.add('hidden');
+      const u = document.getElementById('login-user').value.trim();
       const p = document.getElementById('login-pass').value;
-      if (u === ADMIN_USER && p === ADMIN_PASS) {
-        sessionStorage.setItem('admin_logged', '1');
-        document.getElementById('login-overlay').classList.add('hidden');
-        document.getElementById('dashboard').classList.remove('hidden');
-        init();
-      } else {
-        document.getElementById('login-error').classList.remove('hidden');
+      try {
+        await sbApi.signIn(u, p);
+        // onAuthStateChange SIGNED_IN akan memanggil enterDashboard()
+      } catch (err) {
+        showLoginError('Email atau password salah');
+        btn.disabled = false;
+        btn.textContent = 'MASUK';
       }
     });
-    function logout() { sessionStorage.removeItem('admin_logged'); location.reload(); }
+    async function logout() {
+      try { await sbApi.signOut(); } catch (e) {}
+      leaveDashboard();
+    }
 
     // ===== NAVIGATION =====
     let currentPage = 'dashboard';

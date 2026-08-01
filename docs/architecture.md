@@ -8,7 +8,7 @@ Arsitektur **Eka Ryan Digital Solution** — portfolio digital freelancer (Eka R
 ┌───────────────────────────────────────────────────────────────────┐
 │  Browser (Client)                                                │
 │  ├─ index.html (publik)  → supabase-js (anon key, RLS read)     │
-│  └─ admin.html (panel)   → supabase-js (service_role key, write)│
+│  └─ admin.html (panel)   → supabase-js (anon key + Supabase Auth│
 │      └─ public/supabase-api.js = wrapper `window.sbApi`         │
 └───────────────────────────────┬─────────────────────────────────┘
                                 │ HTTPS
@@ -48,8 +48,8 @@ Arsitektur **Eka Ryan Digital Solution** — portfolio digital freelancer (Eka R
 5. Bila fetch gagal → fallback ke `db.getConfig()` (localStorage).
 
 ### Admin Panel (`admin.html`)
-1. Login dengan shared key (user/pass dari `supabase-config.js`, default `Eka Ryan` / `Ekaryan443!`).
-2. CRUD via `sbApi.saveXxx/deleteXxx` — memakai service_role key (bypass RLS).
+1. Login via **Supabase Auth** (`sbApi.signIn(email, password)`); sesi otomatis dilampirkan ke client supabase-js.
+2. CRUD via `sbApi.saveXxx/deleteXxx` — berjalan sebagai `authenticated`, diizinkan RLS karena user adalah admin (`is_admin()`).
 3. Upload gambar → `sbApi.uploadImage()` → Supabase Storage `assets/uploads/<timestamp>_<nama>`.
 4. Respons di-mirror ke `db.js` (localStorage) sebagai backup lokal.
 
@@ -59,7 +59,7 @@ Arsitektur **Eka Ryan Digital Solution** — portfolio digital freelancer (Eka R
 ## Keamanan
 
 - Publik: hanya anon key → baca publik + kirim pesan (RLS membatasi).
-- Admin: service_role key → tulis/hapus; di-hardcode di `supabase-config.js`, **tidak boleh commit** ke repo publik.
+- Admin: **Supabase Auth** (email/password). Tulis/hapus diizinkan hanya bila klaim email JWT = email admin (`is_admin()` di RLS). Tidak ada secret key di browser.
 - Semua tulis lewat client (tidak ada API server); validasi input tetap dilakukan di sisi klien (`optimizeImage`, `escapeHtml`).
 - Supabase handle TLS, auth, dan backup secara otomatis.
 

@@ -5,8 +5,9 @@
 // admin.html. Semua query CRUD dibungkus di sini sehingga halaman tidak
 // bergantung langsung pada SDK.
 //
-// - client publik (`sb`):  anon key -> hanya baca + insert pesan (dijaga RLS)
-// - client admin (`sbAdm`): service_role key -> tulis/hapus + storage
+// - client tunggal (`sb`): pakai anon key. Setelah login via Supabase Auth,
+//   supabase-js otomatis melampirkan sesi JWT user ke klien yang sama, sehingga
+//   tulis/hapus diizinkan RLS untuk admin (authenticated + is_admin).
 //
 // Dependency: supabase-js v2 via CDN + supabase-config.js (dimuat lebih dulu).
 // ============================================================================
@@ -24,9 +25,6 @@
 
   const { createClient } = window.supabase;
   const sb = createClient(cfg.url, cfg.anonKey);
-  const sbAdm = createClient(cfg.url, cfg.serviceKey || cfg.anonKey, {
-    auth: { persistSession: false, autoRefreshToken: false }
-  });
 
   const ASSET_BUCKET = 'assets';
   const AUDIO_BUCKET = 'audio';
@@ -70,30 +68,30 @@
     };
     let serviceId = id;
     if (serviceId) {
-      const { error } = await sbAdm.from('services').update(base).eq('id', serviceId);
+      const { error } = await sb.from('services').update(base).eq('id', serviceId);
       if (error) throw error;
     } else {
-      const { data: rows } = await sbAdm
+      const { data: rows } = await sb
         .from('services').select('sort_order').order('sort_order', { ascending: false }).limit(1);
       serviceId = gid('svc');
       base.sort_order = ((rows && rows[0] && rows[0].sort_order) || 0) + 1;
       base.is_active = 1;
-      const { error } = await sbAdm.from('services').insert({ id: serviceId, ...base });
+      const { error } = await sb.from('services').insert({ id: serviceId, ...base });
       if (error) throw error;
     }
     // Ganti seluruh details & tags (paling sederhana & konsisten dengan D1).
     const details = Array.isArray(data.details) ? data.details.filter(Boolean) : [];
     const tags = Array.isArray(data.tags) ? data.tags.filter(Boolean) : [];
-    await sbAdm.from('service_details').delete().eq('service_id', serviceId);
-    await sbAdm.from('service_tags').delete().eq('service_id', serviceId);
+    await sb.from('service_details').delete().eq('service_id', serviceId);
+    await sb.from('service_tags').delete().eq('service_id', serviceId);
     if (details.length) {
-      const { error } = await sbAdm.from('service_details').insert(
+      const { error } = await sb.from('service_details').insert(
         details.map((text, i) => ({ id: gid('sd'), service_id: serviceId, sort_order: i + 1, text }))
       );
       if (error) throw error;
     }
     if (tags.length) {
-      const { error } = await sbAdm.from('service_tags').insert(
+      const { error } = await sb.from('service_tags').insert(
         tags.map(tag => ({ id: gid('st'), service_id: serviceId, tag }))
       );
       if (error) throw error;
@@ -102,7 +100,7 @@
   }
 
   async function deleteService(id) {
-    const { error } = await sbAdm.from('services').delete().eq('id', id);
+    const { error } = await sb.from('services').delete().eq('id', id);
     if (error) throw error;
   }
 
@@ -115,16 +113,16 @@
 
   async function saveWorkflow(data, id) {
     if (id) {
-      const { error } = await sbAdm.from('workflow').update({
+      const { error } = await sb.from('workflow').update({
         title: data.title, short_desc: data.short_desc || '', long_desc: data.long_desc || ''
       }).eq('id', id);
       if (error) throw error;
       return id;
     }
-    const { data: rows } = await sbAdm
+    const { data: rows } = await sb
       .from('workflow').select('sort_order').order('sort_order', { ascending: false }).limit(1);
     const newId = gid('wf');
-    const { error } = await sbAdm.from('workflow').insert({
+    const { error } = await sb.from('workflow').insert({
       id: newId,
       title: data.title,
       short_desc: data.short_desc || '',
@@ -136,7 +134,7 @@
   }
 
   async function deleteWorkflow(id) {
-    const { error } = await sbAdm.from('workflow').delete().eq('id', id);
+    const { error } = await sb.from('workflow').delete().eq('id', id);
     if (error) throw error;
   }
 
@@ -149,14 +147,14 @@
 
   async function saveSkill(data, id) {
     if (id) {
-      const { error } = await sbAdm.from('skills').update({ name: data.name, category: data.category }).eq('id', id);
+      const { error } = await sb.from('skills').update({ name: data.name, category: data.category }).eq('id', id);
       if (error) throw error;
       return id;
     }
-    const { data: rows } = await sbAdm
+    const { data: rows } = await sb
       .from('skills').select('sort_order').order('sort_order', { ascending: false }).limit(1);
     const newId = gid('sk');
-    const { error } = await sbAdm.from('skills').insert({
+    const { error } = await sb.from('skills').insert({
       id: newId,
       name: data.name,
       category: data.category,
@@ -167,7 +165,7 @@
   }
 
   async function deleteSkill(id) {
-    const { error } = await sbAdm.from('skills').delete().eq('id', id);
+    const { error } = await sb.from('skills').delete().eq('id', id);
     if (error) throw error;
   }
 
@@ -185,16 +183,16 @@
 
   async function saveAddon(data, id) {
     if (id) {
-      const { error } = await sbAdm.from('add_ons').update({
+      const { error } = await sb.from('add_ons').update({
         name: data.name, category: data.category, price: data.price || ''
       }).eq('id', id);
       if (error) throw error;
       return id;
     }
-    const { data: rows } = await sbAdm
+    const { data: rows } = await sb
       .from('add_ons').select('sort_order').order('sort_order', { ascending: false }).limit(1);
     const newId = gid('adn');
-    const { error } = await sbAdm.from('add_ons').insert({
+    const { error } = await sb.from('add_ons').insert({
       id: newId,
       name: data.name,
       category: data.category,
@@ -206,7 +204,7 @@
   }
 
   async function deleteAddon(id) {
-    const { error } = await sbAdm.from('add_ons').delete().eq('id', id);
+    const { error } = await sb.from('add_ons').delete().eq('id', id);
     if (error) throw error;
   }
 
@@ -218,13 +216,13 @@
   }
 
   async function saveConfig(payload) {
-    const { error } = await sbAdm.from('config').upsert({ id: 'main', ...payload, updated_at: new Date().toISOString() });
+    const { error } = await sb.from('config').upsert({ id: 'main', ...payload, updated_at: new Date().toISOString() });
     if (error) throw error;
   }
 
   // ===== MESSAGES =====
   async function getMessages() {
-    const { data, error } = await sbAdm.from('messages').select('*').order('created_at', { ascending: false });
+    const { data, error } = await sb.from('messages').select('*').order('created_at', { ascending: false });
     if (error) throw error;
     return data || [];
   }
@@ -243,29 +241,50 @@
   }
 
   async function markMessageRead(id) {
-    const { error } = await sbAdm.from('messages').update({ is_read: 1 }).eq('id', id);
+    const { error } = await sb.from('messages').update({ is_read: 1 }).eq('id', id);
     if (error) throw error;
   }
 
   async function deleteMessage(id) {
-    const { error } = await sbAdm.from('messages').delete().eq('id', id);
+    const { error } = await sb.from('messages').delete().eq('id', id);
     if (error) throw error;
   }
 
   async function clearMessages() {
-    const { error } = await sbAdm.from('messages').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    const { error } = await sb.from('messages').delete().neq('id', '00000000-0000-0000-0000-000000000000');
     if (error) throw error;
+  }
+
+  // ===== AUTH (Supabase Auth — login admin) =====
+  async function signIn(email, password) {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    return data;
+  }
+
+  async function signOut() {
+    const { error } = await sb.auth.signOut();
+    if (error) throw error;
+  }
+
+  async function getSession() {
+    const { data } = await sb.auth.getSession();
+    return data && data.session;
+  }
+
+  function onAuthStateChange(callback) {
+    return sb.auth.onAuthStateChange(callback);
   }
 
   // ===== STORAGE =====
   async function uploadImage(file) {
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
     const path = 'uploads/' + Date.now() + '_' + safeName;
-    const { error } = await sbAdm.storage.from(ASSET_BUCKET).upload(path, file, {
+    const { error } = await sb.storage.from(ASSET_BUCKET).upload(path, file, {
       cacheControl: '3600', upsert: true
     });
     if (error) throw error;
-    const { data } = sbAdm.storage.from(ASSET_BUCKET).getPublicUrl(path);
+    const { data } = sb.storage.from(ASSET_BUCKET).getPublicUrl(path);
     return { url: data.publicUrl, path };
   }
 
@@ -278,7 +297,7 @@
     const bucket = parts[0];
     const objectPath = parts.slice(1).join('/');
     if (bucket !== ASSET_BUCKET && bucket !== AUDIO_BUCKET) return;
-    await sbAdm.storage.from(bucket).remove([objectPath]);
+    await sb.storage.from(bucket).remove([objectPath]);
   }
 
   function extractImagePath(url) {
@@ -289,8 +308,8 @@
     const buckets = [ASSET_BUCKET];
     const objects = [];
     for (const bucket of buckets) {
-      const { data: root, error: errRoot } = await sbAdm.storage.from(bucket).list('', { limit: 1000 });
-      const { data: uploads, error: errUploads } = await sbAdm.storage.from(bucket).list('uploads', { limit: 1000 });
+      const { data: root, error: errRoot } = await sb.storage.from(bucket).list('', { limit: 1000 });
+      const { data: uploads, error: errUploads } = await sb.storage.from(bucket).list('uploads', { limit: 1000 });
       if (errRoot && errUploads) continue;
       const sizeOf = o => Number((o.metadata && (o.metadata.size || o.metadata.contentLength)) || 0);
       (root || []).forEach(o => {
@@ -309,7 +328,7 @@
     const bucket = parts[0];
     const objectPath = parts.slice(1).join('/');
     if (bucket !== ASSET_BUCKET && bucket !== AUDIO_BUCKET) return;
-    await sbAdm.storage.from(bucket).remove([objectPath]);
+    await sb.storage.from(bucket).remove([objectPath]);
   }
 
   function publicUrl(bucket, path) {
@@ -324,6 +343,7 @@
     getAddOns, saveAddon, deleteAddon,
     getConfig, saveConfig,
     getMessages, saveMessage, markMessageRead, deleteMessage, clearMessages,
+    signIn, signOut, getSession, onAuthStateChange,
     uploadImage, deleteImage, extractImagePath, listStorage, deleteStorageObject,
     publicUrl
   };

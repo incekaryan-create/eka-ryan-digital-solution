@@ -55,7 +55,7 @@ services 1──* service_tags
 
 - Semua tabel `enable row level security`.
 - `anon` → SELECT semua tabel publik + INSERT `messages`.
-- Write/hapus → hanya service_role (dipakai Admin Panel).
+- Write/hapus → hanya pengguna **Supabase Auth** yang lolos `is_admin()` (dipakai Admin Panel).
 - Lihat `supabase/schema.sql` bagian policy untuk detail.
 
 ## Data
