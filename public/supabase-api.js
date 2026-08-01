@@ -304,6 +304,28 @@
     return extractPathFromUrl(url);
   }
 
+  // ===== CV UPLOAD =====
+  async function uploadCV(file) {
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const path = 'cv/' + Date.now() + '_' + safeName;
+    const { error } = await sb.storage.from(ASSET_BUCKET).upload(path, file, {
+      cacheControl: '3600', upsert: true
+    });
+    if (error) throw error;
+    const { data } = sb.storage.from(ASSET_BUCKET).getPublicUrl(path);
+    return { url: data.publicUrl, path };
+  }
+
+  async function deleteCV(urlOrPath) {
+    const path = extractPathFromUrl(urlOrPath) || urlOrPath;
+    if (!path) return;
+    const parts = path.split('/');
+    const bucket = parts[0];
+    const objectPath = parts.slice(1).join('/');
+    if (bucket !== ASSET_BUCKET) return;
+    await sb.storage.from(bucket).remove([objectPath]);
+  }
+
   async function listStorage() {
     const buckets = [ASSET_BUCKET];
     const objects = [];
@@ -345,6 +367,7 @@
     getMessages, saveMessage, markMessageRead, deleteMessage, clearMessages,
     signIn, signOut, getSession, onAuthStateChange,
     uploadImage, deleteImage, extractImagePath, listStorage, deleteStorageObject,
+    uploadCV, deleteCV,
     publicUrl
   };
 })();

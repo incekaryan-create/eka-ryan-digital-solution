@@ -792,6 +792,7 @@
     let SERVICES_DATA = [];
     let WORKFLOW_DATA = [];
     let SKILLS_LIST = [];
+    let CV_URL = '';
     const adminConfig = db.getConfig();
 
     // ===== APPLY CONFIG OVERRIDES (localStorage / defaults) =====
@@ -872,6 +873,8 @@
         const socialLinks = document.querySelectorAll('a[href="https://linkedin.com/in/placeholder"], a[href="https://instagram.com/placeholder"], a[href="https://tiktok.com/@placeholder"], a[href="https://x.com/placeholder"]');
         const socialUrls = [c.social_linkedin, c.social_instagram, c.social_tiktok, c.social_twitter];
         socialLinks.forEach((el, i) => { if (socialUrls[i]) el.href = socialUrls[i]; });
+
+        if (c.cv_url) CV_URL = c.cv_url;
       } catch (e) { /* keep localStorage fallback */ }
     })();
 
@@ -1304,33 +1307,14 @@
     });
 
     // ===== DOWNLOAD RESUME =====
-    document.getElementById('download-resume-btn').addEventListener('click', function() {
-      const btn = this;
+    function triggerCVDownload(btn) {
       btn.innerHTML = '<span class="h-3.5 w-3.5 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-900 inline-block"></span><span>Menyiapkan CV...</span>';
       btn.disabled = true;
-      setTimeout(() => {
-        const content = `
-=====================================================
-EKA RYAN - PENGEMBANG WEBSITE, SOFTWARE & APLIKASI
-=====================================================
-Email: inc.ekaryan@gmail.com
-Website: ekaryandigitalsolution.pages.dev
-Lokasi: Bali, Indonesia
-
-PROFIL:
-Saya merancang sistem web dan mobile modern yang cepat, intuitif, dan siap skalabilitas.
-
-KEAHLIAN:
-React, TypeScript, Next.js, Node.js, Express, PostgreSQL, Flutter, React Native, REST APIs, Tailwind CSS, Git, Docker, MongoDB, CI/CD, WebSockets, Cloudflare.
-
-PENGALAMAN:
-- Lead Full-Stack Developer, Nexora Inc (2023 - Sekarang)
-- Senior Web Developer, Volterra Motors (2021 - 2023)
-- Lead Mobile Developer, Balance Wellness (2019 - 2021)`;
-        const blob = new Blob([content], { type: 'text/plain' });
+      if (CV_URL) {
         const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'Eka_Ryan_Resume_Developer.txt';
+        a.href = CV_URL;
+        a.download = 'Eka_Ryan_CV.pdf';
+        a.target = '_blank';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -1341,16 +1325,7 @@ PENGALAMAN:
           btn.innerHTML = '<svg class="h-4 w-4 group-hover:-translate-y-0.5 transition-transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg><span>Unduh CV Saya</span>';
           btn.classList.remove('bg-emerald-600', 'border-emerald-600', 'text-white');
         }, 3000);
-      }, 1500);
-    });
-
-    // Desktop download resume button
-    const desktopBtn = document.getElementById('download-resume-btn-desktop');
-    if (desktopBtn) {
-      desktopBtn.addEventListener('click', function() {
-        const btn = this;
-        btn.innerHTML = '<span class="h-3.5 w-3.5 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-900 inline-block"></span><span>Menyiapkan CV...</span>';
-        btn.disabled = true;
+      } else {
         setTimeout(() => {
           const content = `
 =====================================================
@@ -1385,7 +1360,14 @@ PENGALAMAN:
             btn.classList.remove('bg-emerald-600', 'border-emerald-600', 'text-white');
           }, 3000);
         }, 1500);
-      });
+      }
+    }
+    document.getElementById('download-resume-btn').addEventListener('click', function() { triggerCVDownload(this); });
+
+    // Desktop download resume button
+    const desktopBtn = document.getElementById('download-resume-btn-desktop');
+    if (desktopBtn) {
+      desktopBtn.addEventListener('click', function() { triggerCVDownload(this); });
     }
 
     // ===== SHARE MODAL =====

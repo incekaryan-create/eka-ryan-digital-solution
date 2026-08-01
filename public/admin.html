@@ -410,6 +410,26 @@
                 <div><label class="block text-[10px] text-zinc-700 mb-1">Poin 3</label><input id="cfg-quality-p3" class="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-xs text-zinc-900" /></div>
               </div>
             </div>
+            <!-- CV / Resume -->
+            <div class="rounded-xl border border-zinc-200 bg-zinc-50 p-5">
+              <h3 class="text-xs font-bold mb-4 flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span> CV / Resume (PDF)</h3>
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-[10px] text-zinc-700 mb-1">URL File CV</label>
+                  <div class="flex gap-2">
+                    <input id="cfg-cv-url" class="flex-1 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-xs text-zinc-900" placeholder="URL PDF atau upload" />
+                    <label class="cursor-pointer rounded-lg border border-zinc-300 bg-zinc-200 px-3 py-2 text-[10px] font-bold text-zinc-600 hover:text-zinc-900 hover:border-zinc-600 transition-all">
+                      <svg class="h-4 w-4 inline mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                      <input type="file" class="hidden" accept=".pdf" onchange="uploadCVFile(this)" />
+                    </label>
+                  </div>
+                  <div id="cv-preview" class="mt-2 hidden">
+                    <a id="cv-preview-link" href="#" target="_blank" class="text-[10px] text-primary-700 underline">Lihat CV saat ini</a>
+                    <button onclick="deleteCVFile()" class="ml-3 text-[9px] text-red-600 hover:text-red-700">Hapus CV</button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="mt-6 flex justify-end">
             <button onclick="saveConfig()" class="rounded-lg bg-accent-500 hover:bg-accent-600 text-primary-950 px-6 py-2.5 text-xs font-bold tracking-widest uppercase transition-all">Simpan Semua Pengaturan</button>
@@ -748,6 +768,29 @@
       document.getElementById('svc-image').value = '';
       document.getElementById('svc-image-preview').classList.add('hidden');
       toast('Gambar layanan dihapus!');
+    }
+
+    async function uploadCVFile(input) {
+      const file = input.files[0];
+      if (!file) return;
+      if (file.type !== 'application/pdf') { toast('Hanya file PDF yang diizinkan!'); return; }
+      const oldUrl = document.getElementById('cfg-cv-url').value;
+      const oldKey = extractR2Key(oldUrl);
+      const data = await sbApi.uploadCV(file);
+      document.getElementById('cfg-cv-url').value = data.url;
+      document.getElementById('cv-preview-link').href = data.url;
+      document.getElementById('cv-preview').classList.remove('hidden');
+      if (oldKey) await sbApi.deleteCV(oldKey);
+      toast('CV berhasil diupload!');
+    }
+
+    async function deleteCVFile() {
+      const url = document.getElementById('cfg-cv-url').value;
+      const key = extractR2Key(url);
+      if (key) await sbApi.deleteCV(key);
+      document.getElementById('cfg-cv-url').value = '';
+      document.getElementById('cv-preview').classList.add('hidden');
+      toast('CV dihapus!');
     }
 
     // ===== AUTH (Supabase Auth) =====
@@ -1249,6 +1292,11 @@
       document.getElementById('cfg-quality-p1').value = c.quality_p1;
       document.getElementById('cfg-quality-p2').value = c.quality_p2;
       document.getElementById('cfg-quality-p3').value = c.quality_p3;
+      document.getElementById('cfg-cv-url').value = c.cv_url || '';
+      if (c.cv_url) {
+        document.getElementById('cv-preview-link').href = c.cv_url;
+        document.getElementById('cv-preview').classList.remove('hidden');
+      }
     }
     async function saveConfig() {
       const payload = {
@@ -1274,7 +1322,8 @@
         quality_desc: document.getElementById('cfg-quality-desc').value,
         quality_p1: document.getElementById('cfg-quality-p1').value,
         quality_p2: document.getElementById('cfg-quality-p2').value,
-        quality_p3: document.getElementById('cfg-quality-p3').value
+        quality_p3: document.getElementById('cfg-quality-p3').value,
+        cv_url: document.getElementById('cfg-cv-url').value
       };
       // Persist ke Supabase (single source of truth) agar situs publik mengikuti.
       try {

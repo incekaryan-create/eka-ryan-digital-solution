@@ -37,7 +37,8 @@ const DEFAULTS = {
     social_linkedin: 'https://linkedin.com/in/placeholder',
     social_instagram: 'https://instagram.com/placeholder',
     social_tiktok: 'https://tiktok.com/@placeholder',
-    social_twitter: 'https://x.com/placeholder'
+    social_twitter: 'https://x.com/placeholder',
+    cv_url: ''
   },
 
   services: [
