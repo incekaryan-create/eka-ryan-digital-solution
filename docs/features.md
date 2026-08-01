@@ -56,6 +56,15 @@ Login Admin Panel memakai **Supabase Auth** (`sbApi.signIn(email, password)`); u
 - Gambar dikompresi klien-side (`optimizeImage`) sebelum upload.
 - Batas ukuran objek Supabase: 50 MB (audio backsound harus < 50 MB).
 
+## SEO & Meta Tags (`index.html`)
+
+- **Standard**: charset, viewport, description, keywords, author, robots, canonical URL.
+- **Open Graph (Facebook/LinkedIn/WhatsApp)**: og:type, og:site_name, og:title, og:description, og:url, og:image (1200×630), og:locale.
+- **Twitter/X**: twitter:card (summary_large_image), twitter:title, twitter:description, twitter:image.
+- **Geo/Local Business**: geo.region, geo.placename, geo.position, ICBM, business:contact_data (country, locality, email, phone).
+- **Pinterest Domain Verification**: `p:domain_verify` — diklaim domain di Pinterest agar bisa mem-publish pin dari website.
+- **Structured Data (JSON-LD)**: `@type: ProfessionalService` dengan schema.org markup (address, areaServed, founder, makesOffer).
+
 ## Catatan
 
 - **Tidak ada Firebase, autentikasi user, OAuth, atau dashboard analytics** di proyek ini.

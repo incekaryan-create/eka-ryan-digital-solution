@@ -24,7 +24,7 @@
 - **Skills**: daftar keahlian.
 - **Add-ons**: pilihan fitur tambahan (dikelompokkan per kategori).
 - **Contact Form**: kirim pesan (publik, tanpa login).
-- **SEO**: meta OG/Twitter, JSON-LD.
+- **SEO**: meta OG/Twitter, JSON-LD, Pinterest domain verification (`p:domain_verify`).
 
 ### 3.2 Admin Panel
 - Login via Supabase Auth (email/password admin; diatur RLS `is_admin()`).
