@@ -1,15 +1,15 @@
 # Deployment Guide
 
-> Lihat [cloudflare.md](./cloudflare.md) untuk bindings & setup, dan [workflow.md](./workflow.md) untuk git workflow.
+> Setup Cloudflare & cleanup: [cloudflare.md](./cloudflare.md) · Setup Supabase: [supabase.md](./supabase.md) · Git workflow: [workflow.md](./workflow.md).
 
 ## Overview
-Proyek **Eka Ryan Digital Solution** dideploy ke **Cloudflare Pages** menggunakan **GitHub Actions**. Tidak menggunakan Firebase, Vercel, Netlify, atau GitHub Pages statis.
+
+Proyek **Eka Ryan Digital Solution** di-hosting di **Cloudflare Pages** (statis) dan menggunakan **Supabase** untuk database & storage. Deploy otomatis via **GitHub Actions**.
 
 ## Arsitektur Deploy
 
-- **Source**: folder `./public` (HTML statis + `db.js` fallback).
-- **Functions**: `functions/api/[[route]].js` (Pages Functions, otomatis terdeploy bersama).
-- **Build output**: dikonfigurasi via `wrangler.toml` → `pages_build_output_dir = "./public"`.
+- **Source**: folder `./public` (HTML statis + JS). Tidak ada build step (Tailwind via CDN).
+- **Backend**: Supabase (bukan Cloudflare Functions) — akses langsung dari browser lewat `supabase-api.js`.
 - **Pages project**: `ekaryandigitalsolution`.
 - **Live URL**: `https://ekaryandigitalsolution.pages.dev/` (admin di `/admin`).
 
@@ -26,58 +26,49 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
-      - name: Deploy
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version: 24 }
+      - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy ./public --project-name=ekaryandigitalsolution --commit-dirty=true
+          command: pages deploy ./public --project-name=ekaryandigitalsolution
 ```
 
-**Cara deploy**: cukup `git push origin main`. GitHub Actions otomatis build & deploy.
+**Cara deploy**: `git push origin main` → GitHub Actions otomatis deploy.
 
-## Bindings (wrangler.toml)
+## Persyaratan Secret GitHub
 
-```toml
-name = "ekaryandigitalsolution"
-compatibility_date = "2024-12-01"
-pages_build_output_dir = "./public"
+- `CLOUDFLARE_API_TOKEN` — token dengan izin `Pages:Edit`.
+- `CLOUDFLARE_ACCOUNT_ID` — account Cloudflare.
 
-[[d1_databases]]
-binding = "DB"
-database_name = "eka-ryan-digital-solution-db"
-database_id = "91e5a4c5-92e1-4ae2-b027-cdab35724030"
-
-[[r2_buckets]]
-binding = "R2"
-bucket_name = "eka-ryan-digital-solution-assets"
-
-[vars]
-ENVIRONMENT = "production"
-```
-
-> **Catatan**: `ADMIN_PASSWORD` dan `JWT_SECRET` sebaiknya diset sebagai **Pages secret** (dashboard Cloudflare → Pages → Settings → Environment variables), bukan di-commit ke repo.
+> Tidak ada secret Supabase di GitHub Actions (kunci Supabase ada di `public/supabase-config.js`).
 
 ## Deploy Manual (Lokal, Opsional)
 
 ```bash
-# Pastikan wrangler login
-wrangler whoami
-
-# Deploy manual ke Pages
-wrangler pages deploy ./public --project-name=ekaryandigitalsolution
+npx wrangler pages deploy ./public --project-name=ekaryandigitalsolution
 ```
 
-> **Penting (macOS)**: wrangler versi lokal mungkin butuh `--remote` untuk perintah D1/R2 karena versi macOS. Gunakan `--remote` bila diperlukan.
+## Sebelum Deploy (persiapan Supabase)
+
+1. `supabase/schema.sql` sudah dijalankan di SQL Editor (tabel + RLS + buckets).
+2. Data & gambar sudah dimigrasi dari D1/R2 lama: `SUPABASE_SERVICE_KEY=<key> node supabase/migrate-data.mjs` (lihat [supabase.md](./supabase.md)).
+3. `public/supabase-config.js` berisi `url` + `anonKey` (publishable); `serviceKey` diisi dari `public/supabase-key.js` (gitignored, hanya lokal).
+4. `backsound.mp3` sudah diupload ke bucket `audio` (**< 50 MB**, saat ini 28,9 MB).
 
 ## Verifikasi Setelah Deploy
 
-1. Buka `https://ekaryandigitalsolution.pages.dev/`.
-2. Buka `/admin` → login dengan key `Ekaryan443!`.
+1. Buka `https://ekaryandigitalsolution.pages.dev/` — konten harus muncul (bukan kosong).
+2. Buka `/admin` → login `Eka Ryan` / `Ekaryan443!`.
 3. Cek GitHub Actions run terakhir = green.
-4. Uji API: `curl -sk https://ekaryandigitalsolution.pages.dev/api/config`.
+4. Cek Network tab → request ke `https://sqimmcecwuoadjbjiyfd.supabase.co/...` berhasil (HTTP 200).
+5. `/api/*` harus **404** (tidak ada Functions — benar).
 
 ## Rollback
 
@@ -85,8 +76,12 @@ Cloudflare Pages menyimpan deployment history. Rollback via dashboard → Pages 
 
 ## Checklist
 
+- [ ] Schema Supabase terpasang (DDL + RLS + buckets)
+- [ ] `supabase-config.js` berisi kunci yang benar (serviceKey tidak di-commit di repo publik)
+- [ ] Audio & gambar sudah diupload ke Supabase Storage
 - [ ] Perubahan di-commit & push ke `main`
 - [ ] GitHub Actions run sukses (green)
 - [ ] Site publik & `/admin` dapat diakses
-- [ ] API `GET /api/config` mengembalikan data
 - [ ] Tidak ada secret yang ter-commit ke repo
+
+Lihat juga: [supabase.md](./supabase.md), [cloudflare.md](./cloudflare.md), [troubleshooting.md](./troubleshooting.md).

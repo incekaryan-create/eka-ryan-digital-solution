@@ -1,91 +1,66 @@
 # Architecture
 
-Arsitektur **Eka Ryan Digital Solution** — portfolio digital freelancer (Eka Ryan) yang di-deploy di **Cloudflare Pages**.
+Arsitektur **Eka Ryan Digital Solution** — portfolio digital freelancer (Eka Ryan) yang di-hosting di **Cloudflare Pages** (statis) dengan data di **Supabase**.
 
 ## Overview
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│  Browser (Client)                                          │
-│  ├─ index.html  (publik)      → fetch /api/* (D1 + R2)    │
-│  └─ admin.html  (panel)       → fetch /api/* + key auth   │
-└───────────────────────────┬───────────────────────────────┘
-                            │ HTTPS
-┌───────────────────────────▼───────────────────────────────┐
-│  Cloudflare Pages (ekaryandigitalsolution)                 │
-│  ├─ Static: ./public (HTML, db.js, assets)                │
-│  └─ Functions: functions/api/[[route]].js (onRequest)     │
-│         │                                                  │
-│         ├──────────────┬───────────────┐                  │
-│         ▼              ▼               ▼                   │
-│      Cloudflare D1   Cloudflare R2   Cloudflare KV/Secrets│
-│   (eka-ryan-...-db) (eka-ryan-...-  (ADMIN_PASSWORD)     │
-│                        assets)                             │
-└─────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────────┐
+│  Browser (Client)                                                │
+│  ├─ index.html (publik)  → supabase-js (anon key, RLS read)     │
+│  └─ admin.html (panel)   → supabase-js (service_role key, write)│
+│      └─ public/supabase-api.js = wrapper `window.sbApi`         │
+└───────────────────────────────┬─────────────────────────────────┘
+                                │ HTTPS
+┌───────────────────────────────▼─────────────────────────────────┐
+│  Cloudflare Pages (ekaryandigitalsolution) — STATIS SAJA        │
+│  └─ ./public (HTML, CSS, JS, db.js fallback)                   │
+│     (tidak ada Functions / D1 / R2 lagi)                       │
+└───────────────────────────────┬─────────────────────────────────┘
+                                │ HTTPS
+┌───────────────────────────────▼─────────────────────────────────┐
+│  Supabase (sqimmcecwuoadjbjiyfd, region ap-southeast-1)        │
+│  ├─ PostgreSQL  : config, services(+details/tags), workflow,   │
+│  │                skills, add_ons, messages   (RLS)            │
+│  └─ Storage     : bucket `assets` (gambar) & `audio` (backsound)│
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ## Komponen Utama
 
-| Layer | Teknologi | Binding / Nama |
-|-------|-----------|----------------|
-| Hosting & CDN | Cloudflare Pages | project `ekaryandigitalsolution` |
-| Build output | Static `./public` | `pages_build_output_dir = "./public"` |
-| API backend | Cloudflare Pages Functions | `functions/api/[[route]].js` |
-| Database (SQL) | Cloudflare D1 | binding `DB`, db `eka-ryan-digital-solution-db` |
-| Object storage | Cloudflare R2 | binding `R2`, bucket `eka-ryan-digital-solution-assets` |
-| Secrets | Cloudflare Pages Env | `ADMIN_PASSWORD` (dashboard) |
+| Layer | Teknologi | Nama / Lokasi |
+|-------|-----------|---------------|
+| Hosting & CDN | Cloudflare Pages (statis) | project `ekaryandigitalsolution` |
+| Build output | Static `./public` | deploy langsung via GitHub Actions |
+| Database (SQL) | Supabase PostgreSQL | `public.*` (lihat `supabase/schema.sql`) |
+| Object storage | Supabase Storage | bucket `assets`, `audio` |
+| Client wrapper | supabase-js v2 (CDN) | `public/supabase-api.js` → `window.sbApi` |
+| Kredensial | Supabase keys | `public/supabase-config.js` |
 | CI/CD | GitHub Actions | `.github/workflows/deploy.yml` |
 
 ## Data Flow
 
 ### Halaman Publik (`index.html`)
 1. Load HTML statis + `db.js` (fallback localStorage).
-2. JS fetch `GET /api/config`, `/api/services`, `/api/workflow`, `/api/skills`, `/api/addons`.
-3. Render konten dari respons D1 (single source of truth).
-4. Gambar di-render dari URL `https://…/api/r2/uploads/<key>` (R2).
+2. `sbApi.getConfig()` / `getServices()` / `getWorkflow()` / `getSkills()` / `getAddOns()` — baca dari Supabase dengan anon key (dibatasi RLS ke SELECT).
+3. Render konten dari Supabase (single source of truth).
+4. Gambar di-render dari URL storage Supabase (`/storage/v1/object/public/assets/...`), audio dari `/storage/v1/object/public/audio/backsound.mp3`.
 5. Bila fetch gagal → fallback ke `db.getConfig()` (localStorage).
 
 ### Admin Panel (`admin.html`)
-1. Login dengan key `Ekaryan443!` (atau `ADMIN_PASSWORD`).
-2. CRUD via `POST/PUT/DELETE /api/*` dengan `?key=` atau header `Authorization: Bearer`.
-3. Upload gambar → `POST /api/upload` (multipart) → simpan ke R2 `uploads/<timestamp>_<name>`.
-4. Respons API di-mirror ke `db.js` (localStorage) sebagai backup lokal.
+1. Login dengan shared key (user/pass dari `supabase-config.js`, default `Eka Ryan` / `Ekaryan443!`).
+2. CRUD via `sbApi.saveXxx/deleteXxx` — memakai service_role key (bypass RLS).
+3. Upload gambar → `sbApi.uploadImage()` → Supabase Storage `assets/uploads/<timestamp>_<nama>`.
+4. Respons di-mirror ke `db.js` (localStorage) sebagai backup lokal.
 
 ### Contact Form
-- `POST /api/messages` (publik, tanpa key) → simpan ke D1 `messages`.
+- `sbApi.saveMessage()` — INSERT `messages` dengan anon key (policy RLS `insert` khusus form).
 
-## R2 Serving
+## Keamanan
 
-File diakses publik lewat catch-all:
-```
-GET /api/r2/<key>  →  env.R2.get(key)  →  Response(binary, Cache-Control: max-age=31536000)
-```
-Semua gambar (hero, layanan, dll.) **wajib** lewat path ini — tidak ada URL gambar hardcoded dari luar.
+- Publik: hanya anon key → baca publik + kirim pesan (RLS membatasi).
+- Admin: service_role key → tulis/hapus; di-hardcode di `supabase-config.js`, **tidak boleh commit** ke repo publik.
+- Semua tulis lewat client (tidak ada API server); validasi input tetap dilakukan di sisi klien (`optimizeImage`, `escapeHtml`).
+- Supabase handle TLS, auth, dan backup secara otomatis.
 
-## Bindings (`wrangler.toml`)
-
-```toml
-name = "ekaryandigitalsolution"
-compatibility_date = "2024-12-01"
-pages_build_output_dir = "./public"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "eka-ryan-digital-solution-db"
-database_id = "91e5a4c5-92e1-4ae2-b027-cdab35724030"
-
-[[r2_buckets]]
-binding = "R2"
-bucket_name = "eka-ryan-digital-solution-assets"
-
-[vars]
-ENVIRONMENT = "production"
-```
-
-## Keamanan (Ringkas)
-- CORS dibatasi ke origin `https://ekaryandigitalsolution.pages.dev`.
-- Write endpoint dilindungi admin key.
-- Input disanitasi (`sanitizeInput`) & divalidasi (email, ukuran file 5 MB, tipe gambar).
-- Secret tidak di-commit; di-set via dashboard Cloudflare.
-
-Lihat juga: [api.md](./api.md), [schema.md](./schema.md), [cloudflare.md](./cloudflare.md), [deployment.md](./deployment.md).
+Lihat juga: [supabase.md](./supabase.md), [api-registry.md](./api-registry.md), [schema.md](./schema.md), [cloudflare.md](./cloudflare.md), [deployment.md](./deployment.md).

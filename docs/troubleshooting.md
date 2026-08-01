@@ -1,22 +1,37 @@
 # Troubleshooting Guide
 
-Masalah nyata yang ditemui di proyek **Eka Ryan Digital Solution** (Cloudflare Pages + D1 + R2).
+Masalah nyata yang ditemui di proyek **Eka Ryan Digital Solution** (Cloudflare Pages statis + Supabase).
 
-## Cloudflare / Wrangler
+## Supabase
 
-### Issue: `wrangler d1` / `wrangler r2` gagal di macOS lama
-Cloudflare butuh macOS 13.5+, namun dev environment bisa di bawahnya. Solusi: selalu tambahkan `--remote`.
-```bash
-wrangler d1 execute eka-ryan-digital-solution-db --remote --command="..."
-wrangler r2 object put ... --remote
-```
+### Issue: Data halaman kosong di preview/branch
+**Penyebab lama (Cloudflare)**: binding D1/R2 hanya di Production → preview 500. **Sekarang tidak relevan** — data datang langsung dari Supabase via browser, jadi preview & production sama-sama membaca data yang sama. Bila kosong:
+- Cek Network tab → request ke `sqimmcecwuoadjbjiyfd.supabase.co` status 200/403/404.
+- Pastikan `supabase-config.js` sudah berisi `url` + `anonKey` yang benar.
 
-### Issue: `wrangler r2 object list` tidak ada
-`wrangler r2 object` tidak punya subcommand `list`. Gunakan REST API:
-```bash
-curl -sk "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/r2/buckets/eka-ryan-digital-solution-assets/objects?limit=100" \
-  -H "Authorization: Bearer $TOKEN"
-```
+### Issue: `GET /rest/v1/...` mengembalikan `404`
+- Tabel belum dibuat → jalankan `supabase/schema.sql` di **SQL Editor**.
+
+### Issue: `403` pada baca data publik
+- Policy RLS `anon read ...` belum dibuat, atau memakai key yang salah (mis. admin memakai anon key untuk tulis). Cek bagian RLS di `supabase/schema.sql`.
+
+### Issue: Admin gagal simpan/hapus
+- `serviceKey` di `supabase-config.js` masih placeholder (`ISI_SERVICE_ROLE_KEY_DARI_DASHBOARD`) atau salah.
+- Ambil service_role/secret key: **Supabase Dashboard → Project Settings → API Keys**.
+
+### Issue: Upload gambar `401/403`
+- Upload memakai service_role key (bukan publishable). Pastikan `serviceKey` benar.
+- Cek bucket `assets` ada & public.
+
+### Issue: Audio backsound tidak bunyi
+- Bucket `audio` harus ada & public; objek `backsound.mp3` harus ter-upload.
+- **Batas 50 MB**: file 76 MB tidak bisa — kompres/trim dulu (lihat [supabase.md](./supabase.md)).
+
+### Issue: Tidak bisa konek langsung (psql)
+- Supabase direct connection bersifat IPv6-only. Gunakan **pooler** IPv4:
+  `host aws-0-ap-southeast-1.pooler.supabase.com`, port `6543`, user `postgres.sqimmcecwuoadjbjiyfd`.
+
+## Cloudflare Pages
 
 ### Issue: Deploy GitHub Actions gagal
 - Cek secret `CLOUDFLARE_API_TOKEN` & `CLOUDFLARE_ACCOUNT_ID` di repo GitHub (Settings → Secrets).
@@ -24,37 +39,30 @@ curl -sk "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/r2/buckets/e
 - Cek log run di tab Actions.
 
 ### Issue: Perubahan tidak muncul di live
-- Cloudflare Pages cache: hard refresh (Cmd+Shift+R) atau buka mode incognito.
-- `*.pages.dev` adalah subdomain Cloudflare, tidak ada user zone → tidak bisa purge cache via API. Cache akan expire natural.
-- Pastikan file benar-benar ter-commit & push ke `main` (deploy otomatis).
+- Hard refresh (Cmd+Shift+R) atau mode incognito.
+- `*.pages.dev` adalah subdomain Cloudflare → cache expire natural, tidak bisa di-purge via API.
+- Pastikan file ter-commit & push ke `main` (deploy otomatis).
 
-## API
+### Issue: `/api/*` masih ada (404)
+- Itu **normal & diharapkan** setelah migrasi: tidak ada Functions lagi. Halaman tidak lagi memakai `/api`.
 
-### Issue: `401 Unauthorized` saat write
-- Pastikan mengirim `?key=Ekaryan443!` (atau header `Authorization: Bearer Ekaryan443!`).
-- Bila `ADMIN_PASSWORD` diset di Cloudflare, pakai nilai itu, bukan default.
-
-### Issue: `POST /api/messages` tetap butuh key?
-Tidak seharusnya. `/api/messages` adalah publik (ada di `publicWritePaths`). Bila 401, cek `functions/api/[[route]].js` baris auth gate.
+## Data / Admin
 
 ### Issue: Data admin tidak muncul di halaman utama
-- **Penyebab lama (sudah diperbaiki)**: admin menulis ke `localStorage` (`db.js`) sementara publik membaca D1. Sekarang admin & publik sama-sama pakai D1 via API.
-- Bila masih beda: cek `GET /api/services` vs tampilan publik; pastikan tidak ada cache lama di browser.
+- **Penyebab lama (sudah diperbaiki)**: admin menulis ke `localStorage` (`db.js`) sementara publik membaca D1. Sekarang admin & publik sama-sama baca/tulis **Supabase**.
+- Bila masih beda: hard refresh browser; pastikan tidak ada cache lama.
 
-### Issue: `grep_search` gagal di `functions/api/[[route]].js`
-Tool `grep_search` gagal pada file dengan `[[` di nama. Gunakan terminal:
-```bash
-grep -n "pattern" "functions/api/[[route]].js"
-```
+### Issue: Gambar lama (URL `/api/r2/...`) rusak
+- R2 tidak lagi dipakai. Upload ulang gambar lewat **Admin Panel** (Simpan) → otomatis tersimpan di Supabase Storage.
 
 ## curl / SSL
 
 ### Issue: `curl: (60) SSL certificate problem`
-macOS di environment ini punya CA store usang → HTTPS ke host eksternal gagal. Gunakan `-k` (insecure) atau `-sk`:
-```bash
-curl -sk https://ekaryandigitalsolution.pages.dev/api/config
-```
-Browser tidak terpengaruh.
+- CA store macOS di environment ini usang. Gunakan `-k`/`-sk`:
+  ```bash
+  curl -sk https://sqimmcecwuoadjbjiyfd.supabase.co/rest/v1/config?select=id \
+    -H "apikey: <ANON_KEY>"
+  ```
 
 ## Git
 
@@ -73,21 +81,19 @@ git add -A && git commit -m "chore: ignore playwright cache"
 
 ## Debug Tips
 
-### Cek API live
+### Cek data live (publik)
 ```bash
-curl -sk https://ekaryandigitalsolution.pages.dev/api/config | head -c 300
+curl -sk "https://sqimmcecwuoadjbjiyfd.supabase.co/rest/v1/config?select=hero_name" \
+  -H "apikey: <ANON_KEY>" -H "Authorization: Bearer <ANON_KEY>"
 ```
 
-### Cek R2
+### Cek objek storage (admin)
 ```bash
-curl -sk "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/r2/buckets/eka-ryan-digital-solution-assets/objects?limit=10" \
-  -H "Authorization: Bearer $TOKEN"
+curl -sk "https://sqimmcecwuoadjbjiyfd.supabase.co/storage/v1/object/list/assets/uploads" \
+  -H "apikey: <SERVICE_ROLE_KEY>" -H "Authorization: Bearer <SERVICE_ROLE_KEY>"
 ```
-
-### Log Functions
-Lihat di dashboard Cloudflare → Pages → project → Functions → Logs (atau `wrangler tail` untuk Worker, tidak untuk Pages statis).
 
 ## Getting Help
 
-- Dokumentasi project: `docs/` — [architecture.md](./architecture.md), [design.md](./design.md), [prd.md](./prd.md), [rules.md](./rules.md), [schema.md](./schema.md), [api.md](./api-registry.md), [cloudflare.md](./cloudflare.md), [deployment.md](./deployment.md), [features.md](./features.md), [workflow.md](./workflow.md), [troubleshooting.md](./troubleshooting.md).
-- Repo: `incekaryan-create/eka-ryan-digital-solution` (private).
+- Dokumentasi project: `docs/` — [architecture.md](./architecture.md), [design.md](./design.md), [prd.md](./prd.md), [rules.md](./rules.md), [schema.md](./schema.md), [api-registry.md](./api-registry.md), [supabase.md](./supabase.md), [cloudflare.md](./cloudflare.md), [deployment.md](./deployment.md), [features.md](./features.md), [workflow.md](./workflow.md), [troubleshooting.md](./troubleshooting.md).
+- Repo: `incekaryan-create/eka-ryan-digital-solution`.

@@ -1,125 +1,39 @@
-# Cloudflare Setup (D1 + R2 + Pages Functions)
+# Cloudflare Pages (Static Hosting Only)
 
-> **Catatan**: Proyek ini **TIDAK menggunakan Firebase**. Dokumen ini mencakup setup Cloudflare yang sebenarnya: D1 (database SQL), R2 (file storage), Pages (hosting), dan Pages Functions (API).
+Cloudflare pada proyek ini sekarang **HANYA untuk hosting statis** `./public`. Database, storage, dan API lama (D1 + R2 + Pages Functions) sudah **dipindahkan ke Supabase**.
 
-## Prerequisites
+> Setup Supabase: [supabase.md](./supabase.md). Deploy: [deployment.md](./deployment.md).
 
-- Akun Cloudflare (Account ID: `55bcfa4f9d8d6b01276737c7b64339a8`)
-- `wrangler` CLI (`npm i -g wrangler`)
-- `wrangler login` sudah dilakukan
+## Yang Masih Dipakai
 
-## Bindings (`wrangler.toml`)
+- **Pages project**: `ekaryandigitalsolution`
+- **Build output**: `./public` (HTML, CSS, JS, `db.js`, `supabase-config.js`, `supabase-api.js`)
+- **Live URL**: `https://ekaryandigitalsolution.pages.dev/` (admin di `/admin`)
+- **Deploy**: GitHub Actions → `cloudflare/wrangler-action@v4` dengan `pages deploy ./public`
 
-```toml
-name = "ekaryandigitalsolution"
-compatibility_date = "2024-12-01"
-pages_build_output_dir = "./public"
+## Yang SUDAH Dihapus dari Repo
 
-[[d1_databases]]
-binding = "DB"
-database_name = "eka-ryan-digital-solution-db"
-database_id = "91e5a4c5-92e1-4ae2-b027-cdab35724030"
+- `functions/` (Pages Functions API `[[route]].js` + audio proxy)
+- `wrangler.toml` (bindings D1 `DB` & R2 `R2`)
+- `.wrangler/` (cache lokal)
 
-[[r2_buckets]]
-binding = "R2"
-bucket_name = "eka-ryan-digital-solution-assets"
+## Cleanup di Dashboard Cloudflare (langkah manual)
 
-[vars]
-ENVIRONMENT = "production"
-```
+Setelah situs baru terverifikasi, hapus artefak lama agar tidak ada sisa biaya/binding:
 
-Akses di kode: `env.DB.prepare('...').bind(...).all()` dan `env.R2.put/get/delete(key)`.
+1. **Pages project** → `ekaryandigitalsolution` → **Settings → Bindings**:
+   - Hapus binding **D1 `DB`** dan **R2 `R2`** (jika masih terpasang).
+2. **Workers & Pages → D1**: hapus database `eka-ryan-digital-solution-db` (`91e5a4c5-92e1-4ae2-b027-cdab35724030`) bila sudah tidak dipakai.
+3. **R2**: hapus bucket `eka-ryan-digital-solution-assets` bila isinya sudah tidak dibutuhkan (gambar lama tidak ikut migrasi).
+4. **Pages → Settings → Environment variables**: hapus `ADMIN_PASSWORD` / `JWT_SECRET` / binding lama yang tak terpakai.
 
-## D1 Database (SQL)
+> Kredensial admin sekarang disimpan di `public/supabase-config.js` (Supabase), bukan secret Cloudflare.
 
-Database: `eka-ryan-digital-solution-db` (id `91e5a4c5-92e1-4ae2-b027-cdab35724030`).
+## Verifikasi Statis Tanpa Backend
 
-```bash
-# List database
-wrangler d1 list --remote
+Setelah deploy, pastikan:
+- `GET /` mengembalikan HTML (bukan 404/500 dari function).
+- `GET /api/*` **harus 404** — ini tanda yang benar (tidak ada Functions lagi).
+- Halaman publik merender data dari Supabase (cek Network tab → request ke `sqimmcecwuoadjbjiyfd.supabase.co`).
 
-# Jalankan SQL (selalu pakai --remote di macOS lama)
-wrangler d1 execute eka-ryan-digital-solution-db --remote \
-  --command="SELECT * FROM services ORDER BY sort_order;"
-
-# Dari file SQL
-wrangler d1 execute eka-ryan-digital-solution-db --remote --file=./schema.sql
-```
-
-Tabel: `config`, `services`, `service_details`, `service_tags`, `workflow`, `skills`, `messages`, `add_ons`. Lihat [schema.md](./schema.md).
-
-## R2 Bucket (File Storage)
-
-Bucket: `eka-ryan-digital-solution-assets`.
-
-```bash
-# Upload file
-wrangler r2 object put eka-ryan-digital-solution-assets/uploads/photo.jpg --file=./photo.jpg
-
-# Hapus file
-wrangler r2 object delete eka-ryan-digital-solution-assets/uploads/photo.jpg
-```
-
-> **Catatan**: `wrangler r2 object` tidak punya subcommand `list`. Untuk list objek, pakai Cloudflare REST API:
-> ```bash
-> curl -sk "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/r2/buckets/eka-ryan-digital-solution-assets/objects?limit=100" \
->   -H "Authorization: Bearer $TOKEN"
-> ```
-
-## Pages Functions
-
-Kode API ada di `functions/api/[[route]].js` (catch-all `onRequest`), otomatis terdeploy bersama `./public`. Pattern berbeda dengan Worker: pakai named export `onRequest(context)` dengan `context = { request, env }`.
-
-```javascript
-export async function onRequest(context) {
-  const { request, env } = context;
-  const url = new URL(request.url);
-  const path = url.pathname.replace('/api', '');
-  const method = request.method;
-  const services = await env.DB.prepare('SELECT * FROM services').all();
-  const object = await env.R2.get('uploads/photo.jpg');
-  return new Response(JSON.stringify({ ok: true }), {
-    headers: { 'Content-Type': 'application/json' }
-  });
-}
-```
-
-## Pages Project
-
-- Project name: `ekaryandigitalsolution`
-- Build output: `./public` (via `pages_build_output_dir`)
-- Functions: `functions/api/[[route]].js`
-
-## Secrets & Environment
-
-Set via dashboard Cloudflare → Pages → Settings → Environment variables (Production):
-
-| Variable | Keterangan |
-|----------|-----------|
-| `ADMIN_PASSWORD` | Override key admin (default `Ekaryan443!` bila kosong) |
-| `JWT_SECRET` | (opsional) untuk auth lanjutan |
-
-Jangan commit secret ke repo.
-
-## Common Commands
-
-| Command | Description |
-|---------|-------------|
-| `wrangler pages deploy ./public --project-name=ekaryandigitalsolution` | Deploy ke Pages |
-| `wrangler d1 execute eka-ryan-digital-solution-db --remote --command="..."` | Jalankan SQL D1 |
-| `wrangler r2 object put ...` | Upload objek R2 |
-| `wrangler tail` | Stream live logs (Worker); untuk Pages lihat di dashboard |
-
-## Best Practices
-
-1. **CORS**: selalu kembalikan header CORS konsisten (lihat `getCorsHeaders()`).
-2. **Error handling**: bungkus di `try/catch`, kembalikan `{ error: "..." }` dengan status tepat.
-3. **Secrets**: jangan hardcode key di `functions/`, gunakan `env.ADMIN_PASSWORD`.
-4. **Sanitasi**: gunakan `sanitizeInput()` untuk cegah XSS.
-5. **R2 public serving**: serve via `GET /api/r2/*` dengan `Cache-Control: max-age=31536000`.
-
-## References
-- [Cloudflare Pages Functions](https://developers.cloudflare.com/pages/functions/)
-- [Cloudflare D1](https://developers.cloudflare.com/d1/)
-- [Cloudflare R2](https://developers.cloudflare.com/r2/)
-- [Cloudflare Pages](https://developers.cloudflare.com/pages/)
+Lihat juga: [supabase.md](./supabase.md), [architecture.md](./architecture.md), [deployment.md](./deployment.md), [troubleshooting.md](./troubleshooting.md).

@@ -18,7 +18,7 @@
 ## 3. Fitur Inti
 
 ### 3.1 Halaman Publik
-- **Hero**: nama, greeting, deskripsi, tagline, foto profil (R2), jaminan & kualitas.
+- **Hero**: nama, greeting, deskripsi, tagline, foto profil (Supabase Storage), jaminan & kualitas.
 - **Layanan**: grid kartu (judul, subtitle, gambar, harga, tags, detail).
 - **Workflow**: langkah alur kerja (timeline/step).
 - **Skills**: daftar keahlian.
@@ -31,12 +31,12 @@
 - Dashboard statistik.
 - CRUD: Services, Workflow, Skills, Add-ons, Messages (baca/hapus).
 - Edit Config (hero & kontak).
-- Storage Manager (list/upload/delete R2).
+- Storage Manager (list/upload/delete Supabase Storage).
 - Backup/Restore (export/import JSON localStorage).
 
 ### 3.3 Infrastruktur
-- API via Cloudflare Pages Functions (`/api/*`).
-- Penyimpanan: D1 (data) + R2 (file).
+- Data: Supabase (PostgreSQL + Storage), akses langsung dari browser via supabase-js.
+- Hosting: Cloudflare Pages statis (`./public`).
 - Deploy otomatis via GitHub Actions.
 
 ## 4. User Stories
@@ -44,14 +44,14 @@
 - Sebagai prospek, saya ingin melihat layanan & harga agar saya bisa memutuskan kolaborasi.
 - Sebagai prospek, saya ingin mengirim pesan kontak agar saya bisa menghubungi Eka Ryan.
 - Sebagai admin, saya ingin mengubah foto hero & layanan tanpa deploy agar konten selalu update.
-- Sebagai admin, saya ingin mengupload gambar ke storage terpusat (R2) agar URL konsisten.
+- Sebagai admin, saya ingin mengupload gambar ke storage terpusat (Supabase) agar URL konsisten.
 
 ## 5. Acceptance Criteria
 
-- [ ] Halaman publik merender data terbaru dari D1 (bukan localStorage stale).
-- [ ] Semua gambar mengarah ke R2 (`/api/r2/uploads/*`), tidak ada URL luar.
+- [ ] Halaman publik merender data terbaru dari Supabase (bukan localStorage stale).
+- [ ] Semua gambar mengarah ke Supabase Storage (tidak ada URL luar / URL R2 lama).
 - [ ] Admin dapat login, CRUD, dan upload gambar dengan sukses.
-- [ ] Contact form tersimpan ke D1 & bisa dibaca di admin.
+- [ ] Contact form tersimpan ke Supabase & bisa dibaca di admin.
 - [ ] Deploy otomatis jalan (GitHub Actions green) setiap push ke `main`.
 
 ## 6. Non-Goals (di luar scope)
@@ -64,8 +64,8 @@
 
 ## 7. Metrik Sukses
 
-- Waktu update konten tanpa deploy = 0 (real-time via D1).
-- Semua aset di R2 (cache 1 tahun, CDN global).
+- Waktu update konten tanpa deploy = 0 (real-time via Supabase).
+- Semua aset di Supabase Storage (CDN global).
 - Lighthouse performance tinggi (static + CDN).
 
 Lihat juga: [features.md](./features.md), [architecture.md](./architecture.md).

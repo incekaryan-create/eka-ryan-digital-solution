@@ -71,10 +71,10 @@ Class helper: `font-heading` (Syne/Space Grotesk), `font-mono` (JetBrains Mono).
 
 ## Gambar & Media
 
-- Semua gambar dari **R2** via `/api/r2/uploads/<key>` (lihat [rules.md](./rules.md)).
+- Semua gambar dari **Supabase Storage** (`https://sqimmcecwuoadjbjiyfd.supabase.co/storage/v1/object/public/assets/<path>`, lihat [supabase.md](./supabase.md)).
 - Atribut: `loading="lazy"`, `referrerpolicy="no-referrer"`, `object-cover`.
 - Fallback: `onerror="this.style.display='none'"` pada kartu layanan.
-- Audio backsound: `/audio/backsound.mp3` (streaming dari R2).
+- Audio backsound: `audio/backsound.mp3` di bucket `audio` Supabase (URL storage publik).
 
 ## Admin Panel
 
@@ -88,4 +88,4 @@ Class helper: `font-heading` (Syne/Space Grotesk), `font-mono` (JetBrains Mono).
 1. **Kontras tinggi** — teks selalu terbaca di background teal (`#014D43`); tombol aksen memakai teks `primary-950`.
 2. **Micro-interaction** — transisi `duration-300/700`, hover scale, warna aksen.
 3. **Konsistensi** — satu aksen (lime `#CEED6B`), satu skala netral (zinc teal-tinted), satu primer (`#014D43`).
-4. **Performance** — lazy-load gambar, CDN Cloudflare, cache R2 1 tahun.
+4. **Performance** — lazy-load gambar, CDN Cloudflare, cache storage Supabase.

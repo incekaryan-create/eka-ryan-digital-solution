@@ -445,7 +445,7 @@
         <div id="page-storage" class="page hidden">
           <div class="flex items-center justify-between mb-6">
             <div>
-              <p class="text-[10px] text-accent-400 font-semibold uppercase tracking-widest">R2 Bucket</p>
+              <p class="text-[10px] text-accent-400 font-semibold uppercase tracking-widest">Supabase Storage</p>
               <h2 class="text-lg font-bold">File Storage</h2>
             </div>
             <button onclick="loadStorage()" class="rounded-lg bg-accent-500 hover:bg-accent-600 px-4 py-2 text-[10px] font-bold tracking-widest text-primary-950 transition-all uppercase">Refresh</button>
@@ -638,6 +638,10 @@
   <!-- TOAST -->
   <div id="toast-container" class="fixed top-4 right-4 z-[60] space-y-2"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-key.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="supabase-api.js"></script>
   <script src="db.js"></script>
   <script>
     // ===== SECURITY HELPERS =====
@@ -649,7 +653,8 @@
     }
 
     // ===== IMAGE UPLOAD HELPERS =====
-    const ADMIN_KEY = 'Ekaryan443!';
+    const ADMIN_USER = (window.SUPABASE_CONFIG && SUPABASE_CONFIG.adminUsername) || 'Eka Ryan';
+    const ADMIN_PASS = (window.SUPABASE_CONFIG && SUPABASE_CONFIG.adminPassword) || 'Ekaryan443!';
 
     // Compress + resize an image client-side before uploading so it renders
     // fast and consistently (avoids 1.6MB+ unoptimized PNGs on the page).
@@ -687,28 +692,18 @@
       }
     }
 
+    // Upload gambar ke Supabase Storage (bucket `assets`) — menggantikan R2.
     async function uploadToR2(file) {
       const optimized = await optimizeImage(file);
-      const formData = new FormData();
-      formData.append('file', optimized);
-      const res = await fetch('/api/upload?key=' + encodeURIComponent(ADMIN_KEY), {
-        method: 'POST',
-        body: formData
-      });
-      return await res.json();
+      return sbApi.uploadImage(optimized);
     }
 
-    async function deleteFromR2(key) {
-      await fetch('/api/upload/delete?key=' + encodeURIComponent(ADMIN_KEY), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key })
-      });
+    async function deleteFromR2(urlOrPath) {
+      await sbApi.deleteImage(urlOrPath);
     }
 
     function extractR2Key(url) {
-      if (!url || !url.includes('/r2/')) return null;
-      return url.split('/r2/')[1];
+      return sbApi.extractImagePath(url);
     }
 
     async function uploadHeroImage(input) {
@@ -767,7 +762,7 @@
       e.preventDefault();
       const u = document.getElementById('login-user').value;
       const p = document.getElementById('login-pass').value;
-      if (u === 'Eka Ryan' && p === 'Ekaryan443!') {
+      if (u === ADMIN_USER && p === ADMIN_PASS) {
         sessionStorage.setItem('admin_logged', '1');
         document.getElementById('login-overlay').classList.add('hidden');
         document.getElementById('dashboard').classList.remove('hidden');
@@ -821,10 +816,10 @@
     async function loadStats() {
       try {
         const [svc, skl, wf, msg] = await Promise.all([
-          fetch('/api/services').then(r => r.json()),
-          fetch('/api/skills').then(r => r.json()),
-          fetch('/api/workflow').then(r => r.json()),
-          fetch('/api/messages').then(r => r.json())
+          sbApi.getServices(),
+          sbApi.getSkills(),
+          sbApi.getWorkflow(),
+          sbApi.getMessages()
         ]);
         document.getElementById('stat-services').textContent = svc.length;
         document.getElementById('stat-skills').textContent = skl.length;
@@ -841,13 +836,12 @@
       if (unread > 0) { badge.textContent = unread; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); }
     }
 
-    // ===== SERVICES CRUD (D1 API) =====
+    // ===== SERVICES CRUD (Supabase) =====
     let servicesCache = [];
     async function renderServicesTable() {
       const search = (document.getElementById('search-services')?.value || '').toLowerCase();
       try {
-        const res = await fetch('/api/services');
-        servicesCache = await res.json();
+        servicesCache = await sbApi.getServices();
       } catch (e) { servicesCache = []; }
       let items = servicesCache;
       if (search) items = items.filter(s => s.title.toLowerCase().includes(search) || s.subtitle.toLowerCase().includes(search) || s.description.toLowerCase().includes(search));
@@ -915,10 +909,10 @@
       if (!data.title) return;
       try {
         if (id) {
-          await fetch('/api/services/' + id + '?key=' + encodeURIComponent(ADMIN_KEY), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+          await sbApi.saveService(data, id);
           toast('Layanan diperbarui!');
         } else {
-          await fetch('/api/services?key=' + encodeURIComponent(ADMIN_KEY), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+          await sbApi.saveService(data);
           toast('Layanan ditambahkan!');
         }
       } catch (e) { toast('Gagal menyimpan layanan.'); }
@@ -928,18 +922,17 @@
     async function deleteService(id) {
       if (!confirm('Yakin hapus layanan ini?')) return;
       try {
-        await fetch('/api/services/' + id + '?key=' + encodeURIComponent(ADMIN_KEY), { method: 'DELETE' });
+        await sbApi.deleteService(id);
         toast('Layanan dihapus!');
       } catch (e) { toast('Gagal menghapus layanan.'); }
       renderServicesTable();
     }
 
-    // ===== WORKFLOW CRUD (D1 API) =====
+    // ===== WORKFLOW CRUD (Supabase) =====
     let workflowCache = [];
     async function renderWorkflowTable() {
       try {
-        const res = await fetch('/api/workflow');
-        workflowCache = await res.json();
+        workflowCache = await sbApi.getWorkflow();
       } catch (e) { workflowCache = []; }
       const items = workflowCache;
       document.getElementById('count-workflow').textContent = items.length + ' langkah';
@@ -977,10 +970,10 @@
       if (!data.title) return;
       try {
         if (id) {
-          await fetch('/api/workflow/' + id + '?key=' + encodeURIComponent(ADMIN_KEY), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+          await sbApi.saveWorkflow(data, id);
           toast('Langkah diperbarui!');
         } else {
-          await fetch('/api/workflow?key=' + encodeURIComponent(ADMIN_KEY), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+          await sbApi.saveWorkflow(data);
           toast('Langkah ditambahkan!');
         }
       } catch (e) { toast('Gagal menyimpan langkah.'); }
@@ -990,19 +983,18 @@
     async function deleteWorkflow(id) {
       if (!confirm('Yakin hapus langkah ini?')) return;
       try {
-        await fetch('/api/workflow/' + id + '?key=' + encodeURIComponent(ADMIN_KEY), { method: 'DELETE' });
+        await sbApi.deleteWorkflow(id);
         toast('Langkah dihapus!');
       } catch (e) { toast('Gagal menghapus langkah.'); }
       renderWorkflowTable();
     }
 
-    // ===== SKILLS CRUD (D1 API) =====
+    // ===== SKILLS CRUD (Supabase) =====
     let skillsCache = [];
     async function renderSkillsTable() {
       const search = (document.getElementById('search-skills')?.value || '').toLowerCase();
       try {
-        const res = await fetch('/api/skills');
-        skillsCache = await res.json();
+        skillsCache = await sbApi.getSkills();
       } catch (e) { skillsCache = []; }
       let items = skillsCache;
       if (search) items = items.filter(s => s.name.toLowerCase().includes(search) || s.category.toLowerCase().includes(search));
@@ -1039,10 +1031,10 @@
       if (!data.name) return;
       try {
         if (id) {
-          await fetch('/api/skills/' + id + '?key=' + encodeURIComponent(ADMIN_KEY), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+          await sbApi.saveSkill(data, id);
           toast('Keahlian diperbarui!');
         } else {
-          await fetch('/api/skills?key=' + encodeURIComponent(ADMIN_KEY), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+          await sbApi.saveSkill(data);
           toast('Keahlian ditambahkan!');
         }
       } catch (e) { toast('Gagal menyimpan keahlian.'); }
@@ -1052,7 +1044,7 @@
     async function deleteSkill(id) {
       if (!confirm('Yakin hapus keahlian ini?')) return;
       try {
-        await fetch('/api/skills/' + id + '?key=' + encodeURIComponent(ADMIN_KEY), { method: 'DELETE' });
+        await sbApi.deleteSkill(id);
         toast('Keahlian dihapus!');
       } catch (e) { toast('Gagal menghapus keahlian.'); }
       renderSkillsTable();
@@ -1063,8 +1055,7 @@
     async function renderAddonsTable() {
       const search = (document.getElementById('search-addons')?.value || '').toLowerCase();
       try {
-        const res = await fetch('/api/addons');
-        const grouped = await res.json();
+        const grouped = await sbApi.getAddOns();
         addonsList = [];
         Object.values(grouped).forEach(items => addonsList.push(...items));
       } catch(e) {
@@ -1110,29 +1101,32 @@
         price: document.getElementById('addon-price').value.trim()
       };
       if (!data.name || !data.category) return;
-      if (id) {
-        await fetch('/api/addons/' + id + '?key=' + encodeURIComponent(ADMIN_KEY), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-        toast('Fitur diperbarui!');
-      } else {
-        await fetch('/api/addons?key=' + encodeURIComponent(ADMIN_KEY), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-        toast('Fitur ditambahkan!');
-      }
+      try {
+        if (id) {
+          await sbApi.saveAddon(data, id);
+          toast('Fitur diperbarui!');
+        } else {
+          await sbApi.saveAddon(data);
+          toast('Fitur ditambahkan!');
+        }
+      } catch (e) { toast('Gagal menyimpan fitur.'); }
       closeModal('modal-addon');
       renderAddonsTable();
     }
     async function deleteAddon(id) {
       if (!confirm('Yakin hapus fitur ini?')) return;
-      await fetch('/api/addons/' + id + '?key=' + encodeURIComponent(ADMIN_KEY), { method: 'DELETE' });
+      try {
+        await sbApi.deleteAddon(id);
+        toast('Fitur dihapus!');
+      } catch (e) { toast('Gagal menghapus fitur.'); }
       renderAddonsTable();
-      toast('Fitur dihapus!');
     }
 
-    // ===== MESSAGES (D1 API) =====
+    // ===== MESSAGES (Supabase) =====
     let messagesCache = [];
     async function renderMessagesTable() {
       try {
-        const res = await fetch('/api/messages');
-        messagesCache = await res.json();
+        messagesCache = await sbApi.getMessages();
       } catch (e) { messagesCache = []; }
       const items = messagesCache;
       document.getElementById('count-messages').textContent = items.length + ' pesan';
@@ -1152,7 +1146,7 @@
     async function viewMessage(id) {
       const m = messagesCache.find(x => x.id === id);
       if (!m) return;
-      try { await fetch('/api/messages/' + id + '/read?key=' + encodeURIComponent(ADMIN_KEY), { method: 'PUT' }); } catch (e) {}
+      try { await sbApi.markMessageRead(id); } catch (e) {}
       document.getElementById('msg-name').textContent = m.name;
       document.getElementById('msg-email').textContent = m.email;
       document.getElementById('msg-whatsapp').textContent = m.whatsapp || '-';
@@ -1175,7 +1169,7 @@
     async function deleteMsg(id) {
       if (!confirm('Hapus pesan ini?')) return;
       try {
-        await fetch('/api/messages/' + id + '?key=' + encodeURIComponent(ADMIN_KEY), { method: 'DELETE' });
+        await sbApi.deleteMessage(id);
         toast('Pesan dihapus!');
       } catch (e) { toast('Gagal menghapus pesan.'); }
       renderMessagesTable();
@@ -1183,7 +1177,7 @@
     async function clearAllMessages() {
       if (!confirm('Hapus SEMUA pesan? Tindakan ini tidak bisa dibatalkan.')) return;
       try {
-        await fetch('/api/messages?key=' + encodeURIComponent(ADMIN_KEY), { method: 'DELETE' });
+        await sbApi.clearMessages();
         toast('Semua pesan dihapus!');
       } catch (e) { toast('Gagal menghapus pesan.'); }
       renderMessagesTable();
@@ -1191,12 +1185,12 @@
 
     // ===== CONFIG =====
     async function loadConfig() {
-      // Read from D1 (single source of truth) so the admin panel reflects
+      // Read from Supabase (single source of truth) so the admin panel reflects
       // what the public site actually shows. Fall back to localStorage defaults.
       let c = db.getConfig();
       try {
-        const res = await fetch('/api/config');
-        if (res.ok) c = await res.json();
+        const remote = await sbApi.getConfig();
+        if (remote) c = remote;
       } catch (e) { /* keep localStorage fallback */ }
       document.getElementById('cfg-hero-greeting').value = c.hero_greeting;
       document.getElementById('cfg-hero-name').value = c.hero_name;
@@ -1252,14 +1246,9 @@
         quality_p2: document.getElementById('cfg-quality-p2').value,
         quality_p3: document.getElementById('cfg-quality-p3').value
       };
-      // Persist to D1 (single source of truth) so the public site reflects it.
+      // Persist ke Supabase (single source of truth) agar situs publik mengikuti.
       try {
-        const res = await fetch('/api/config?key=' + encodeURIComponent(ADMIN_KEY), {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (!res.ok) throw new Error('save failed');
+        await sbApi.saveConfig(payload);
         // Also update localStorage mirror for offline admin convenience
         db.updateConfig(payload);
         toast('Pengaturan tersimpan!');
@@ -1268,14 +1257,12 @@
       }
     }
 
-    // ===== STORAGE MANAGER =====
+    // ===== STORAGE MANAGER (Supabase Storage) =====
     async function loadStorage() {
       const tbody = document.getElementById('tbody-storage');
       tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center text-[11px] text-zinc-500">Memuat...</td></tr>';
       try {
-        const res = await fetch('/api/storage?key=' + encodeURIComponent(ADMIN_KEY));
-        if (!res.ok) throw new Error('list failed');
-        const { objects } = await res.json();
+        const { objects } = await sbApi.listStorage();
         document.getElementById('count-storage').textContent = objects.length + ' file';
         const total = objects.reduce((s, o) => s + (o.size || 0), 0);
         document.getElementById('size-storage').textContent = (total / 1024 / 1024).toFixed(2) + ' MB';
@@ -1308,12 +1295,7 @@
       const key = decodeURIComponent(encodedKey);
       if (!confirm('Hapus file "' + key + '"? Tindakan tidak bisa dibatalkan.')) return;
       try {
-        const res = await fetch('/api/storage?key=' + encodeURIComponent(ADMIN_KEY), {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ key })
-        });
-        if (!res.ok) throw new Error('delete failed');
+        await sbApi.deleteStorageObject(key);
         toast('File dihapus!');
         loadStorage();
       } catch (e) {

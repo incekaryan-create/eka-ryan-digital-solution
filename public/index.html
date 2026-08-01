@@ -16,7 +16,7 @@
   <meta property="og:title" content="Eka Ryan Digital Solution — Jasa Website, Software & Aplikasi" />
   <meta property="og:description" content="Jasa pembuatan website, software desktop, dan aplikasi mobile. Mulai Rp 500.000. Berbasis di Bali, melayani seluruh dunia." />
   <meta property="og:url" content="https://ekaryandigitalsolution.pages.dev/" />
-  <meta property="og:image" content="https://ekaryandigitalsolution.pages.dev/api/r2/uploads/1784346590252_WhatsApp_Image_2026-07-17_at_21.45.38.jpeg" />
+  <meta property="og:image" content="https://sqimmcecwuoadjbjiyfd.supabase.co/storage/v1/object/public/assets/uploads/hero_profile.jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:locale" content="id_ID" />
@@ -25,7 +25,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Eka Ryan Digital Solution — Jasa Website, Software & Aplikasi" />
   <meta name="twitter:description" content="Jasa pembuatan website, software desktop, dan aplikasi mobile. Mulai Rp 500.000." />
-  <meta name="twitter:image" content="https://ekaryandigitalsolution.pages.dev/api/r2/uploads/1784346590252_WhatsApp_Image_2026-07-17_at_21.45.38.jpeg" />
+  <meta name="twitter:image" content="https://sqimmcecwuoadjbjiyfd.supabase.co/storage/v1/object/public/assets/uploads/hero_profile.jpeg" />
 
   <!-- Geo / Local Business signals -->
   <meta name="geo.region" content="ID" />
@@ -45,7 +45,7 @@
     "name": "Eka Ryan Digital Solution",
     "description": "Jasa pembuatan website (company profile, CMS, toko online), software desktop, dan aplikasi mobile.",
     "url": "https://ekaryandigitalsolution.pages.dev/",
-    "image": "https://ekaryandigitalsolution.pages.dev/api/r2/uploads/1784346590252_WhatsApp_Image_2026-07-17_at_21.45.38.jpeg",
+    "image": "https://sqimmcecwuoadjbjiyfd.supabase.co/storage/v1/object/public/assets/uploads/hero_profile.jpeg",
     "email": "inc.ekaryan@gmail.com",
     "telephone": "+6285857854360",
     "priceRange": "Rp 500.000 - Rp 5.000.000",
@@ -172,7 +172,7 @@
 <body class="min-h-screen font-sans bg-zinc-950 text-white">
 
   <!-- Background music (autoplay on homepage open, with user-interaction fallback) -->
-  <audio id="bg-audio" src="/audio/backsound.mp3" loop preload="auto"></audio>
+  <audio id="bg-audio" src="" loop preload="auto"></audio>
   <button id="bg-audio-toggle" aria-label="Putar musik latar" title="Putar musik latar"
     class="group fixed bottom-4 left-4 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900/80 text-white backdrop-blur transition-colors hover:border-accent-500 hover:text-accent-500 cursor-pointer animate-pulse">
     <svg id="bg-audio-icon-play" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
@@ -776,10 +776,13 @@
   </button>
 
   <!-- ===================== JAVASCRIPT ===================== -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="supabase-api.js"></script>
   <script src="db.js"></script>
   <script>
     // ===== LOAD DATA FROM DATABASE =====
-    // Services & skills are fetched LIVE from D1 (single source of truth).
+    // Services & skills are fetched LIVE from Supabase (single source of truth).
     // They start empty and are populated by the async loader below so the
     // site always reflects the latest database content, not stale localStorage.
     let SERVICES_DATA = [];
@@ -835,14 +838,13 @@
       }
     }
 
-    // ===== APPLY CONFIG FROM D1 (single source of truth) =====
-    // The admin panel writes to D1; fetch it so desktop & mobile always match,
-    // overriding any per-device localStorage value.
+    // ===== APPLY CONFIG FROM SUPABASE (single source of truth) =====
+    // The admin panel writes to Supabase; fetch it so desktop & mobile always
+    // match, overriding any per-device localStorage value.
     (async () => {
       try {
-        const res = await fetch('/api/config');
-        if (!res.ok) return;
-        const c = await res.json();
+        const c = await sbApi.getConfig();
+        if (!c) return;
         const heroImg = document.querySelector('.hero-float img');
         if (heroImg && c.hero_image) heroImg.src = c.hero_image;
         const setText = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
@@ -856,29 +858,37 @@
       } catch (e) { /* keep localStorage fallback */ }
     })();
 
-    // ===== LOAD SERVICES & SKILLS FROM D1 (single source of truth) =====
-    // The admin panel writes services & skills to D1; fetch them so the site
-    // always reflects the latest database content instead of stale localStorage.
+    // ===== LOAD SERVICES & SKILLS FROM SUPABASE (single source of truth) =====
+    // The admin panel writes services & skills to Supabase; fetch them so the
+    // site always reflects the latest database content instead of stale localStorage.
     (async () => {
       try {
-        const [svcRes, skRes, wfRes] = await Promise.all([
-          fetch('/api/services'),
-          fetch('/api/skills'),
-          fetch('/api/workflow')
+        const [svc, sk, wf] = await Promise.all([
+          sbApi.getServices(),
+          sbApi.getSkills(),
+          sbApi.getWorkflow()
         ]);
-        if (svcRes.ok) {
-          SERVICES_DATA = await svcRes.json();
+        if (Array.isArray(svc)) {
+          SERVICES_DATA = svc;
           renderServices();
         }
-        if (skRes.ok) {
-          SKILLS_LIST = (await skRes.json()).map(s => s.name);
+        if (Array.isArray(sk)) {
+          SKILLS_LIST = sk.map(s => s.name);
           renderSkills();
         }
-        if (wfRes.ok) {
-          WORKFLOW_DATA = await wfRes.json();
+        if (Array.isArray(wf)) {
+          WORKFLOW_DATA = wf;
           renderWorkflow();
         }
       } catch (e) { /* keep localStorage fallback */ }
+    })();
+
+    // ===== BACKGROUND MUSIC FROM SUPABASE STORAGE =====
+    (() => {
+      const audioEl = document.getElementById('bg-audio');
+      if (audioEl && window.sbApi) {
+        audioEl.src = sbApi.publicUrl('audio', 'backsound.mp3');
+      }
     })();
 
     // ===== STATE =====
@@ -1114,9 +1124,7 @@
       // Keep the placeholder option, clear any previously loaded options
       select.querySelectorAll('option:not([value=""])').forEach(o => o.remove());
       try {
-        const res = await fetch('/api/services');
-        if (!res.ok) return;
-        const services = await res.json();
+        const services = await sbApi.getServices();
         services.forEach(s => {
           const opt = document.createElement('option');
           opt.value = s.id;
@@ -1136,8 +1144,7 @@
       const hiddenInput = document.getElementById('form-addons-hidden');
       
       try {
-        const res = await fetch('/api/addons');
-        const addons = await res.json();
+        const addons = await sbApi.getAddOns();
         const categories = Object.keys(addons);
         
         if (categories.length === 0) {
@@ -1229,18 +1236,14 @@
       const service = serviceId ? SERVICES_DATA.find(s => s.id === serviceId) : null;
 
       try {
-        await fetch('/api/messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name,
-            email,
-            whatsapp,
-            service_id: serviceId,
-            subject: service ? service.title : 'Tanpa Layanan',
-            message,
-            add_ons: selectedAddons
-          })
+        await sbApi.saveMessage({
+          name,
+          email,
+          whatsapp,
+          service_id: serviceId,
+          subject: service ? service.title : 'Tanpa Layanan',
+          message,
+          add_ons: selectedAddons
         });
       } catch(e) {}
 

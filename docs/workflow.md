@@ -13,7 +13,7 @@ Proyek ini menggunakan **satu branch utama: `main`**. Tidak ada branch `develop`
 git checkout main
 git pull origin main
 
-# 2. Edit kode (public/, functions/, docs/, wrangler.toml)
+# 2. Edit kode (public/, supabase/, docs/, .github/)
 
 # 3. Commit
 git add -A
@@ -43,7 +43,7 @@ Types:
 - `refactor` - restrukturisasi
 - `chore` - maintenance
 
-Contoh: `fix: admin panel sekarang baca/tulis D1 bukan localStorage`
+Contoh: `feat: admin panel baca/tulis Supabase bukan D1`
 
 ## Deployment
 
@@ -51,7 +51,7 @@ Deploy **otomatis** lewat GitHub Actions (lihat `docs/deployment.md`). Tidak ada
 
 ## Code Review Checklist
 
-- [ ] Perubahan tidak mem-break API publik
+- [ ] Perubahan tidak mem-break akses data (`sbApi`)
 - [ ] `db.js` hanya dipakai sebagai fallback/backup, bukan sumber utama
 - [ ] Tidak ada secret di-commit
 - [ ] Dokumentasi (`docs/`) diperbarui bila ada perubahan API/fitur

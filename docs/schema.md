@@ -1,125 +1,48 @@
-# Database Schema (Cloudflare D1)
+# Database Schema (Supabase PostgreSQL)
 
-Skema **D1** (`eka-ryan-digital-solution-db`) untuk **Eka Ryan Digital Solution**. Semua tabel diakses via `env.DB` di `functions/api/[[route]].js`.
+Skema database **Supabase** untuk **Eka Ryan Digital Solution**. Definisi lengkap (DDL + RLS + seed) ada di **[`supabase/schema.sql`](../supabase/schema.sql)**.
 
-> Tidak ada file `.sql` di repo; skema & seed dikelola langsung di Cloudflare D1. Jalankan SQL dengan `wrangler d1 execute … --remote` (lihat [cloudflare.md](./cloudflare.md)).
+> Project ref `sqimmcecwuoadjbjiyfd`, region `ap-southeast-1`. Semua tabel berada di schema `public`.
 
-## Tabel
+## Ringkasan Tabel
 
 ### `config`
 Satu baris (`id = 'main'`). Menyimpan hero & kontak.
 
 | Kolom | Tipe | Keterangan |
 |-------|------|-----------|
-| `id` | TEXT | PK, default `'main'` |
-| `hero_greeting` | TEXT | "Hai, Saya" |
-| `hero_name` | TEXT | "Eka Ryan" |
-| `hero_description` | TEXT | Deskripsi hero |
-| `hero_tagline` | TEXT | "Web Developer • UI/UX Designer • Freelancer" |
-| `hero_image` | TEXT | URL R2 (`/api/r2/uploads/...`) |
-| `guarantee_title` | TEXT | Judul jaminan |
-| `guarantee_desc` | TEXT | Deskripsi jaminan |
-| `guarantee_p1` | TEXT | Poin 1 |
-| `guarantee_p2` | TEXT | Poin 2 |
-| `guarantee_p3` | TEXT | Poin 3 |
-| `quality_title` | TEXT | Judul kualitas |
-| `quality_desc` | TEXT | Deskripsi kualitas |
-| `quality_p1` | TEXT | Poin 1 |
-| `quality_p2` | TEXT | Poin 2 |
-| `quality_p3` | TEXT | Poin 3 |
-| `contact_email` | TEXT | Email kontak |
-| `contact_wa` | TEXT | Nomor WhatsApp (tanpa +) |
-| `contact_location` | TEXT | Lokasi |
-| `contact_website` | TEXT | Website |
-| `social_linkedin` | TEXT | URL LinkedIn |
-| `social_instagram` | TEXT | URL Instagram |
-| `social_tiktok` | TEXT | URL TikTok |
-| `social_twitter` | TEXT | URL X/Twitter |
+| `id` | text | PK, default `'main'` |
+| `hero_greeting` | text | "Hai, Saya" |
+| `hero_name` | text | "Eka Ryan" |
+| `hero_description` | text | Deskripsi hero |
+| `hero_tagline` | text | "Web Developer • UI/UX Designer • Freelancer" |
+| `hero_image` | text | URL Supabase Storage (`/storage/v1/object/public/assets/...`) |
+| `guarantee_title` / `guarantee_desc` / `guarantee_p1..p3` | text | Blok jaminan |
+| `quality_title` / `quality_desc` / `quality_p1..p3` | text | Blok kualitas |
+| `contact_email` / `contact_wa` / `contact_location` / `contact_website` | text | Info kontak |
+| `social_linkedin` / `social_instagram` / `social_tiktok` / `social_twitter` | text | URL sosial |
+| `updated_at` | timestamptz | Update otomatis |
 
 ### `services`
-Layanan utama (digabung `service_details` & `service_tags` saat GET).
-
-| Kolom | Tipe | Keterangan |
-|-------|------|-----------|
-| `id` | TEXT | PK (mis. `svc_web_simple`) |
-| `sort_order` | INT | Urut tampil |
-| `title` | TEXT | Judul layanan |
-| `subtitle` | TEXT | Subtitle (mis. "FULL-STACK") |
-| `description` | TEXT | Deskripsi |
-| `image` | TEXT | URL R2 |
-| `price` | TEXT | Harga (string) |
-| `is_active` | INT | 0/1 |
-| `created_at` | TEXT | ISO timestamp |
+Layanan utama. Kolom: `id` (text PK), `sort_order` int, `title`, `subtitle`, `description`, `price`, `image` (URL storage), `is_active` integer (1 = aktif), `created_at` timestamptz, `updated_at` timestamptz.
 
 ### `service_details`
-Detail poin per layanan.
-
-| Kolom | Tipe | Keterangan |
-|-------|------|-----------|
-| `id` | TEXT | PK |
-| `service_id` | TEXT | FK → `services.id` |
-| `detail` | TEXT | Satu poin detail |
-| `sort_order` | INT | Urut |
+Detail poin per layanan: `id` (text PK), `service_id` (FK→`services.id`, on delete cascade), `sort_order`, `text`, `created_at`.
 
 ### `service_tags`
-Tag per layanan.
-
-| Kolom | Tipe | Keterangan |
-|-------|------|-----------|
-| `id` | TEXT | PK |
-| `service_id` | TEXT | FK → `services.id` |
-| `tag` | TEXT | Tag (mis. "web", "react") |
+Tag per layanan: `id` (text PK), `service_id` (FK→`services.id`, cascade), `tag`, `created_at`.
 
 ### `workflow`
-Langkah alur kerja.
-
-| Kolom | Tipe | Keterangan |
-|-------|------|-----------|
-| `id` | TEXT | PK (mis. `wf_1`) |
-| `sort_order` | INT | Urut |
-| `title` | TEXT | Judul step |
-| `description` | TEXT | Deskripsi |
-| `is_active` | INT | 0/1 |
-| `created_at` | TEXT | ISO timestamp |
+Langkah alur kerja: `id` (text PK), `title`, `short_desc`, `long_desc`, `sort_order`, `created_at`.
 
 ### `skills`
-Keahlian.
-
-| Kolom | Tipe | Keterangan |
-|-------|------|-----------|
-| `id` | TEXT | PK |
-| `sort_order` | INT | Urut |
-| `name` | TEXT | Nama skill |
-| `level` | TEXT | Level (mis. "Expert") |
-| `category` | TEXT | Kategori |
-| `is_active` | INT | 0/1 |
-| `created_at` | TEXT | ISO timestamp |
-
-### `messages`
-Pesan kontak (dari `POST /api/messages`, publik).
-
-| Kolom | Tipe | Keterangan |
-|-------|------|-----------|
-| `id` | TEXT | PK |
-| `name` | TEXT | Nama pengirim |
-| `email` | TEXT | Email |
-| `message` | TEXT | Isi pesan |
-| `is_read` | INT | 0/1 |
-| `created_at` | TEXT | ISO timestamp |
+Keahlian: `id` (text PK), `name`, `category` (default `'other'`, mis. `frontend|backend|design|...`), `sort_order`, `created_at`.
 
 ### `add_ons`
-Fitur tambahan (dikelompokkan per kategori di API).
+Fitur tambahan: `id` (text PK), `name`, `category`, `price`, `sort_order`, `created_at`.
 
-| Kolom | Tipe | Keterangan |
-|-------|------|-----------|
-| `id` | TEXT | PK |
-| `category` | TEXT | Kategori (mis. "SEO", "Performance") |
-| `name` | TEXT | Nama add-on |
-| `description` | TEXT | Deskripsi |
-| `price` | TEXT | Harga |
-| `is_active` | INT | 0/1 |
-| `sort_order` | INT | Urut |
-| `created_at` | TEXT | ISO timestamp |
+### `messages`
+Pesan kontak: `id` (text PK, default `gen_random_uuid()::text`), `name`, `email`, `whatsapp`, `service_id`, `subject`, `message`, `add_ons` (**text** berisi JSON string, default `'[]'`), `is_read` (**integer** 0/1), `created_at` timestamptz.
 
 ## Relasi
 
@@ -128,10 +51,29 @@ services 1──* service_details
 services 1──* service_tags
 ```
 
-## Catatan
+## RLS & Keamanan
 
-- `GET /api/services` melakukan JOIN `service_details` + `service_tags` → mengembalikan `details: [...]` & `tags: [...]`.
-- Field config dibatasi `ALLOWED_CONFIG_FIELDS` di API (cegah injection).
-- Semua `image`/`hero_image` berisi URL R2 (`/api/r2/uploads/...`), bukan URL luar.
+- Semua tabel `enable row level security`.
+- `anon` → SELECT semua tabel publik + INSERT `messages`.
+- Write/hapus → hanya service_role (dipakai Admin Panel).
+- Lihat `supabase/schema.sql` bagian policy untuk detail.
 
-Lihat juga: [api.md](./api.md), [architecture.md](./architecture.md).
+## Data
+
+Data awal (config `main`, 4 services + details/tags, 5 workflow, 19 skills, 7 add-ons) diambil dari database Cloudflare D1 lama. Jalankan skrip migrasi:
+
+```
+SUPABASE_SERVICE_KEY=<service_role key> node supabase/migrate-data.mjs
+```
+
+Skrip ini otomatis men-download gambar dari storage R2 lama, upload ke bucket `assets` Supabase, mengganti link gambar di data, lalu insert/upsert. Bisa dijalankan ulang (idempotent). Gambar/audio lama yang sudah tidak terpakai dapat dihapus via Admin Panel > Storage.
+
+> Catatan: `schema.sql` sekarang hanya berisi DDL + RLS + bucket (tanpa seed).
+
+## Akses di Kode
+
+- **Publik** (`index.html`): `sbApi.getConfig/getServices/getWorkflow/getSkills/getAddOns/saveMessage`.
+- **Admin** (`admin.html`): `sbApi.saveXxx/deleteXxx/getMessages/uploadImage/listStorage/...`.
+- Seluruh fungsi bungkus ada di `public/supabase-api.js`.
+
+Lihat juga: [supabase.md](./supabase.md), [api-registry.md](./api-registry.md), [architecture.md](./architecture.md).

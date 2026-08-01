@@ -2,39 +2,39 @@
 
 Aturan wajib untuk **Eka Ryan Digital Solution**. Patuhi saat mengubah kode, docs, atau deploy.
 
-## 1. Single Source of Truth (D1 + R2)
+## 1. Single Source of Truth (Supabase)
 
-- **Data dinamis** (config, services, workflow, skills, add-ons, messages) disimpan di **Cloudflare D1**.
-- **File/gambar** disimpan di **Cloudflare R2** (`uploads/`).
+- **Data dinamis** (config, services, workflow, skills, add-ons, messages) disimpan di **Supabase PostgreSQL**.
+- **File/gambar/audio** disimpan di **Supabase Storage** (bucket `assets`, `audio`).
 - `public/db.js` **HANYA** fallback localStorage + backup lokal. **Bukan** sumber utama. Jangan jadikan acuan data.
+- Cloudflare Pages **hanya** hosting statis — tidak ada Functions/D1/R2.
 
 ## 2. Gambar & Storage
 
-- ✅ Semua gambar **wajib** lewat R2: `https://ekaryandigitalsolution.pages.dev/api/r2/uploads/<key>`.
+- ✅ Semua gambar **wajib** lewat Supabase Storage: `https://sqimmcecwuoadjbjiyfd.supabase.co/storage/v1/object/public/assets/<path>`.
 - ❌ **DILARANG** hardcode URL gambar dari luar (imgur, drive, domain lain, base64 inline besar).
-- Upload via `POST /api/upload` (JPEG/PNG/GIF/WebP, maks 5 MB).
-- Meta `og:image` / `twitter:image` di `index.html` harus menunjuk ke R2 (bukan domain luar).
+- Upload via Admin Panel (`sbApi.uploadImage`) — path `uploads/<timestamp>_<nama>`.
+- Meta `og:image` / `twitter:image` di `index.html` harus menunjuk ke URL storage (bukan URL R2 lama).
 
 ## 3. Keamanan
 
-- Write endpoint (`POST/PUT/DELETE`) **wajib** pakai admin key (`?key=` atau `Authorization: Bearer`).
-- `POST /api/messages` adalah **publik** (pengecualian, tanpa key).
-- **JANGAN** commit secret. `ADMIN_PASSWORD` & `JWT_SECRET` di-set via dashboard Cloudflare (Pages → Settings → Env).
-- Selalu sanitasi input (`sanitizeInput`) & validasi (email, ukuran, tipe).
-- CORS hanya untuk origin `https://ekaryandigitalsolution.pages.dev`.
+- Publik (anon key) hanya bisa **baca** + kirim pesan kontak (diatur RLS).
+- Write/hapus **hanya** lewat service_role key (`supabase-config.js` → `serviceKey`).
+- **JANGAN commit service_role key** ke repositori publik (repo GitHub ini public!). Ganti setelah mengambilnya & putar kunci bila bocor.
+- Login Admin Panel = shared key (`adminUsername`/`adminPassword` di `supabase-config.js`).
+- Selalu sanitasi output saat render (`escapeHtml`).
 
-## 4. API
+## 4. Data Access
 
-- Format respons GET: data langsung (array/object), tidak dibungkus.
-- Write sukses: `{ "success": true }` atau `{ "id": "...", "success": true }`.
-- Error: `{ "error": "..." }` dengan status tepat (400/401/404/500).
-- Field config hanya dari `ALLOWED_CONFIG_FIELDS` (cegah SQL injection via nama kolom).
+- Akses data lewat `window.sbApi` (`public/supabase-api.js`) — **jangan** akses supabase-js langsung di halaman.
+- Halaman publik hanya memakai fungsi read + `saveMessage`.
+- Halaman admin memakai fungsi write + storage (service role).
 
 ## 5. Git Workflow
 
 - **Satu branch**: `main`. Tidak ada `develop`/`feature/*`.
 - Deploy **otomatis** via GitHub Actions setiap `git push origin main`.
-- Jangan commit: `.playwright-mcp/`, `.wrangler/`, `.DS_Store`, secret.
+- Jangan commit: `.playwright-mcp/`, `.DS_Store`, `public/src/assets/sound/backsound.mp3`, secret.
 
 ### Commit Convention
 ```
@@ -44,21 +44,22 @@ Aturan wajib untuk **Eka Ryan Digital Solution**. Patuhi saat mengubah kode, doc
 
 ## 6. Code Review Checklist
 
-- [ ] Tidak mem-break API publik.
+- [ ] Tidak ada referensi `/api/*`, `functions/`, `wrangler`, D1, atau R2 tersisa.
 - [ ] `db.js` hanya fallback/backup, bukan sumber utama.
-- [ ] Tidak ada secret ter-commit.
-- [ ] Semua gambar → R2 (tidak ada URL luar).
+- [ ] Tidak ada secret ter-commit (terutama `serviceKey` di `supabase-config.js`).
+- [ ] Semua gambar → Supabase Storage (tidak ada URL luar / URL R2 lama).
 - [ ] Docs (`docs/`) diperbarui bila ada perubahan API/fitur.
 - [ ] GitHub Actions deploy sukses (green).
 
 ## 7. Dokumentasi
 
 - Setiap perubahan API/fitur → update `docs/` yang relevan.
-- Struktur docs: `architecture.md`, `design.md`, `prd.md`, `rules.md`, `schema.md`, `api.md`, `cloudflare.md`, `deployment.md`, `features.md`, `workflow.md`, `troubleshooting.md`.
-- **Pada sesi baru**, baca semua file di `docs/` dulu sebelum mulai kerja (lihat skill `docs-orientation`).
+- Struktur docs: `architecture.md`, `design.md`, `prd.md`, `rules.md`, `schema.md`, `api-registry.md`, `supabase.md`, `cloudflare.md`, `deployment.md`, `features.md`, `workflow.md`, `troubleshooting.md`.
+- **Pada sesi baru**, baca semua file di `docs/` dulu sebelum mulai kerja.
 
 ## 8. Naming
 
-- Tabel D1: `config`, `services`, `service_details`, `service_tags`, `workflow`, `skills`, `messages`, `add_ons`.
-- Key R2 upload: `uploads/<timestamp>_<sanitized-name>`.
-- Binding: `DB` (D1), `R2` (R2).
+- Tabel Supabase: `config`, `services`, `service_details`, `service_tags`, `workflow`, `skills`, `messages`, `add_ons`.
+- Path storage gambar: `uploads/<timestamp>_<sanitized-name>`.
+- Bucket: `assets` (gambar), `audio` (backsound).
+- Client wrapper: `sbApi` (`supabase-api.js`), konfigurasi: `supabase-config.js`.

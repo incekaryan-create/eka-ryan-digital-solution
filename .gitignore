@@ -1,14 +1,15 @@
 node_modules/
-.wrangler/
-.dev.vars
 dist/
 .cache/
 *.log
 .DS_Store
 .aider*
 
-# Large audio served from R2 (not committed)
+# Audio source dipakai untuk upload ke Supabase Storage (tidak di-commit)
 public/src/assets/sound/backsound.mp3
+
+# Service_role key Supabase (hanya lokal, jangan di-commit)
+public/supabase-key.js
 
 # Playwright MCP session files
 .playwright-mcp/

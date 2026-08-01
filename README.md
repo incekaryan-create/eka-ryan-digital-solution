@@ -1,21 +1,21 @@
-# Eka Ryan Portfolio - Cloudflare Pages
+# Eka Ryan Portfolio — Cloudflare Pages + Supabase
 
-Portfolio website for Eka Ryan Digital Solution, deployed on Cloudflare Pages with D1 database and R2 storage.
+Portfolio website untuk Eka Ryan Digital Solution. Hosting **Cloudflare Pages** (statis) + data di **Supabase** (PostgreSQL + Storage).
 
 ## Tech Stack
 
-- **Frontend**: HTML5, Tailwind CSS, Vanilla JavaScript
-- **Database**: Cloudflare D1 (SQLite-compatible)
-- **Storage**: Cloudflare R2 (object storage)
-- **Hosting**: Cloudflare Pages
-- **API**: Cloudflare Pages Functions
+- **Frontend**: HTML5, Tailwind CSS (CDN), Vanilla JavaScript
+- **Database**: Supabase PostgreSQL (pengganti Cloudflare D1)
+- **Storage**: Supabase Storage, bucket `assets` + `audio` (pengganti Cloudflare R2)
+- **Hosting**: Cloudflare Pages (statis, tanpa Functions)
+- **Data access**: supabase-js v2 (CDN) via `public/supabase-api.js`
 
 ## Features
 
 - Responsive portfolio website
-- Admin panel for content management
-- Contact form with message storage
-- File upload to R2 storage
+- Admin panel untuk content management
+- Contact form tersimpan ke Supabase
+- File upload ke Supabase Storage
 - SEO optimized
 - Fast global CDN delivery
 
@@ -23,177 +23,119 @@ Portfolio website for Eka Ryan Digital Solution, deployed on Cloudflare Pages wi
 
 ```
 eka-ryan-digital-solution/
-├── public/                 # Static files (deployed to Pages)
-│   ├── index.html         # Main portfolio page
+├── public/                 # Static files (deployed ke Pages)
+│   ├── index.html         # Halaman portfolio utama
 │   ├── admin.html         # Admin panel
 │   ├── db.js              # LocalStorage fallback + backup (bukan sumber utama)
+│   ├── supabase-config.js # Kredensial Supabase (url, anonKey, serviceKey)
+│   ├── supabase-api.js    # Wrapper `window.sbApi` (semua akses data)
 │   └── src/               # Assets (images, css, js)
-├── functions/             # Pages Functions (API)
-│   └── api/
-│       └── [[route]].js   # API handler (catch-all)
+├── supabase/
+│   ├── schema.sql         # DDL + RLS + buckets (jalankan di SQL Editor)
+│   ├── migrate-data.mjs   # Migrasi data & gambar dari D1/R2 lama
+│   └── migration-data/    # Snapshot data lama (config, services, skills, dll)
 ├── docs/                  # Dokumentasi project
-│   ├── architecture.md     # Arsitektur sistem (Pages + D1 + R2)
+│   ├── architecture.md     # Arsitektur sistem (Pages statis + Supabase)
 │   ├── design.md           # Design system & UI guidelines
 │   ├── prd.md              # Product Requirements Document
 │   ├── rules.md            # Aturan & konvensi project
-│   ├── schema.md           # Skema D1 (tabel & kolom)
-│   ├── api-registry.md     # Daftar endpoint API
-│   ├── cloudflare.md       # Setup Cloudflare (D1+R2+Pages Functions)
+│   ├── schema.md           # Skema Supabase (tabel & kolom)
+│   ├── api-registry.md     # Referensi `sbApi` (data access)
+│   ├── supabase.md         # Setup & arsitektur Supabase
+│   ├── cloudflare.md       # Cloudflare Pages (static hosting only + cleanup)
 │   ├── deployment.md       # Panduan deploy (GitHub Actions)
 │   ├── features.md         # Daftar fitur
 │   ├── workflow.md         # Git & dev workflow
 │   └── troubleshooting.md  # Masalah umum & solusi
-├── wrangler.toml          # Cloudflare Pages config + bindings
-└── .github/workflows/deploy.yml  # Auto-deploy ke Pages
+├── opencode.json          # Konfigurasi opencode (Supabase MCP)
+└── .github/workflows/deploy.yml  # Auto-deploy statis ke Pages
 ```
 
 ## Quick Start
 
 ### Prerequisites
 
-- Node.js 18+
-- Cloudflare account
-- Wrangler CLI
+- Akun Supabase (project sudah dibuat: `sqimmcecwuoadjbjiyfd`)
+- Akun Cloudflare (token Pages)
 
-### 1. Install Dependencies
+### 1. Setup Database
 
-```bash
-npm install
+Jalankan `supabase/schema.sql` di **Supabase Dashboard → SQL Editor** (tabel, RLS, buckets).
+
+### 1b. Migrasi Data dari D1/R2 Lama (opsional, sudah dilakukan)
+
+```
+SUPABASE_SERVICE_KEY=<service_role key> node supabase/migrate-data.mjs
 ```
 
-### 2. Login to Cloudflare
+Men-download gambar dari R2 lama, upload ke bucket `assets`, lalu mengisi semua tabel dari snapshot `supabase/migration-data/`.
+
+### 2. Isi Kredensial
+
+`public/supabase-config.js`:
+- `url` → `https://sqimmcecwuoadjbjiyfd.supabase.co` (sudah terisi)
+- `anonKey` → Publishable/anon key (sudah terisi)
+- `serviceKey` → **Secret/service_role key** — ditaruh di file **`public/supabase-key.js`** yang di-gitignore (bukan di `supabase-config.js`). `supabase-config.js` otomatis memakai `window.SUPABASE_SERVICE_KEY` dari file itu. **Jangan commit ke repo publik.**
+
+### 3. Upload Asset
+
+- Gambar hero & layanan: upload via Admin Panel → otomatis ke bucket `assets` (data lama sudah dimigrasi oleh `migrate-data.mjs`).
+- `backsound.mp3` (< 50 MB, saat ini 28,9 MB): sudah diupload ke bucket `audio`.
+
+### 4. Deploy
 
 ```bash
-wrangler login
+git push origin main   # auto-deploy via GitHub Actions
 ```
 
-### 3. Deploy
-
-Deploy otomatis via GitHub Actions setiap `git push` ke `main`. Untuk deploy manual:
-
+Atau manual:
 ```bash
-wrangler pages deploy ./public --project-name=ekaryandigitalsolution
+npx wrangler pages deploy ./public --project-name=ekaryandigitalsolution
 ```
 
-### 4. Access Your Website
+### 5. Access
 
 - **Website**: https://ekaryandigitalsolution.pages.dev
-- **Admin Panel**: https://ekaryandigitalsolution.pages.dev/admin (redirect dari `/admin.html`)
-
-## Manual Setup
-
-### Create R2 Bucket
-
-```bash
-wrangler r2 bucket create eka-ryan-digital-solution-assets
-```
-
-### Create D1 Database
-
-```bash
-wrangler d1 create eka-ryan-digital-solution-db
-```
-
-Update `wrangler.toml` dengan database ID yang dihasilkan.
-
-### Initialize Database
-
-Skema & seed data sudah ada di Cloudflare D1 (database `eka-ryan-digital-solution-db`). Untuk menjalankan SQL manual:
-
-```bash
-wrangler d1 execute eka-ryan-digital-solution-db --remote --command="SELECT * FROM services;"
-```
-
-> Di macOS lama, selalu tambahkan `--remote` untuk perintah D1/R2.
-
-### Deploy to Pages
-
-```bash
-wrangler pages deploy ./public --project-name=ekaryandigitalsolution
-```
+- **Admin Panel**: https://ekaryandigitalsolution.pages.dev/admin
+  - Login: `Eka Ryan` / `Ekaryan443!` (dapat diubah di `supabase-config.js`)
 
 ## Local Development
 
-Tidak ada build step. Cukup edit `public/` dan `functions/`. Deploy lewat `git push` (GitHub Actions) atau `wrangler pages deploy`.
+Tidak ada build step. Edit `public/` langsung. Buka `public/index.html` di browser (data dari Supabase berjalan via HTTPS). Deploy lewat `git push`.
 
-## API Endpoints
+> Catatan: `supabase-config.js` berisi `anonKey` (aman untuk publik). `serviceKey` di file lokal Anda JANGAN di-commit ke GitHub (repo ini public).
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| GET | `/api/config` | Get site configuration | publik |
-| PUT | `/api/config` | Update site configuration | key |
-| GET | `/api/services` | List all services | publik |
-| GET | `/api/services/:id` | Get service details | publik |
-| POST | `/api/services` | Create new service | key |
-| PUT | `/api/services/:id` | Update service | key |
-| DELETE | `/api/services/:id` | Delete service | key |
-| GET | `/api/workflow` | List workflow steps | publik |
-| POST | `/api/workflow` | Create workflow step | key |
-| PUT | `/api/workflow/:id` | Update workflow step | key |
-| DELETE | `/api/workflow/:id` | Delete workflow step | key |
-| GET | `/api/skills` | List all skills | publik |
-| POST | `/api/skills` | Create new skill | key |
-| PUT | `/api/skills/:id` | Update skill | key |
-| DELETE | `/api/skills/:id` | Delete skill | key |
-| GET | `/api/addons` | List add-ons (grouped) | publik |
-| GET | `/api/addons/list` | List add-ons (flat) | publik |
-| POST | `/api/addons` | Create add-on | key |
-| PUT | `/api/addons/:id` | Update add-on | key |
-| DELETE | `/api/addons/:id` | Delete add-on | key |
-| GET | `/api/messages` | List all messages | key |
-| POST | `/api/messages` | Submit contact form | **publik** |
-| PUT | `/api/messages/:id/read` | Mark message as read | key |
-| DELETE | `/api/messages/:id` | Delete message | key |
-| DELETE | `/api/messages` | Delete all messages | key |
-| POST | `/api/upload` | Upload file to R2 | key |
-| POST | `/api/upload/delete` | Delete file from R2 | key |
-| GET | `/api/storage` | List R2 objects | key |
-| DELETE | `/api/storage` | Delete R2 object | key |
-| GET | `/api/r2/*` | Serve public file from R2 | publik |
+## Data Access (sbApi)
 
-Lihat `docs/api-registry.md` untuk detail lengkap.
+Tidak ada REST API server. Halaman memakai `window.sbApi` (lihat `docs/api-registry.md`):
+
+| Area | Fungsi |
+|------|--------|
+| Config | `getConfig`, `saveConfig` |
+| Services | `getServices`, `saveService`, `deleteService` |
+| Workflow | `getWorkflow`, `saveWorkflow`, `deleteWorkflow` |
+| Skills | `getSkills`, `saveSkill`, `deleteSkill` |
+| Add-ons | `getAddOns`, `saveAddon`, `deleteAddon` |
+| Messages | `getMessages`, `saveMessage`, `markMessageRead`, `deleteMessage`, `clearMessages` |
+| Storage | `uploadImage`, `deleteImage`, `listStorage`, `deleteStorageObject`, `publicUrl` |
 
 ## Database Tables
 
-- **config**: Site-wide configuration
-- **services**: Service offerings
-- **service_details**: Service detail items
-- **service_tags**: Service tags
-- **workflow**: Workflow steps
-- **skills**: Technical skills
-- **messages**: Contact form submissions
+- **config**: konfigurasi seluruh situs
+- **services** / **service_details** / **service_tags**: layanan + detail + tag
+- **workflow**: langkah alur kerja
+- **skills**: keahlian
+- **add_ons**: fitur tambahan
+- **messages**: pesan kontak
 
-## Admin Panel
+## Environment / Secrets
 
-Akses `/admin`. Tidak ada username — hanya **admin key**:
-
-- **Admin key**: `Ekaryan443!` (default, hardcoded di `admin.html` & fallback `env.ADMIN_PASSWORD || 'Ekaryan443!'` di API)
-
-Untuk mengubah key di production, set **Pages secret** `ADMIN_PASSWORD` di dashboard Cloudflare (Settings → Environment variables), bukan di `wrangler.toml`.
-
-## Environment Variables
-
-`wrangler.toml` saat ini:
-
-```toml
-[vars]
-ENVIRONMENT = "production"
-```
-
-Secret (jangan di-commit, set via Cloudflare dashboard):
-- `ADMIN_PASSWORD` — override admin key (default `Ekaryan443!` bila kosong)
-- `JWT_SECRET` — (opsional) untuk auth lanjutan
+- GitHub Actions: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` (repo Settings → Secrets).
+- Supabase keys: `public/supabase-config.js` (jangan commit `serviceKey`).
 
 ## Documentation
 
-Lihat folder `docs/`:
-- `api-registry.md` — semua endpoint API
-- `deployment.md` — cara deploy (GitHub Actions)
-- `cloudflare-workers.md` — Pages Functions & bindings
-- `features.md` — fitur project
-- `firebase-setup.md` — sebenarnya panduan Cloudflare (D1+R2)
-- `workflow.md` — git workflow
-- `troubleshooting.md` — masalah umum & solusi
+Lihat folder `docs/` — mulai dari `architecture.md`, `supabase.md`, `cloudflare.md`, `deployment.md`.
 
 ## License
 

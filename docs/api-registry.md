@@ -1,114 +1,81 @@
-# API Registry
+# Data Access (supabase-api)
 
-API untuk **Eka Ryan Digital Solution** — diimplementasikan sebagai Cloudflare Pages Function di `functions/api/[[route]].js`. Semua endpoint berada di bawah prefix `/api`.
+Proyek **tidak lagi punya REST API server**. Halaman browser berkomunikasi langsung dengan **Supabase** melalui `public/supabase-api.js`, yang mengekspos wrapper `window.sbApi` untuk `index.html` dan `admin.html`.
 
-> Dokumen ini merujuk ke [schema.md](./schema.md) untuk struktur tabel D1 dan [cloudflare.md](./cloudflare.md) untuk bindings.
+> Lihat [supabase.md](./supabase.md) untuk setup, dan [schema.md](./schema.md) untuk struktur tabel.
 
-## Base URL
+## Client
 
-- Production: `https://ekaryandigitalsolution.pages.dev/api`
-- Origin yang diizinkan (CORS): `https://ekaryandigitalsolution.pages.dev`
+- **Publik (`sb`)**: anon/publishable key → dibatasi RLS (SELECT + INSERT messages).
+- **Admin (`sbAdm`)**: service_role key → write/hapus + storage.
 
-## Autentikasi
+Kedua client dibuat di `public/supabase-api.js` memakai supabase-js v2 (CDN).
 
-Operasi tulis (POST/PUT/DELETE) dilindungi dengan **admin key** sederhana.
+## Fungsi `window.sbApi`
 
-- Kirim via query param: `?key=Ekaryan443!`
-- Atau via header: `Authorization: Bearer Ekaryan443!`
-- Key default adalah `Ekaryan443!` (hardcoded di `admin.html` dan sebagai fallback `env.ADMIN_PASSWORD || 'Ekaryan443!'` di API).
-- Untuk mengubah key di production, set **Pages secret** `ADMIN_PASSWORD` di dashboard Cloudflare.
-- **Pengecualian publik**: `POST /api/messages` (form kontak) tidak memerlukan key.
+### Services
+| Fungsi | Keterangan |
+|--------|-----------|
+| `getServices()` | Semua layanan (urut `sort_order`), tiap item punya `details[]` & `tags[]` |
+| `saveService(data, id?)` | Buat (id baru) / update layanan + ganti details & tags |
+| `deleteService(id)` | Hapus layanan (cascade details/tags) |
 
-Jika key salah: `401 { "error": "Unauthorized" }`.
+`data` untuk `saveService`: `{ title, subtitle, description, price, image, tags[], details[] }`.
 
-## Format Respons
+### Workflow
+| Fungsi | Keterangan |
+|--------|-----------|
+| `getWorkflow()` | Semua langkah (urut `sort_order`) |
+| `saveWorkflow(data, id?)` | `data: { title, short_desc, long_desc }` |
+| `deleteWorkflow(id)` | Hapus langkah |
 
-- **GET sukses**: mengembalikan data langsung (array/object), bukan dibungkus.
-  - Contoh: `GET /api/services` → `[ { id, title, ... }, ... ]`
-  - Contoh: `GET /api/config` → `{ id: "main", hero_name, ... }`
-- **Write sukses**: `{ "success": true }` atau `{ "id": "<id>", "success": true }` (status 201 untuk create).
-- **Error**: `{ "error": "<pesan>" }` dengan status HTTP yang sesuai (400/401/404/500).
+### Skills
+| Fungsi | Keterangan |
+|--------|-----------|
+| `getSkills()` | Semua skill (urut `sort_order`) |
+| `saveSkill(data, id?)` | `data: { name, category }` |
+| `deleteSkill(id)` | Hapus skill |
 
-## Endpoint Publik (GET)
+### Add-ons
+| Fungsi | Keterangan |
+|--------|-----------|
+| `getAddOns()` | Object `{ category: [addon] }` (urut kategori & sort_order) |
+| `saveAddon(data, id?)` | `data: { name, category, price }` |
+| `deleteAddon(id)` | Hapus add-on |
 
-| Method | Endpoint | Deskripsi | Respons |
-|--------|----------|-----------|---------|
-| GET | `/api/config` | Ambil konfigurasi hero & kontak | object config |
-| GET | `/api/services` | Daftar layanan (join `service_details` + `service_tags`) | array service |
-| GET | `/api/services/:id` | Detail satu layanan | object service |
-| GET | `/api/workflow` | Daftar alur kerja | array workflow |
-| GET | `/api/skills` | Daftar keahlian | array skill |
-| GET | `/api/messages` | Daftar pesan masuk (admin) | array message |
-| GET | `/api/addons` | Add-ons dikelompokkan per kategori | object `{ category: [addon] }` |
-| GET | `/api/addons/list` | Add-ons flat (semua) | array addon |
-| GET | `/api/storage` | Daftar objek di R2 bucket | `{ objects: [...], truncated }` |
-| GET | `/api/r2/*` | Serve file publik dari R2 (cache 1 tahun) | binary file |
+### Config
+| Fungsi | Keterangan |
+|--------|-----------|
+| `getConfig()` | Baris `config` (`id='main'`) atau `null` |
+| `saveConfig(payload)` | Upsert seluruh kolom config |
 
-### Bentuk object `service`
-```json
-{
-  "id": "svc_xxx",
-  "sort_order": 1,
-  "title": "Pengembangan Web",
-  "subtitle": "FULL-STACK DEVELOPMENT",
-  "description": "...",
-  "image": "https://.../r2/uploads/xxx.jpg",
-  "price": "Mulai dari Rp 5.000.000",
-  "is_active": 1,
-  "created_at": "2024-...",
-  "details": ["...", "..."],
-  "tags": ["web", "react"]
-}
-```
+### Messages
+| Fungsi | Keterangan |
+|--------|-----------|
+| `getMessages()` | Semua pesan (terbaru dulu) — admin |
+| `saveMessage(msg)` | Insert pesan dari form (publik) |
+| `markMessageRead(id)` | Tandai dibaca |
+| `deleteMessage(id)` | Hapus satu |
+| `clearMessages()` | Hapus semua |
 
-## Endpoint Tulisan (perlu `?key=`)
+### Storage
+| Fungsi | Keterangan |
+|--------|-----------|
+| `uploadImage(file)` | Upload ke bucket `assets/uploads/` → `{ url, path }` |
+| `deleteImage(urlOrPath)` | Hapus objek (terima URL publik / path). URL R2 lama diabaikan |
+| `extractImagePath(url)` | Ambil path dari URL storage, atau `null` |
+| `listStorage()` | `{ objects: [{ key, url, size }] }` |
+| `deleteStorageObject(key)` | Hapus berdasarkan `key` (`assets/uploads/...`) |
+| `publicUrl(bucket, path)` | URL publik storage |
 
-| Method | Endpoint | Deskripsi | Auth |
-|--------|----------|-----------|------|
-| PUT | `/api/config` | Update config (hero, kontak, sosmed) | key |
-| POST | `/api/services` | Buat layanan | key |
-| PUT | `/api/services/:id` | Update layanan | key |
-| DELETE | `/api/services/:id` | Hapus layanan | key |
-| POST | `/api/workflow` | Buat langkah workflow | key |
-| PUT | `/api/workflow/:id` | Update workflow | key |
-| DELETE | `/api/workflow/:id` | Hapus workflow | key |
-| POST | `/api/skills` | Buat skill | key |
-| PUT | `/api/skills/:id` | Update skill | key |
-| DELETE | `/api/skills/:id` | Hapus skill | key |
-| POST | `/api/messages` | Kirim pesan kontak | **publik** |
-| PUT | `/api/messages/:id/read` | Tandai pesan sudah dibaca | key |
-| DELETE | `/api/messages/:id` | Hapus satu pesan | key |
-| DELETE | `/api/messages` | Hapus semua pesan | key |
-| POST | `/api/addons` | Buat add-on | key |
-| PUT | `/api/addons/:id` | Update add-on | key |
-| DELETE | `/api/addons/:id` | Hapus add-on | key |
-| POST | `/api/upload` | Upload file ke R2 (form-data `file`) | key |
-| POST | `/api/upload/delete` | Hapus file R2 (body `{ key }`) | key |
-| GET | `/api/storage` | List storage R2 | key |
-| DELETE | `/api/storage` | Hapus objek R2 (body `{ key }`) | key |
+## Autentikasi Admin
 
-## Validasi & Batasan
+Login Admin Panel tetap **shared key sederhana** (bukan Supabase Auth). Kredensial ada di `public/supabase-config.js` → `adminUsername` / `adminPassword` (default `Eka Ryan` / `Ekaryan443!`). Setelah login, `sessionStorage.admin_logged` = `'1'`.
 
-- `sanitizeInput()` memotong input ke 500 karakter dan membuang `<` `>`.
-- `validateEmail()` untuk field email pesan.
-- Tipe file upload diizinkan: JPEG, PNG, GIF, WebP (`ALLOWED_IMAGE_TYPES`).
-- Ukuran file maksimal: **5 MB** (`MAX_FILE_SIZE`).
-- Panjang pesan maksimal: 5000 karakter (`MAX_MESSAGE_LENGTH`).
-- Panjang input umum maksimal: 500 karakter (`MAX_INPUT_LENGTH`).
+## Validasi
 
-## Contoh
+- Input dibersihkan via `escapeHtml()` saat render (cegah XSS).
+- Gambar dikompresi klien-side (`optimizeImage`) sebelum upload.
+- Supabase membatasi akses via RLS; tidak ada endpoint server untuk dilewati.
 
-```bash
-# Ambil layanan (publik)
-curl -sk https://ekaryandigitalsolution.pages.dev/api/services
-
-# Buat layanan (admin)
-curl -sk -X POST "https://ekaryandigitalsolution.pages.dev/api/services?key=Ekaryan443!" \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Desain Logo","subtitle":"BRANDING","description":"..."}'
-
-# Kirim pesan kontak (publik, tanpa key)
-curl -sk -X POST "https://ekaryandigitalsolution.pages.dev/api/messages" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Budi","email":"budi@mail.com","message":"Halo"}'
-```
+Lihat juga: [architecture.md](./architecture.md), [supabase.md](./supabase.md).
